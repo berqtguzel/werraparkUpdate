@@ -1,213 +1,207 @@
 import React from "react";
-import { Link } from "@inertiajs/react";
-import {
-    FaMapMarkerAlt,
-    FaPhoneAlt,
-    FaEnvelope,
-    FaLinkedin,
-    FaInstagram,
-    FaFacebook,
-    FaChevronUp,
-} from "react-icons/fa";
-import "../../css/Footer.css";
+import "../../css/footer.css";
 
 export default function Footer() {
     const year = new Date().getFullYear();
 
     return (
-        <footer
-            className="footer relative text-slate-100 bg-gradient-to-b from-sky-900 via-sky-800 to-sky-900 overflow-hidden"
-            aria-labelledby="footer-heading"
-        >
-            <h2 id="footer-heading" className="sr-only">
-                Fußzeile und Kontaktinformationen
-            </h2>
-            <div className="footer-svg pointer-events-none absolute inset-x-0 -top-6 transform-gpu overflow-hidden">
-                <svg
-                    viewBox="0 0 1440 120"
-                    className="w-full h-24 text-sky-900"
-                    preserveAspectRatio="none"
-                    aria-hidden
-                >
-                    <path
-                        fill="currentColor"
-                        d="M0,32L48,42.7C96,53,192,75,288,96C384,117,480,139,576,138.7C672,139,768,117,864,117.3C960,117,1056,139,1152,133.3C1248,128,1344,96,1392,80L1440,64L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"
-                    />
-                </svg>
+        <footer className="wh-foot" role="contentinfo">
+            {/* Üst: CTA Şeridi */}
+            <div className="wh-foot-cta">
+                <div className="wh-container wh-foot-cta__inner">
+                    <h3>Urlaub im Grünen – direkt zum Bestpreis buchen</h3>
+                    <a href="/offers" className="wh-btn wh-btn--invert">
+                        Jetzt buchen
+                    </a>
+                </div>
             </div>
 
-            <div className="container mx-auto px-6 pt-20 pb-10">
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-                    <div className="md:col-span-5">
-                        <div className="flex items-start gap-4">
-                            <div>
-                                <h3 className="text-2xl font-extrabold">
-                                    <Link
-                                        href="/"
-                                        aria-label="O&I CLEAN - Startseite"
-                                    >
-                                        O&amp;I CLEAN
-                                    </Link>
-                                </h3>
-                                <p className="mt-2 text-sky-100 text-sm leading-relaxed max-w-md">
-                                    Ihr Partner für professionelle Reinigung,
-                                    Pflege und Gebäudemanagement mit deutscher
-                                    Präzision und Zuverlässigkeit.
-                                </p>
+            {/* Orta: Grid içerik */}
+            <div className="wh-foot-main">
+                <div className="wh-container wh-foot-grid">
+                    {/* Marka / açıklama */}
+                    <div className="wh-foot-col">
+                        <a
+                            href="/"
+                            className="wh-foot-brand"
+                            aria-label="Startseite"
+                        >
+                            <img
+                                src="/images/logo-white.svg"
+                                alt="Werrapark Resort"
+                                className="wh-foot-logo"
+                            />
+                        </a>
+                        <p className="wh-foot-text">
+                            Natur, Ruhe und Genuss im Thüringer Wald. Der
+                            Werrapark vereint komfortable Zimmer, regionale
+                            Kulinarik und vielfältige Aktivitäten – zu jeder
+                            Jahreszeit.
+                        </p>
 
-                                <div className="mt-4 flex flex-wrap gap-3">
-                                    <a
-                                        href="https://www.linkedin.com"
-                                        aria-label="LinkedIn - O&I CLEAN"
-                                        title="LinkedIn"
-                                        className="inline-flex items-center justify-center p-2 rounded-md bg-white/6 hover:bg-white/10 transition inline-icon"
-                                        rel="noopener noreferrer"
-                                        target="_blank"
-                                    >
-                                        <FaLinkedin size={16} />
-                                    </a>
-                                    <a
-                                        href="https://www.instagram.com"
-                                        aria-label="Instagram - O&I CLEAN"
-                                        title="Instagram"
-                                        className="inline-flex items-center justify-center p-2 rounded-md bg-white/6 hover:bg-white/10 transition inline-icon"
-                                        rel="noopener noreferrer"
-                                        target="_blank"
-                                    >
-                                        <FaInstagram size={16} />
-                                    </a>
-                                    <a
-                                        href="https://www.facebook.com"
-                                        aria-label="Facebook - O&I CLEAN"
-                                        title="Facebook"
-                                        className="inline-flex items-center justify-center p-2 rounded-md bg-white/6 hover:bg-white/10 transition inline-icon"
-                                        rel="noopener noreferrer"
-                                        target="_blank"
-                                    >
-                                        <FaFacebook size={16} />
-                                    </a>
-                                </div>
-                            </div>
+                        <div
+                            className="wh-foot-socials"
+                            aria-label="Social Media"
+                        >
+                            <a
+                                href="#"
+                                aria-label="Facebook"
+                                className="wh-foot-social"
+                            >
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path
+                                        d="M14 9h3V6h-3c-1.7 0-3 1.3-3 3v3H8v3h3v6h3v-6h3l1-3h-4V9c0-.6.4-1 1-1z"
+                                        fill="currentColor"
+                                    />
+                                </svg>
+                            </a>
+                            <a
+                                href="#"
+                                aria-label="Instagram"
+                                className="wh-foot-social"
+                            >
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <rect
+                                        x="4"
+                                        y="4"
+                                        width="16"
+                                        height="16"
+                                        rx="4"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="1.5"
+                                    />
+                                    <circle
+                                        cx="12"
+                                        cy="12"
+                                        r="3.5"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="1.5"
+                                    />
+                                    <circle
+                                        cx="17.5"
+                                        cy="6.5"
+                                        r="1"
+                                        fill="currentColor"
+                                    />
+                                </svg>
+                            </a>
                         </div>
                     </div>
 
-                    <nav aria-label="Schnell Links" className="md:col-span-2">
-                        <h4 className="text-lg font-semibold mb-3">Links</h4>
-                        <ul className="space-y-2 text-sm text-sky-100">
+                    {/* Hızlı Linkler */}
+                    <nav className="wh-foot-col" aria-label="Schnellzugriff">
+                        <h4 className="wh-foot-title">Informationen</h4>
+                        <ul className="wh-foot-list">
                             <li>
-                                <Link
-                                    href="/uber-uns"
-                                    className="hover:text-white"
-                                    aria-label="Über uns"
-                                >
-                                    Über uns
-                                </Link>
+                                <a href="/about">Über uns</a>
                             </li>
                             <li>
-                                <Link
-                                    href="/Contact"
-                                    className="hover:text-white"
-                                    aria-label="Contact"
-                                >
-                                    Contact
-                                </Link>
+                                <a href="/rooms">Zimmer &amp; Suiten</a>
                             </li>
                             <li>
-                                <Link
-                                    href="/faq"
-                                    className="hover:text-white"
-                                    aria-label="FAQ"
-                                >
-                                    FAQ
-                                </Link>
+                                <a href="/dining">Restaurant &amp; Kulinarik</a>
                             </li>
                             <li>
-                                <Link
-                                    href="/datenschutz"
-                                    className="hover:text-white"
-                                    aria-label="Datenschutz"
-                                >
-                                    Datenschutz
-                                </Link>
+                                <a href="/activities">Aktivitäten</a>
+                            </li>
+                            <li>
+                                <a href="/spa">Spa &amp; Wellness</a>
                             </li>
                         </ul>
                     </nav>
 
-                    <div className="md:col-span-3">
-                        <h4 className="text-lg font-semibold mb-3">Kontakt</h4>
-                        <address className="not-italic text-sm text-sky-100 space-y-3">
-                            <div className="flex items-start">
-                                <FaMapMarkerAlt className="mr-3 mt-1 text-amber-400" />
-                                <span>Spaldingstr. 77–79, 20097 Hamburg</span>
-                            </div>
-                            <div className="flex items-center">
-                                <FaPhoneAlt className="mr-3 text-amber-400" />
-                                <a
-                                    href="tel:+494046633519"
-                                    className="hover:text-white"
-                                    aria-label="Telefonnummer"
-                                >
-                                    +49 (0)40 46 63 35 19
-                                </a>
-                            </div>
-                            <div className="flex items-center">
-                                <FaEnvelope className="mr-3 text-amber-400" />
-                                <a
-                                    href="mailto:info@oi-clean.de"
-                                    className="hover:text-white"
-                                    aria-label="E-Mail"
-                                >
-                                    info@oi-clean.de
-                                </a>
-                            </div>
+                    {/* Yasal / Servis */}
+                    <nav className="wh-foot-col" aria-label="Rechtliches">
+                        <h4 className="wh-foot-title">
+                            Service &amp; Rechtliches
+                        </h4>
+                        <ul className="wh-foot-list">
+                            <li>
+                                <a href="/faq">Häufige Fragen</a>
+                            </li>
+                            <li>
+                                <a href="/gutscheine">Gutscheine</a>
+                            </li>
+                            <li>
+                                <a href="/agb">AGB</a>
+                            </li>
+                            <li>
+                                <a href="/privacy">Datenschutz</a>
+                            </li>
+                            <li>
+                                <a href="/impressum">Impressum</a>
+                            </li>
+                        </ul>
+                    </nav>
+
+                    {/* İletişim / Bülten */}
+                    <div className="wh-foot-col">
+                        <h4 className="wh-foot-title">Kontakt</h4>
+                        <address className="wh-foot-text not-italic">
+                            R.-Breitscheid-Straße 41–45
+                            <br />
+                            98574 Masserberg / Heubach
+                            <br />
+                            Deutschland
                         </address>
-                    </div>
+                        <p className="wh-foot-text">
+                            Tel{" "}
+                            <a href="tel:+4936870800">+49 (0) 36870 / 800</a>
+                            <br />
+                            <a href="mailto:info@werrapark.de">
+                                info@werrapark.de
+                            </a>
+                        </p>
 
-                    <div className="md:col-span-12 mt-2">
-                        <div className="mt-6 border-t border-white/10 pt-4 flex flex-col md:flex-row items-center justify-between gap-3">
-                            <p className="text-sm text-sky-200">
-                                © {year} O&amp;I CLEAN group GmbH. Alle Rechte
-                                vorbehalten.
-                            </p>
-
-                            <div className="flex items-center gap-4">
-                                <Link
-                                    href="/impressum"
-                                    className="text-sm hover:underline"
-                                    aria-label="Impressum"
-                                >
-                                    Impressum
-                                </Link>
-                                <Link
-                                    href="/datenschutz"
-                                    className="text-sm hover:underline"
-                                    aria-label="Datenschutz"
-                                >
-                                    Datenschutz
-                                </Link>
-                                <Link
-                                    href="/agb"
-                                    className="text-sm hover:underline"
-                                    aria-label="AGB"
-                                >
-                                    AGB
-                                </Link>
-                            </div>
-                        </div>
+                        <form
+                            className="wh-foot-news"
+                            onSubmit={(e) => e.preventDefault()}
+                            aria-label="Newsletter"
+                        >
+                            <label htmlFor="news-email" className="sr-only">
+                                E-Mail
+                            </label>
+                            <input
+                                id="news-email"
+                                type="email"
+                                placeholder="Ihre E-Mail-Adresse"
+                                className="wh-input"
+                                required
+                            />
+                            <button
+                                className="wh-btn wh-btn--primary"
+                                type="submit"
+                            >
+                                Newsletter
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
 
-            {/* Back to top */}
-            <div className="footer-backtop">
-                <a
-                    href="#top"
-                    className="inline-flex items-center justify-center p-2 rounded-full bg-white/6 hover:bg-white/10 transition"
-                    aria-label="Nach oben"
-                    title="Nach oben"
-                >
-                    <FaChevronUp />
-                </a>
+            {/* Alt: telif / mini-nav */}
+            <div className="wh-foot-bottom">
+                <div className="wh-container wh-foot-bottom__inner">
+                    <p className="wh-foot-copy">
+                        © {year} Werrapark Hotel. Alle Rechte vorbehalten.
+                    </p>
+                    <ul className="wh-foot-mini">
+                        <li>
+                            <a href="/privacy">Datenschutz</a>
+                        </li>
+                        <li>
+                            <a href="/agb">AGB</a>
+                        </li>
+                        <li>
+                            <a href="/impressum">Impressum</a>
+                        </li>
+                        <li>
+                            <a href="/contact">Kontakt</a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </footer>
     );
