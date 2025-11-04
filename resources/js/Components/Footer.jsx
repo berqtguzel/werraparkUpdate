@@ -27,7 +27,7 @@ export default function Footer() {
                             aria-label="Startseite"
                         >
                             <img
-                                src="/images/logo-white.svg"
+                                src="/images/Logo/logo.png"
                                 alt="Werrapark Resort"
                                 className="wh-foot-logo"
                             />

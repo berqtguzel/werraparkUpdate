@@ -32,7 +32,6 @@ export default function Header({ currentRoute }) {
                             className="wh-toplink"
                         >
                             <span className="wh-ico" aria-hidden>
-                                {/* mail */}
                                 <svg viewBox="0 0 24 24" aria-hidden="true">
                                     <path
                                         d="M4 6h16v12H4z"
@@ -52,7 +51,6 @@ export default function Header({ currentRoute }) {
                         </a>
                         <a href="tel:+4936874205706" className="wh-toplink">
                             <span className="wh-ico" aria-hidden>
-                                {/* phone */}
                                 <svg viewBox="0 0 24 24" aria-hidden="true">
                                     <path
                                         d="M6.6 10.8a15 15 0 006.6 6.6l2.2-2.2a1 1 0 011-.25 11 11 0 003.5.56 1 1 0 011 1v3.2a1 1 0 01-1 1A17 17 0 013 5a1 1 0 011-1h3.2a1 1 0 011 1 11 11 0 00.56 3.5 1 1 0 01-.25 1z"
@@ -148,14 +146,13 @@ export default function Header({ currentRoute }) {
             <div className="wh-navwrap">
                 <div className="wh-container wh-nav__inner">
                     <Link href="/" className="wh-brand" aria-label="Startseite">
-                        {/* Light/Dark varyasyonuna hazır: isterseniz iki logo kullanın */}
                         <img
-                            src="/images/logo.svg"
+                            src="/images/Logo/logo.png"
                             alt="Werrapark Resort"
                             className="wh-brand__logo wh-brand__logo--light"
                         />
                         <img
-                            src="/images/logo-dark.svg"
+                            src="/images/Logo/logo.png"
                             alt=""
                             className="wh-brand__logo wh-brand__logo--dark"
                         />
