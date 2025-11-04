@@ -1,5 +1,5 @@
 ﻿{
-  "name": "werrapark",
+  "name": "oi-clean",
   "private": true,
   "scripts": {
     "dev": "vite",

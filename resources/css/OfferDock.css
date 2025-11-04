@@ -1,0 +1,121 @@
+/* === Offer Dock (ikon yok, premium görünüm) ============================== */
+:root {
+  --odock-bg: rgba(32, 99, 255, 0.85);  /* mavi cam */
+  --odock-bg-blur: 8px;
+  --odock-border: rgba(255,255,255,0.25);
+  --odock-text: #fff;
+  --odock-sub: rgba(255,255,255,0.85);
+  --odock-cta-bg: #ffffff;
+  --odock-cta-text: #2457ff;
+  --odock-cta-bg-hover: #f5f7ff;
+  --odock-shadow: 0 18px 40px -12px rgba(20,50,120,.35);
+  --odock-tab-bg: rgba(19, 79, 230, 0.95);
+  --odock-focus: 0 0 0 3px rgba(255,255,255,.4);
+}
+
+/* Kökte JS'den şunlar gelir:
+   --panel-w : panel genişliği (örn 280px)
+   --tab-w   : ok genişliği     (örn 40px)
+   --panel-x : panelin translateX değeri (0px veya negatif) */
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --odock-bg: rgba(36, 95, 255, 0.9);
+    --odock-tab-bg: rgba(22, 85, 240, 0.95);
+    --odock-cta-text: #1e40af;
+  }
+}
+
+.odock {
+  position: fixed;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 60;
+  pointer-events: none; /* dış tıklamalar geçsin */
+  /* genişliği panel kadar değil; yerleşimi left:0’a sabit */
+}
+
+/* Panel */
+.odock__panel {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateX(var(--panel-x, 0px)) translateY(-50%);
+  width: var(--panel-w, 280px);
+  height: 92px;
+  pointer-events: auto;
+
+  display: flex;
+  align-items: center;
+
+  border-top-right-radius: 18px;
+  border-bottom-right-radius: 18px;
+  background: var(--odock-bg);
+  backdrop-filter: blur(var(--odock-bg-blur));
+  -webkit-backdrop-filter: blur(var(--odock-bg-blur));
+  box-shadow: var(--odock-shadow);
+  border: 1px solid var(--odock-border);
+  border-right-color: transparent; /* birleşimde çizgi olmasın */
+  transition: transform .28s cubic-bezier(.2,.8,.2,1);
+}
+
+/* içerik */
+.odock__body {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 16px 14px 18px;
+  color: var(--odock-text);
+}
+.odock__title { font-weight: 800; letter-spacing: .2px; line-height: 1.1; }
+.odock__sub { font-size: 12.5px; opacity: .9; margin-top: 2px; }
+.odock__body > .odock__group { display: flex; flex-direction: column; margin-right: 6px; width: 30%; }
+
+/* CTA */
+.odock__cta {
+  appearance: none; border: 0; outline: none;
+  background: var(--odock-cta-bg); color: var(--odock-cta-text);
+  font-weight: 700; padding: 10px 16px; border-radius: 999px;
+  letter-spacing: .2px; box-shadow: 0 6px 18px -8px rgba(255,255,255,.9);
+  transition: background .2s ease, transform .06s ease;
+  cursor: pointer;
+}
+.odock__cta:hover { background: var(--odock-cta-bg-hover); }
+.odock__cta:active { transform: translateY(1px); }
+.odock__cta:focus-visible { box-shadow: var(--odock-focus); }
+
+/* Ok sekmesi (panelden BAĞIMSIZ) */
+.odock__tab {
+  position: absolute;
+  top: 50%;
+  /* Sekmenin x konumu panelin görünür sağ kenarına bağlanır:
+     expanded: left = panel-w - tab-w
+     collapsed: left = 0 */
+  left: calc(var(--panel-w, 280px) + var(--panel-x, 0px) - var(--tab-w, 40px));
+  transform: translateY(-50%);
+  width: var(--tab-w, 40px);
+  height: 84px;
+  border: 0;
+  outline: none;
+  background: var(--odock-tab-bg);
+  color: #fff;
+  border-radius: 14px;
+  box-shadow: var(--odock-shadow);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: left .28s cubic-bezier(.2,.8,.2,1), background .2s ease, transform .2s ease;
+  pointer-events: auto;
+}
+.odock__tab:hover { background: rgba(19,79,230,1); }
+.odock__tab:active { transform: translateY(-50%) scale(.98); }
+.odock__tab:focus-visible { box-shadow: var(--odock-focus); }
+
+/* küçük ekranlar */
+@media (max-width: 420px) {
+  .odock__panel { height: 86px; }
+  .odock__tab   { height: 80px; }
+  .odock__cta { padding: 9px 14px; }
+}
