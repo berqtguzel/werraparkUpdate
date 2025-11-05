@@ -1,22 +1,14 @@
 import React from "react";
 import "../../../css/video-promo.css";
 
-/**
- * Werbevideo bölümü
- * - poster: Önyüz görseli (thumbnail)
- * - videoId: YouTube video ID (örn. "dQw4w9WgXcQ")
- * - title: Başlık
- * - alt: poster için alternatif metin
- */
 export default function VideoPromo({
     title = "Schauen Sie sich unser Werbevideo an",
-    poster = "/images/video-poster.jpg",
+    poster = "/public/images/Thumbnail2.webp",
     videoId = "dQw4w9WgXcQ",
     alt = "Werbevideo Vorschaubild",
 }) {
     const [playing, setPlaying] = React.useState(false);
 
-    // YouTube embed URL (autoplay açık)
     const src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&hl=de`;
 
     return (
@@ -44,7 +36,6 @@ export default function VideoPromo({
                         >
                             <img className="vp-img" src={poster} alt={alt} />
                             <span className="vp-play" aria-hidden="true">
-                                {/* ▶ Play ikonu */}
                                 <svg viewBox="0 0 64 64" width="64" height="64">
                                     <circle
                                         cx="32"
@@ -58,7 +49,6 @@ export default function VideoPromo({
                                     />
                                 </svg>
                             </span>
-                            {/* Altta hafif CTA şeridi (görseldeki stile yakın) */}
                             <span className="vp-cta">
                                 Schauen Sie sich unser Werbevideo an
                             </span>

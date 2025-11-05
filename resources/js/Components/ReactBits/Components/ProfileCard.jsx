@@ -15,14 +15,9 @@ const ANIMATION_CONFIG = {
     DEVICE_BETA_OFFSET: 20,
 };
 
-const clamp = (value, min = 0, max = 100) =>
-    Math.min(Math.max(value, min), max);
-
-const round = (value, precision = 3) => parseFloat(value.toFixed(precision));
-
-const adjust = (value, fromMin, fromMax, toMin, toMax) =>
-    round(toMin + ((toMax - toMin) * (value - fromMin)) / (fromMax - fromMin));
-
+const clamp = (v, min = 0, max = 100) => Math.min(Math.max(v, min), max);
+const round = (v, p = 3) => parseFloat(v.toFixed(p));
+const adjust = (v, a, b, c, d) => round(c + ((d - c) * (v - a)) / (b - a));
 const easeInOutCubic = (x) =>
     x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
 
@@ -55,8 +50,8 @@ const ProfileCardComponent = ({
         let rafId = null;
 
         const updateCardTransform = (offsetX, offsetY, card, wrap) => {
-            const width = card.clientWidth;
-            const height = card.clientHeight;
+            const width = card.clientWidth || 1;
+            const height = card.clientHeight || 1;
 
             const percentX = clamp((100 / width) * offsetX);
             const percentY = clamp((100 / height) * offsetY);
@@ -64,7 +59,7 @@ const ProfileCardComponent = ({
             const centerX = percentX - 50;
             const centerY = percentY - 50;
 
-            const properties = {
+            const props = {
                 "--pointer-x": `${percentX}%`,
                 "--pointer-y": `${percentY}%`,
                 "--background-x": `${adjust(percentX, 0, 100, 35, 65)}%`,
@@ -80,63 +75,46 @@ const ProfileCardComponent = ({
                 "--rotate-y": `${round(centerY / 4)}deg`,
             };
 
-            Object.entries(properties).forEach(([property, value]) => {
-                wrap.style.setProperty(property, value);
-            });
+            for (const [k, v] of Object.entries(props))
+                wrap.style.setProperty(k, v);
         };
 
-        const createSmoothAnimation = (
-            duration,
-            startX,
-            startY,
-            card,
-            wrap
-        ) => {
-            const startTime = performance.now();
+        const animateToCenter = (duration, fromX, fromY, card, wrap) => {
+            const start = performance.now();
             const targetX = wrap.clientWidth / 2;
             const targetY = wrap.clientHeight / 2;
 
-            const animationLoop = (currentTime) => {
-                const elapsed = currentTime - startTime;
-                const progress = clamp(elapsed / duration);
-                const easedProgress = easeInOutCubic(progress);
-
-                const currentX = adjust(easedProgress, 0, 1, startX, targetX);
-                const currentY = adjust(easedProgress, 0, 1, startY, targetY);
-
-                updateCardTransform(currentX, currentY, card, wrap);
-
-                if (progress < 1) {
-                    rafId = requestAnimationFrame(animationLoop);
-                }
+            const loop = (t) => {
+                const p = clamp((t - start) / duration);
+                const e = easeInOutCubic(p);
+                const x = adjust(e, 0, 1, fromX, targetX);
+                const y = adjust(e, 0, 1, fromY, targetY);
+                updateCardTransform(x, y, card, wrap);
+                if (p < 1) rafId = requestAnimationFrame(loop);
             };
-
-            rafId = requestAnimationFrame(animationLoop);
+            rafId = requestAnimationFrame(loop);
         };
 
         return {
             updateCardTransform,
-            createSmoothAnimation,
+            animateToCenter,
             cancelAnimation: () => {
-                if (rafId) {
-                    cancelAnimationFrame(rafId);
-                    rafId = null;
-                }
+                if (rafId) cancelAnimationFrame(rafId);
+                rafId = null;
             },
         };
     }, [enableTilt]);
 
     const handlePointerMove = useCallback(
-        (event) => {
+        (e) => {
             const card = cardRef.current;
             const wrap = wrapRef.current;
-
             if (!card || !wrap || !animationHandlers) return;
 
             const rect = card.getBoundingClientRect();
             animationHandlers.updateCardTransform(
-                event.clientX - rect.left,
-                event.clientY - rect.top,
+                e.clientX - rect.left,
+                e.clientY - rect.top,
                 card,
                 wrap
             );
@@ -147,52 +125,50 @@ const ProfileCardComponent = ({
     const handlePointerEnter = useCallback(() => {
         const card = cardRef.current;
         const wrap = wrapRef.current;
-
         if (!card || !wrap || !animationHandlers) return;
-
         animationHandlers.cancelAnimation();
         wrap.classList.add("active");
         card.classList.add("active");
     }, [animationHandlers]);
 
-    const handlePointerLeave = useCallback(
-        (event) => {
-            const card = cardRef.current;
-            const wrap = wrapRef.current;
-
-            if (!card || !wrap || !animationHandlers) return;
-
-            animationHandlers.createSmoothAnimation(
-                ANIMATION_CONFIG.SMOOTH_DURATION,
-                event.offsetX,
-                event.offsetY,
-                card,
-                wrap
-            );
-            wrap.classList.remove("active");
-            card.classList.remove("active");
-        },
-        [animationHandlers]
-    );
+    const handlePointerLeave = useCallback(() => {
+        const card = cardRef.current;
+        const wrap = wrapRef.current;
+        if (!card || !wrap || !animationHandlers) return;
+        // bazı tarayıcılarda offsetX/Y yok -> merkezden animasyon
+        const fromX = wrap.clientWidth / 2;
+        const fromY = wrap.clientHeight / 2;
+        animationHandlers.animateToCenter(
+            ANIMATION_CONFIG.SMOOTH_DURATION,
+            fromX,
+            fromY,
+            card,
+            wrap
+        );
+        wrap.classList.remove("active");
+        card.classList.remove("active");
+    }, [animationHandlers]);
 
     const handleDeviceOrientation = useCallback(
         (event) => {
             const card = cardRef.current;
             const wrap = wrapRef.current;
-
             if (!card || !wrap || !animationHandlers) return;
 
-            const { beta, gamma } = event;
-            if (!beta || !gamma) return;
+            const { beta, gamma } = event; // x (tilt front/back), y (left/right)
+            if (beta == null || gamma == null) return; // 0 değerini kaçırma
 
-            animationHandlers.updateCardTransform(
-                card.clientHeight / 2 + gamma * mobileTiltSensitivity,
-                card.clientWidth / 2 +
-                    (beta - ANIMATION_CONFIG.DEVICE_BETA_OFFSET) *
-                        mobileTiltSensitivity,
-                card,
-                wrap
-            );
+            const cx = card.clientWidth / 2;
+            const cy = card.clientHeight / 2;
+
+            // gamma sağ-sol, beta öne-arkaya: biraz yumuşat
+            const x = cx + gamma * mobileTiltSensitivity;
+            const y =
+                cy +
+                (beta - ANIMATION_CONFIG.DEVICE_BETA_OFFSET) *
+                    mobileTiltSensitivity;
+
+            animationHandlers.updateCardTransform(x, y, card, wrap);
         },
         [animationHandlers, mobileTiltSensitivity]
     );
@@ -202,63 +178,80 @@ const ProfileCardComponent = ({
 
         const card = cardRef.current;
         const wrap = wrapRef.current;
-
         if (!card || !wrap) return;
 
-        const pointerMoveHandler = handlePointerMove;
-        const pointerEnterHandler = handlePointerEnter;
-        const pointerLeaveHandler = handlePointerLeave;
-        const deviceOrientationHandler = handleDeviceOrientation;
+        // performans & dokunmatik davranışı
+        card.style.willChange = "transform";
+        card.style.transformStyle = "preserve-3d";
+        card.style.touchAction = enableMobileTilt ? "pan-y" : "auto"; // istersen "none"
 
-        const handleClick = () => {
-            if (!enableMobileTilt || location.protocol !== "https:") return;
-            if (
-                typeof window.DeviceMotionEvent.requestPermission === "function"
-            ) {
-                window.DeviceMotionEvent.requestPermission()
+        const resizeObs = new ResizeObserver(() => {
+            // boyut değişince merkez konumları güncel kalsın
+            animationHandlers.updateCardTransform(
+                wrap.clientWidth / 2,
+                wrap.clientHeight / 2,
+                card,
+                wrap
+            );
+        });
+        resizeObs.observe(card);
+
+        // Dinleyiciler
+        card.addEventListener("pointerenter", handlePointerEnter);
+        card.addEventListener("pointermove", handlePointerMove, {
+            passive: true,
+        });
+        card.addEventListener("pointerleave", handlePointerLeave);
+
+        // iOS izin akışı (Orientation için doğru API)
+        const askOrientationPermission = () => {
+            if (!enableMobileTilt) return;
+            const needsPermission =
+                typeof DeviceOrientationEvent !== "undefined" &&
+                typeof DeviceOrientationEvent.requestPermission === "function";
+            if (needsPermission) {
+                DeviceOrientationEvent.requestPermission()
                     .then((state) => {
                         if (state === "granted") {
                             window.addEventListener(
                                 "deviceorientation",
-                                deviceOrientationHandler
+                                handleDeviceOrientation
                             );
                         }
                     })
-                    .catch((err) => console.error(err));
+                    .catch(console.error);
             } else {
                 window.addEventListener(
                     "deviceorientation",
-                    deviceOrientationHandler
+                    handleDeviceOrientation
                 );
             }
         };
+        // kullanıcı etkileşimiyle tetikle (iOS şartı)
+        card.addEventListener("click", askOrientationPermission);
 
-        card.addEventListener("pointerenter", pointerEnterHandler);
-        card.addEventListener("pointermove", pointerMoveHandler);
-        card.addEventListener("pointerleave", pointerLeaveHandler);
-        card.addEventListener("click", handleClick);
-
-        const initialX = wrap.clientWidth - ANIMATION_CONFIG.INITIAL_X_OFFSET;
-        const initialY = ANIMATION_CONFIG.INITIAL_Y_OFFSET;
-
-        animationHandlers.updateCardTransform(initialX, initialY, card, wrap);
-        animationHandlers.createSmoothAnimation(
+        // başlangıç animasyonu
+        const ix = wrap.clientWidth - ANIMATION_CONFIG.INITIAL_X_OFFSET;
+        const iy = ANIMATION_CONFIG.INITIAL_Y_OFFSET;
+        animationHandlers.updateCardTransform(ix, iy, card, wrap);
+        animationHandlers.animateToCenter(
             ANIMATION_CONFIG.INITIAL_DURATION,
-            initialX,
-            initialY,
+            ix,
+            iy,
             card,
             wrap
         );
 
         return () => {
-            card.removeEventListener("pointerenter", pointerEnterHandler);
-            card.removeEventListener("pointermove", pointerMoveHandler);
-            card.removeEventListener("pointerleave", pointerLeaveHandler);
-            card.removeEventListener("click", handleClick);
+            card.removeEventListener("pointerenter", handlePointerEnter);
+            card.removeEventListener("pointermove", handlePointerMove);
+            card.removeEventListener("pointerleave", handlePointerLeave);
+            card.removeEventListener("click", askOrientationPermission);
             window.removeEventListener(
                 "deviceorientation",
-                deviceOrientationHandler
+                handleDeviceOrientation
             );
+            resizeObs.disconnect();
             animationHandlers.cancelAnimation();
         };
     }, [
@@ -293,7 +286,12 @@ const ProfileCardComponent = ({
             className={`pc-card-wrapper ${className}`.trim()}
             style={cardStyle}
         >
-            <section ref={cardRef} className="pc-card">
+            <section
+                ref={cardRef}
+                className="pc-card"
+                /* güvenli tarafta olmak için inline de ekliyoruz */
+                style={{ touchAction: enableMobileTilt ? "pan-y" : "auto" }}
+            >
                 <div className="pc-inside">
                     <div className="pc-shine" />
                     <div className="pc-glare" />
@@ -359,5 +357,4 @@ const ProfileCardComponent = ({
 };
 
 const ProfileCard = React.memo(ProfileCardComponent);
-
 export default ProfileCard;

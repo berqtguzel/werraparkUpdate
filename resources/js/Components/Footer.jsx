@@ -6,7 +6,6 @@ export default function Footer() {
 
     return (
         <footer className="wh-foot" role="contentinfo">
-            {/* Üst: CTA Şeridi */}
             <div className="wh-foot-cta">
                 <div className="wh-container wh-foot-cta__inner">
                     <h3>Urlaub im Grünen – direkt zum Bestpreis buchen</h3>
@@ -16,10 +15,8 @@ export default function Footer() {
                 </div>
             </div>
 
-            {/* Orta: Grid içerik */}
             <div className="wh-foot-main">
                 <div className="wh-container wh-foot-grid">
-                    {/* Marka / açıklama */}
                     <div className="wh-foot-col">
                         <a
                             href="/"
@@ -90,7 +87,6 @@ export default function Footer() {
                         </div>
                     </div>
 
-                    {/* Hızlı Linkler */}
                     <nav className="wh-foot-col" aria-label="Schnellzugriff">
                         <h4 className="wh-foot-title">Informationen</h4>
                         <ul className="wh-foot-list">
@@ -112,7 +108,6 @@ export default function Footer() {
                         </ul>
                     </nav>
 
-                    {/* Yasal / Servis */}
                     <nav className="wh-foot-col" aria-label="Rechtliches">
                         <h4 className="wh-foot-title">
                             Service &amp; Rechtliches
@@ -136,7 +131,6 @@ export default function Footer() {
                         </ul>
                     </nav>
 
-                    {/* İletişim / Bülten */}
                     <div className="wh-foot-col">
                         <h4 className="wh-foot-title">Kontakt</h4>
                         <address className="wh-foot-text not-italic">

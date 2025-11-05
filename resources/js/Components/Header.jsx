@@ -134,7 +134,6 @@ export default function Header({ currentRoute }) {
                             </a>
                         </div>
 
-                        {/* Tema düğmesi (topbar sağ) */}
                         <div className="wh-theme-toggle">
                             <ThemeToggle />
                         </div>
@@ -142,7 +141,6 @@ export default function Header({ currentRoute }) {
                 </div>
             </div>
 
-            {/* MAIN BAR */}
             <div className="wh-navwrap">
                 <div className="wh-container wh-nav__inner">
                     <Link href="/" className="wh-brand" aria-label="Startseite">

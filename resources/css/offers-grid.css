@@ -1,0 +1,182 @@
+.og-wrap{
+  --brand: #29c17e;
+  --brand-2: #0ea567;
+  --og-bg: transparent;
+  --og-title: var(--tg-accent, #0f1a14);
+  --og-text: var(--tg-text, #0f1a14);
+  --og-muted: #5c6b64;
+  --og-surface: #ffffff;
+  --og-border: rgba(10,42,28,.08);
+  --og-soft: rgba(15, 35, 26, .04);
+  --og-glass: rgba(255,255,255,.7);
+  --og-ring: rgba(41,193,126,.45);
+  --og-shadow: 0 22px 60px rgba(16,48,36,.14);
+  --og-green: #18a861;
+  --og-green-2: #118a52;
+  padding: 40px 20px 64px;
+  background: var(--og-bg);
+}
+
+
+html[data-theme="dark"] .og-wrap,
+body[data-theme="dark"] .og-wrap,
+.dark .og-wrap{
+  --og-title: #edf9f2;
+  --og-text: #edf9f2;
+  --og-muted: #aab8b2;
+  --og-surface: #0f1613;
+  --og-border: rgba(255,255,255,.08);
+  --og-soft: rgba(255,255,255,.05);
+  --og-glass: rgba(18,26,23,.6);
+  --og-shadow: 0 28px 70px rgba(0,0,0,.42);
+  --og-green: #1fce79;
+  --og-green-2: #0ea567;
+}
+
+
+.og-title{
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 800;
+  font-size: clamp(26px, 3.6vw, 42px);
+  text-align: center;
+  color: var(--og-title);
+  margin: 8px auto 28px;
+  letter-spacing: .2px;
+  position: relative;
+}
+.og-title::after{
+  content:"";
+  display:block;
+  width: 120px; height: 4px;
+  margin: 12px auto 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, var(--brand), transparent);
+  filter: drop-shadow(0 2px 6px rgba(41,193,126,.35));
+}
+
+
+.og-flow-shell{
+  max-width: 1100px;
+  margin: 0 auto 64px;
+  border-radius: 18px;
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--og-soft), transparent), var(--og-surface);
+  border: 1px solid var(--og-border);
+  box-shadow: var(--og-shadow);
+}
+
+
+
+.flowing-menu{
+  position: relative;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+
+.flowing-menu .fm-row,
+.flowing-menu [class*="row"]{
+  position: relative;
+  min-height: 120px;
+  border-bottom: 1px solid var(--og-border);
+  overflow: hidden;
+  isolation: isolate;
+}
+.flowing-menu .fm-row:last-child,
+.flowing-menu [class*="row"]:last-child{ border-bottom: none; }
+
+
+.flowing-menu .fm-row > a,
+.flowing-menu [class*="row"] > a{
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  text-decoration: none;
+  color: var(--og-text);
+  z-index: 1;
+}
+
+
+.flowing-menu .fm-text,
+.flowing-menu [class*="text"]{
+  font-weight: 900;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--og-green);
+  text-shadow:
+    0 2px 10px rgba(0,0,0,.35),
+    0 0 0.01px rgba(0,0,0,.35);
+  font-size: clamp(22px, 5vw, 52px);
+}
+
+
+.flowing-menu .fm-bg,
+.flowing-menu [class*="bg"],
+.flowing-menu img{
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transform: scale(1.02);
+  filter: saturate(.95) contrast(.95) brightness(.75);
+  transition: transform .4s ease, filter .4s ease, opacity .4s ease;
+  z-index: -1;
+}
+
+
+.flowing-menu .fm-row::before,
+.flowing-menu [class*="row"]::before{
+  content:"";
+  position:absolute; inset:0;
+  background:
+    radial-gradient(60% 80% at 50% 40%, rgba(0,0,0,.12), transparent 65%),
+    linear-gradient(180deg, rgba(0,0,0,.06), rgba(0,0,0,.35));
+  opacity:.9;
+  pointer-events: none;
+  z-index: 0;
+}
+
+
+.flowing-menu .fm-row:hover .fm-bg,
+.flowing-menu [class*="row"]:hover [class*="bg"],
+.flowing-menu [class*="row"]:hover img{
+  transform: scale(1.06);
+  filter: saturate(1) contrast(1) brightness(.9);
+}
+.flowing-menu .fm-row:hover::before,
+.flowing-menu [class*="row"]:hover::before{ opacity: 1; }
+
+.flowing-menu .fm-row > a:focus-visible,
+.flowing-menu [class*="row"] > a:focus-visible{
+  outline: none;
+  box-shadow: inset 0 0 0 4px var(--og-ring);
+  border-radius: 10px;
+}
+
+
+.flowing-menu .fm-badge,
+.flowing-menu [class*="badge"]{
+  position: absolute; top: 10px; right: 12px;
+  width: 64px; height: auto;
+  opacity: .95;
+  filter: drop-shadow(0 3px 8px rgba(0,0,0,.45));
+  z-index: 2;
+}
+
+
+@media (max-width: 900px){
+  .flowing-menu .fm-row,
+  .flowing-menu [class*="row"]{ min-height: 96px; }
+  .flowing-menu .fm-row > a,
+  .flowing-menu [class*="row"] > a{ padding: 18px; }
+  .flowing-menu .fm-text,
+  .flowing-menu [class*="text"]{ font-size: clamp(20px, 6vw, 40px); }
+}
+@media (max-width: 600px){
+  .og-flow-shell{ border-radius: 14px; }
+  .flowing-menu .fm-row,
+  .flowing-menu [class*="row"]{ min-height: 86px; }
+  .flowing-menu .fm-text,
+  .flowing-menu [class*="text"]{ font-size: clamp(18px, 7vw, 34px); }
+}
