@@ -1,6 +1,15 @@
+"use client";
+
 import React from "react";
 import { FiCheck, FiMapPin, FiHome, FiChevronRight } from "react-icons/fi";
 import "../../../css/rooms-showcase.css";
+
+// DotGrid'i lazy yükleyelim (ReactBits > Backgrounds > DotGrid)
+const DotGrid = React.lazy(() =>
+    import("../ReactBits/Backgrounds/DotGrid").then((m) => ({
+        default: m.default || m,
+    }))
+);
 
 const DATA = {
     title: "Unsere besten Zimmer",
@@ -10,7 +19,7 @@ const DATA = {
             id: "heubach",
             name: "Hotel Heubacher Höhe",
             location: "Masserberg • OT Heubach",
-            image: "/images/rooms/heubach.jpg",
+            image: "/images/template2.png",
             cta: { label: "Hotel Erkunden", href: "/heubach" },
             items: [
                 "13 Einzelzimmer 16 qm",
@@ -24,7 +33,7 @@ const DATA = {
             id: "frankenblick",
             name: "Hotel Frankenblick",
             location: "Masserberg • OT Schnett",
-            image: "/images/rooms/frankenblick.jpg",
+            image: "/images/template2.png",
             cta: { label: "Hotel Erkunden", href: "/frankenblick" },
             items: [
                 "12 Einzelzimmer 16 qm",
@@ -36,7 +45,7 @@ const DATA = {
             id: "sommerberg",
             name: "Hotel Sommerberg",
             location: "Masserberg • OT Fehrenbach",
-            image: "/images/rooms/sommerberg.jpg",
+            image: "/images/template2.png",
             cta: { label: "Hotel Erkunden", href: "/sommerberg" },
             items: [
                 "2 Einzelzimmer 15 qm",
@@ -48,7 +57,7 @@ const DATA = {
     ],
     homes: {
         title: "Ferienhäuser",
-        image: "/images/rooms/houses.jpg",
+        image: "/images/template2.png",
         cta: { label: "Alle Ferienhäuser", href: "/ferienhaeuser" },
         items: [
             "24 Einheiten gesamt",
@@ -144,11 +153,45 @@ const HomesCard = ({ homes }) => (
 );
 
 export default function RoomsShowcase({
-    data = DATA, // istersen dışarıdan kendi verini geç
+    data = DATA,
     eyebrow = "Unterkünfte",
 }) {
+    const [mounted, setMounted] = React.useState(false);
+    React.useEffect(() => setMounted(true), []);
+
     return (
-        <section className="rs-wrap" aria-labelledby="rooms-title">
+        <section className="rs-wrap rs-with-bg" aria-labelledby="rooms-title">
+            {mounted && (
+                <React.Suspense fallback={null}>
+                    <div
+                        className="rs-dotgrid"
+                        aria-hidden="true"
+                        style={{
+                            position: "absolute",
+                            inset: 0,
+                            zIndex: 0,
+                            pointerEvents: "none",
+                            overflow: "hidden",
+                        }}
+                    >
+                        <DotGrid
+                            dotSize={14}
+                            gap={36}
+                            baseColor="#1f7008"
+                            activeColor="#0E9B5B"
+                            proximity={160}
+                            speedTrigger={110}
+                            shockRadius={260}
+                            shockStrength={5}
+                            maxSpeed={5200}
+                            resistance={820}
+                            returnDuration={1.3}
+                        />
+                    </div>
+                </React.Suspense>
+            )}
+
+            {/* ==== İçerik ==== */}
             <div className="rs-top">
                 <Eyebrow>{eyebrow}</Eyebrow>
                 <Title id="rooms-title">{data.title}</Title>

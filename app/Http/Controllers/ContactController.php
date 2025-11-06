@@ -3,40 +3,36 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\ContactFormMail;
-use App\Http\Requests\ContactFormRequest;
-use App\Services\DashboardService;
+use Inertia\Inertia;
 
 class ContactController extends Controller
 {
-    protected $dashboardService;
-
-    public function __construct(DashboardService $dashboardService)
+    public function index()
     {
-        $this->dashboardService = $dashboardService;
+        // Inertia React/Vue sayfanı buraya bağla
+        return Inertia::render('kontakt/Index', [
+            'title' => 'Kontakt',
+            'subtitle' => 'Wir helfen Ihnen gern weiter.',
+        ]);
     }
 
-    public function submit(ContactFormRequest $request)
+    public function store(Request $request)
     {
-        try {
+        $data = $request->validate([
+            'name'    => ['required','string','max:120'],
+            'email'   => ['required','email'],
+            'phone'   => ['nullable','string','max:40'],
+            'message' => ['required','string','max:5000'],
+            'privacy' => ['accepted'],
+        ]);
 
-            $response = $this->dashboardService->submitContact($request->validated());
+        // TODO: Mail gönder / DB'ye kaydet
+        // Mail::to('info@werrapark.de')->send(new \App\Mail\ContactMail($data));
+        // ContactMessage::create($data);
 
-            if (!$response) {
-                throw new \Exception('Dashboard API error');
-            }
-
-
-            if (config('dashboard.send_backup_email', true)) {
-                Mail::to(config('mail.admin_email', 'info@oi-clean.de'))
-                    ->send(new ContactFormMail($request->validated()));
-            }
-
-            return back()->with('success', 'Ihre Nachricht wurde erfolgreich gesendet.');
-        } catch (\Exception $e) {
-            report($e);
-            return back()->with('error', 'Es gab einen Fehler beim Senden Ihrer Nachricht. Bitte versuchen Sie es später erneut.');
-        }
+        return back()->with('flash', [
+            'type' => 'success',
+            'message' => 'Nachricht erfolgreich gesendet.'
+        ]);
     }
 }

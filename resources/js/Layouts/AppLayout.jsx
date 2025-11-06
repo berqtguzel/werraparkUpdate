@@ -6,6 +6,7 @@ export default function AppLayout({ children, currentRoute }) {
     return (
         <ThemeProvider>
             <Header currentRoute={currentRoute} />
+
             <main>{children}</main>
             <Footer />
         </ThemeProvider>

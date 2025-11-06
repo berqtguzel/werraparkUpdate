@@ -52,7 +52,7 @@ export default function Hotels() {
     React.useEffect(() => setIsClient(true), []);
 
     return (
-        <section className="hotels-section relative overflow-hidden">
+        <section className="hotels-section relative overflow-hidden" aria-labelledby="hotels-heading">
             {isClient && (
                 <React.Suspense fallback={null}>
                     <div
@@ -82,7 +82,11 @@ export default function Hotels() {
             )}
 
             <div className="hotels-container relative z-20">
-                <h2 className="hotels-title">Unsere Hotels</h2>
+                <h2 id="hotels-heading" className="hotels-title">Unsere Hotels</h2>
+                <p className="hotels-subtitle" role="doc-subtitle">
+                    Entdecken Sie unsere Häuser im Thüringer Wald – komfortabel, naturverbunden
+                    und mit herzlicher Gastfreundschaft.
+                </p>
 
                 <div className="hotel-grid">
                     {hotels.map((hotel, index) => (
@@ -97,7 +101,7 @@ export default function Hotels() {
                             hoverIntensity={1.0}
                             className="hotel-eb"
                         >
-                            <div className="hotel-card eb-reset">
+                            <div className="hotel-card eb-reset" role="article" aria-label={hotel.name}>
                                 <div className="hotel-image">
                                     <img
                                         src={hotel.image}
@@ -119,6 +123,7 @@ export default function Hotels() {
                                                         ? "star active"
                                                         : "star"
                                                 }
+                                                aria-hidden
                                             />
                                         ))}
                                     </div>
@@ -127,13 +132,13 @@ export default function Hotels() {
                                         <a
                                             href={`mailto:${hotel.email}`}
                                             className="hotel-link"
-                                        >
+                                        aria-label={`E-Mail senden an ${hotel.name}`}>
                                             <Mail size={16} /> {hotel.email}
                                         </a>
                                         <a
                                             href={`tel:${hotel.phone}`}
                                             className="hotel-link"
-                                        >
+                                            aria-label={`Telefonnummer von ${hotel.name} anrufen`}>
                                             <Phone size={16} /> {hotel.phone}
                                         </a>
                                     </div>

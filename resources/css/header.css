@@ -219,7 +219,7 @@
 .dark .wh-brand__logo--dark,  [data-theme="dark"] .wh-brand__logo--dark{display:block}
 
 /* Desktop Nav */
-.wh-nav-desktop{display:none; align-items:center; gap:10px}
+.wh-nav-desktop{display:none; align-items:center; gap:10px; white-space:nowrap}
 @media (min-width:1024px){ .wh-nav-desktop{display:flex} }
 
 /* Linkler */
@@ -228,6 +228,7 @@
   padding:12px 14px; border-radius:12px; text-decoration:none;
   color:var(--wp-ink-700); font-weight:700;
   transition:background .18s ease, color .18s ease, box-shadow .18s ease;
+  white-space:nowrap; line-height:1;
 }
 .wh-link:hover{background:var(--wp-green-100); color:var(--wp-green-700)}
 .wh-link.is-active{

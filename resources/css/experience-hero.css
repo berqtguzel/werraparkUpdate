@@ -1,12 +1,69 @@
+/* ================= THEME TOKENS ================= */
+.ex-wrap{
+  /* Brand */
+  --brand: #18b86a;
+  --brand-2: #0ea567;
+
+  /* Light */
+  --ex-bg: #edf5f0;
+  --ex-surface: #ffffff;
+  --ex-text: #0f1a14;
+  --ex-muted: #50645c;
+  --ex-accent: #0f1a14;
+  --ex-border: rgba(10,42,28,.10);
+  --ex-soft: rgba(15,35,26,.05);
+  --ex-ring: rgba(24,184,106,.45);
+  --ex-shadow: 0 22px 60px rgba(16,48,36,.12);
+
+  /* Badge */
+  --badge-bg: linear-gradient(135deg, #10b565, #0c8f56);
+  --badge-grid: rgba(255,255,255,.06);
+
+  position: relative;
+  padding: 56px 20px 72px;
+  background:
+    radial-gradient(900px 600px at 8% -10%, rgba(24,184,106,.14), transparent 60%),
+    linear-gradient(180deg, var(--ex-bg), #e8f2ec 60%, #e3efe8);
+  color: var(--ex-text);
+}
+
+/* ================= DARK OVERRIDE ================= */
 html[data-theme="dark"] .ex-wrap,
 body[data-theme="dark"] .ex-wrap,
 .dark .ex-wrap{
   --ex-bg: #0c1210;
   --ex-surface: #0f1613;
-  --ex-text: #e9faf2;
-  --ex-muted: #a9bbb3;
-  --ex-accent: #ecfff7;
 
+  /* Metinleri beyaza çek */
+  --ex-text: #ffffff;
+  --ex-muted: rgba(255,255,255,.88);
+  --ex-accent: #ffffff;
+
+  --ex-border: rgba(255,255,255,.20);
+  --ex-soft: rgba(255,255,255,.10);
+  --ex-shadow: 0 28px 70px rgba(0,0,0,.45);
+
+  --badge-bg: linear-gradient(135deg, #15c374, #0ea567);
+  --badge-grid: rgba(0,0,0,.15);
+
+  /* Koyu arka plan degrade */
+  background:
+    radial-gradient(1200px 800px at 8% -10%, rgba(24,184,106,.12), transparent 60%),
+    linear-gradient(180deg, #0b1411, #0a100e 60%, #0a0f0d);
+}
+
+/* Güvenli görünürlük – koyu temada metinlere hafif gölge */
+html[data-theme="dark"] .ex-wrap .ex-title,
+html[data-theme="dark"] .ex-wrap .ex-desc,
+html[data-theme="dark"] .ex-wrap .ex-meta-label,
+html[data-theme="dark"] .ex-wrap .ex-link,
+html[data-theme="dark"] .ex-wrap .ex-content {
+  color: #fff !important;
+  text-shadow: 0 2px 12px rgba(0,0,0,.35);
+}
+html[data-theme="dark"] .ex-wrap .ex-link:hover{
+  color: #b7ffe0 !important;
+  border-color: rgba(183,255,224,.65);
 }
 
 /* ================= LAYOUT ================= */
@@ -77,7 +134,6 @@ body[data-theme="dark"] .ex-wrap,
   overflow: hidden;
 }
 .ex-badge::after{
-  /* soft grid inside badge */
   content:"";
   position:absolute; inset:0;
   background:
@@ -99,9 +155,8 @@ body[data-theme="dark"] .ex-wrap,
 }
 
 /* ================= RIGHT: CONTENT ================= */
-.ex-content{
-  padding-top: 6px;
-}
+.ex-content{ padding-top: 6px; }
+
 .ex-eyebrow{
   display: inline-block;
   font-size: 12px;
@@ -112,6 +167,7 @@ body[data-theme="dark"] .ex-wrap,
   padding: 6px 10px;
   border-radius: 999px;
 }
+
 .ex-title{
   margin: 10px 0 12px;
   font-family: Georgia, "Times New Roman", serif;
@@ -121,17 +177,18 @@ body[data-theme="dark"] .ex-wrap,
   color: var(--ex-accent);
   text-wrap: balance;
 }
+
 .ex-desc{
   margin: 0 0 18px;
   color: var(--ex-muted);
   line-height: 1.7;
   max-width: 60ch;
 }
+
 .ex-rule{
   height: 1px;
   border: 0;
-  background:
-    linear-gradient(90deg, transparent, var(--ex-border), transparent);
+  background: linear-gradient(90deg, transparent, var(--ex-border), transparent);
   margin: 16px 0 14px;
 }
 

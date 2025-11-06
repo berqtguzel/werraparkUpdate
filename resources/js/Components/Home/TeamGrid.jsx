@@ -1,11 +1,14 @@
 import React from "react";
 import "../../../css/team-grid.css";
 import demoTeam from "@/Data/demoData";
-import ProfileCard from "../ReactBits/Components/ProfileCard";
+import TiltedCard from "../ReactBits/Components/TiltedCard";
 
-/* ---------------------------
-   Yardımcılar
---------------------------- */
+/* yardımcılar */
+const norm = (s = "") =>
+    s
+        .normalize("NFD")
+        .replace(/\p{Diacritic}/gu, "")
+        .toLowerCase();
 function buildHandle(email = "", fallback = "") {
     if (!email) return fallback || "";
     const [local, domain] = String(email).toLowerCase().split("@");
@@ -21,163 +24,164 @@ function buildHandle(email = "", fallback = "") {
     return local || fallback || "";
 }
 
-/* Tema sınıfını izleyip “light” mı diye söyleyen ufak hook */
-function useIsLightTheme() {
-    const [isLight, setIsLight] = React.useState(() =>
-        typeof document !== "undefined"
-            ? document.documentElement.classList.contains("light")
-            : false
+/* üst isim bandı */
+function NameBar({ name }) {
+    return (
+        <div className="tg-namebar">
+            <span className="tg-namebar__text">{name}</span>
+        </div>
     );
-
-    React.useEffect(() => {
-        if (typeof document === "undefined") return;
-        const el = document.documentElement;
-        const obs = new MutationObserver(() =>
-            setIsLight(el.classList.contains("light"))
-        );
-        obs.observe(el, { attributes: true, attributeFilter: ["class"] });
-        return () => obs.disconnect();
-    }, []);
-
-    return isLight;
 }
 
-/* ---------------------------
-   Statik varlıklar
---------------------------- */
-const LOGO_PATTERN = "/images/logo/werrapark.png";
-const GRAIN_TEXTURE = "/assets/demo/grain.webp";
-/** arka plana koymak istediğin PNG */
-const PNG_BG_URL = "/assets/demo/your-bg.png"; // <- kendi dosya yolun
+/* alt bilgi/iletişim */
+function CardInfo({ title, handle, email, phone, website }) {
+    return (
+        <div className="tg-info">
+            {title && <div className="tg-info__title">{title}</div>}
+            <div className="tg-contacts">
+                {handle && <span className="tg-chip">@{handle}</span>}
+                {email && (
+                    <a
+                        className="tg-chip tg-chip--link"
+                        href={`mailto:${email}`}
+                        aria-label="E-Mail senden"
+                    >
+                        <svg width="14" height="14" viewBox="0 0 24 24">
+                            <path
+                                fill="currentColor"
+                                d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Zm0 4-8 5L4 8V6l8 5 8-5Z"
+                            />
+                        </svg>
+                        <span>E-Mail</span>
+                    </a>
+                )}
+                {phone && (
+                    <a className="tg-chip tg-chip--link" href={`tel:${phone}`} aria-label="Anrufen">
+                        <svg width="14" height="14" viewBox="0 0 24 24">
+                            <path
+                                fill="currentColor"
+                                d="M6.6 10.8a15.05 15.05 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.24c1.1.37 2.3.56 3.6.56a1 1 0 0 1 1 1V21a1 1 0 0 1-1 1C10.4 22 2 13.6 2 3a1 1 0 0 1 1-1h3.48a1 1 0 0 1 1 1c0 1.3.19 2.5.56 3.6a1 1 0 0 1-.24 1L6.6 10.8Z"
+                            />
+                        </svg>
+                        <span>Anrufen</span>
+                    </a>
+                )}
+                {website && (
+                    <a
+                        className="tg-chip tg-chip--link"
+                        href={website}
+                        target="_blank"
+                        rel="noreferrer"
+                    >
+                        <svg width="14" height="14" viewBox="0 0 24 24">
+                            <path
+                                fill="currentColor"
+                                d="M10 13a5 5 0 0 1 0-7l2-2a5 5 0 1 1 7 7l-1 1-1.41-1.41 1-1a3 3 0 0 0-4.24-4.24l-2 2A3 3 0 1 0 14 12l1-1 1.41 1.41-1 1a5 5 0 0 1-7 0Zm4-2a5 5 0 0 1 0 7l-2 2a5 5 0 0 1-7-7l1-1L7.41 13l-1 1a3 3 0 0 0 4.24 4.24l2-2A3 3 0 0 0 12 12l-1 1L9.59 11l1-1a5 5 0 0 1 7 0Z"
+                            />
+                        </svg>
+                        <span>Web</span>
+                    </a>
+                )}
+            </div>
+        </div>
+    );
+}
 
-/* ---------------------------
-   Kart efektleri (tema-dereceli)
---------------------------- */
+export default function TeamGrid({
+    heading = "Unser Team",
+    people = demoTeam,
+}) {
+    const list = Array.isArray(people) && people.length ? people : demoTeam;
 
-/* Koyu tema */
-const BEHIND_DARK = `
-radial-gradient(farthest-side circle at var(--pointer-x) var(--pointer-y),
-  rgba(255,255,255,.07) 4%,
-  hsl(116.91 50% 80%) 10%,
-  hsl(119.6 90.41% 52.27%) 50%,
-  hsla(29,0%,60%,0) 100%),
-radial-gradient(35% 52% at 55% 20%, hsl(97 100% 70%) 0%, transparent 100%),
-radial-gradient(100% 100% at 50% 50%, hsl(106.92 71.17% 75.93%) 1%, transparent 76%),
-conic-gradient(from 124deg at 50% 50%,
-  hsl(106.96 85.6% 62.74%) 0%,
-  hsl(97 100% 70%) 40%, hsl(97 100% 70%) 60%,
-  hsl(121.85 90.4% 76.92%) 100%)
-`;
+    let leadIdx = list.findIndex((p) =>
+        norm(p.name || "").includes("sezai koc")
+    );
+    if (leadIdx < 0) leadIdx = 0;
+    const lead = list[leadIdx];
+    const others = list.filter((_, i) => i !== leadIdx);
 
-const INNER_DARK = `
-linear-gradient(145deg, hsl(102.46 40% 45% / 85%) 0%, rgba(255,255,255,.07) 100%)
-`;
-
-/* Açık tema */
-const BEHIND_LIGHT = `
-radial-gradient(farthest-side circle at var(--pointer-x) var(--pointer-y),
-  rgba(255,255,255,.12) 6%,
-  hsl(136 70% 88%) 14%,
-  hsl(141 75% 63%) 48%,
-  hsla(29,0%,60%,0) 100%),
-radial-gradient(35% 52% at 55% 22%, hsl(141 95% 78%) 0%, transparent 100%),
-radial-gradient(100% 100% at 50% 50%, hsl(140 70% 86%) 1%, transparent 78%),
-conic-gradient(from 124deg at 50% 50%,
-  hsl(144 85% 70%) 0%,
-  hsl(141 92% 72%) 40%, hsl(141 92% 72%) 60%,
-  hsl(135 82% 84%) 100%)
-`;
-
-const INNER_LIGHT = `
-linear-gradient(145deg, hsl(140 40% 70% / 65%) 0%, rgba(255,255,255,.18) 100%)
-`;
-
-/* ---------------------------
-   Bileşen
---------------------------- */
-export default function TeamGrid({ people = [], heading = "Unser Team" }) {
-    const list = people.length ? people : demoTeam;
-    const leader = list[0];
-    const members = list.slice(1, 4);
-
-    const isLight = useIsLightTheme();
-
-    const behindGradient = isLight ? BEHIND_LIGHT : BEHIND_DARK;
-    const innerGradient = isLight ? INNER_LIGHT : INNER_DARK;
-
-    // PNG + gradient birlikte (PNG ilk katman)
-    const behindWithPng = `url('${PNG_BG_URL}'), ${behindGradient}`;
+    const leadHandle = buildHandle(lead?.email, lead?.handle);
 
     return (
-        <section className="tg-section tg-section--galaxy-canvas">
+        <section className="tg-section tg-meshbg">
+            <div className="tg-pattern" aria-hidden="true" />
             <div className="tg-shell">
-                <h2 className="tg-heading">{heading}</h2>
+                <header className="tg-head">
+                    <span className="tg-eyebrow">werrapark</span>
+                    <h2 className="tg-heading">{heading}</h2>
+                    <p className="tg-sub">
+                        Lernen Sie die Menschen kennen, die Ihren Aufenthalt besonders machen.
+                    </p>
+                </header>
 
-                {leader && (
-                    <div className="tg-lead">
-                        <ProfileCard
-                            className="tg-card"
-                            avatarUrl={
-                                leader.avatar ||
+                <div className="tg-hero">
+                    <article className="tg-card tg-card--hero">
+                        <TiltedCard
+                            imageSrc={
+                                lead?.image ||
+                                lead?.avatar ||
                                 "/images/avatar-placeholder.png"
                             }
-                            miniAvatarUrl={
-                                leader.avatar ||
-                                "/images/avatar-placeholder.png"
-                            }
-                            iconUrl={LOGO_PATTERN}
-                            grainUrl={GRAIN_TEXTURE}
-                            behindGradient={behindWithPng} // PNG + gradient
-                            innerGradient={innerGradient}
-                            showBehindGradient
-                            enableTilt
-                            enableMobileTilt={true} // mobilde tilt açık
-                            mobileTiltSensitivity={5}
-                            name={leader.name}
-                            title={leader.title}
-                            handle={buildHandle(leader.email, leader.handle)}
-                            status="online"
-                            contactText="E-Mail"
-                            showUserInfo
-                            onContactClick={() =>
-                                leader.email &&
-                                (window.location.href = `mailto:${leader.email}`)
-                            }
+                            altText={`${lead?.name || "Profil"} image`}
+                            captionText=""
+                            containerWidth="100%"
+                            containerHeight="440px"
+                            imageWidth="100%"
+                            imageHeight="100%"
+                            scaleOnHover={1.06}
+                            rotateAmplitude={12}
+                            showMobileWarning={false}
+                            showTooltip={false}
+                            displayOverlayContent
+                            overlayContent={<NameBar name={lead?.name} />}
                         />
-                    </div>
-                )}
+                        <CardInfo
+                            title={lead?.title}
+                            handle={leadHandle}
+                            email={lead?.email}
+                            phone={lead?.phone || lead?.tel || lead?.mobile}
+                            website={lead?.website || lead?.url}
+                        />
+                    </article>
+                </div>
 
-                <div className="tg-row-3">
-                    {members.map((p) => (
-                        <ProfileCard
-                            key={p.email || p.name}
-                            className="tg-card"
-                            avatarUrl={
-                                p.avatar || "/images/avatar-placeholder.png"
-                            }
-                            miniAvatarUrl={
-                                p.avatar || "/images/avatar-placeholder.png"
-                            }
-                            iconUrl={LOGO_PATTERN}
-                            grainUrl={GRAIN_TEXTURE}
-                            behindGradient={behindWithPng} // PNG + gradient
-                            innerGradient={innerGradient}
-                            showBehindGradient
-                            enableTilt
-                            enableMobileTilt={true} // mobilde tilt açık
-                            mobileTiltSensitivity={5}
-                            name={p.name}
-                            title={p.title}
-                            handle={buildHandle(p.email, p.handle)}
-                            status="online"
-                            contactText="E-Mail"
-                            showUserInfo
-                            onContactClick={() =>
-                                p.email &&
-                                (window.location.href = `mailto:${p.email}`)
-                            }
-                        />
-                    ))}
+                <div className="tg-grid tg-grid--row">
+                    {others.map((p, i) => {
+                        const handle = buildHandle(p.email, p.handle);
+                        const src =
+                            p.image ||
+                            p.avatar ||
+                            "/images/avatar-placeholder.png";
+                        return (
+                            <article
+                                className="tg-card tg-card--equal"
+                                key={p.email || p.name || i}
+                            >
+                                <TiltedCard
+                                    imageSrc={src}
+                                    altText={`${p.name || "Profil"} image`}
+                                    captionText=""
+                                    containerWidth="100%"
+                                    containerHeight="360px"
+                                    imageWidth="100%"
+                                    imageHeight="100%"
+                                    scaleOnHover={1.05}
+                                    rotateAmplitude={10}
+                                    showMobileWarning={false}
+                                    showTooltip={false}
+                                    displayOverlayContent
+                                    overlayContent={<NameBar name={p.name} />}
+                                />
+                                <CardInfo
+                                    title={p.title}
+                                    handle={handle}
+                                    email={p.email}
+                                    phone={p.phone || p.tel || p.mobile}
+                                    website={p.website || p.url}
+                                />
+                            </article>
+                        );
+                    })}
                 </div>
             </div>
         </section>

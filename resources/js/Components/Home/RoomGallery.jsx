@@ -1,9 +1,8 @@
-"use client"; // <- Next.js ise şart, yoksa DOM ölçümleri yapılamaz
-
+"use client";
 import React, { useMemo } from "react";
 import "../../../css/rooms-gallery.css";
-import DomeGallery from "../ReactBits/Components/DomeGallery";
 
+import InfiniteMenu from "../ReactBits/Components/InfiniteMenu";
 const SAMPLE = [
     { src: "/images/rooms/room.png", title: "Standard Doppelzimmer" },
     { src: "/images/rooms/room.png", title: "Einzelzimmer – hell & ruhig" },
@@ -22,11 +21,17 @@ export default function RoomsGallery({
     heading = "Zimmer & Impressionen",
     sub = "Einblicke in unsere freundlich gestalteten Zimmer, Studios und Suiten.",
 }) {
-    // DomeGallery images props
-    const images = useMemo(
-        () => photos.map((p) => ({ src: p.src, alt: p.title || "" })),
-        [photos]
-    );
+    // Masonry items -> { id, img, url, height, title }
+    const items = useMemo(() => {
+        const heights = [240, 280, 320, 360, 300, 340];
+        return photos.map((p, i) => ({
+            id: `room-${i}`,
+            img: p.src,
+            url: p.src,
+            title: p.title || "",
+            height: heights[i % heights.length],
+        }));
+    }, [photos]);
 
     return (
         <section className="rg-wrap" aria-labelledby="rg-title">
@@ -38,26 +43,11 @@ export default function RoomsGallery({
                 <p className="rg-sub">{sub}</p>
             </header>
 
-            {/* GÖRÜNÜRLÜK İÇİN GENİŞLİK + YÜKSEKLİK VERİYORUZ */}
-            <div className="rg-dome-shell">
-                <DomeGallery
-                    images={images}
-                    fit={0.5}
-                    fitBasis="auto"
-                    minRadius={560}
-                    padFactor={0.22}
-                    overlayBlurColor="#000010"
-                    maxVerticalRotationDeg={6}
-                    dragSensitivity={22}
-                    dragDampening={2}
-                    segments={35}
-                    enlargeTransitionMS={300}
-                    openedImageWidth="86vw"
-                    openedImageHeight="86vh"
-                    imageBorderRadius="14px"
-                    openedImageBorderRadius="14px"
-                    grayscale={false}
-                />
+            {/* Arka plan kabuğu */}
+            <div className="rg-dome-shell rg-masonry-shell">
+                <div className="rg-masonry-stage">
+                    <InfiniteMenu items={SAMPLE} />
+                </div>
             </div>
         </section>
     );

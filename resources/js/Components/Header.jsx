@@ -7,12 +7,15 @@ export default function Header({ currentRoute }) {
     // ---- nav tanımı ----
     const nav = [
         { label: "Home", href: "/", key: "home" },
-        { label: "Zimmer & Suiten", href: "/rooms", key: "rooms" },
-        { label: "Restaurant", href: "/dining", key: "dining" },
-        { label: "Aktivitäten", href: "/activities", key: "activities" },
-        { label: "Spa", href: "/spa", key: "spa" },
-        { label: "Events", href: "/events", key: "events" },
-        { label: "Kontakt", href: "/contact", key: "contact" },
+        { label: "Über uns", href: "/uber-uns", key: "uberuns" },
+        { label: "Historie", href: "/historie", key: "historie" },
+        { label: "Gäste ABC", href: "/gaeste-abc", key: "gaeste-abc" },
+        { label: "Urlaubsthemen", href: "/urlaubsthemen", key: "urlaubsthemen" },
+        { label: "Galerie", href: "/galerie", key: "galerie" },
+        { label: "Karriere", href: "/karriere", key: "karriere" },
+        { label: "Bewertungen", href: "/bewertungen", key: "bewertungen" },
+        { label: "Veranstaltung", href: "/veranstaltung", key: "veranstaltung" },
+        { label: "Gutscheinshop", href: "/gutscheinshop", key: "gutscheinshop" },
     ];
 
     const [open, setOpen] = React.useState(false);
@@ -145,12 +148,12 @@ export default function Header({ currentRoute }) {
                 <div className="wh-container wh-nav__inner">
                     <Link href="/" className="wh-brand" aria-label="Startseite">
                         <img
-                            src="/images/Logo/logo.png"
+                            src="/images/logo.svg"
                             alt="Werrapark Resort"
                             className="wh-brand__logo wh-brand__logo--light"
                         />
                         <img
-                            src="/images/Logo/logo.png"
+                            src="/images/logo.svg"
                             alt=""
                             className="wh-brand__logo wh-brand__logo--dark"
                         />

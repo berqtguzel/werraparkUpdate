@@ -31,6 +31,13 @@
   margin-bottom: clamp(28px, 5vw, 52px);
   color: var(--hotel-text);
 }
+.hotels-subtitle{
+  margin:-20px auto 28px;
+  max-width:780px;
+  text-align:center;
+  color: color-mix(in oklab, var(--hotel-text) 68%, transparent);
+  font-size: clamp(14px, 1.8vw, 16px);
+}
 
 /* GRID */
 .hotel-grid{
