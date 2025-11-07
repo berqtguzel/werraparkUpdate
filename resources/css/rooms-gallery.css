@@ -1,153 +1,144 @@
-/* =================================================================== */
-/* ROOMS GALLERY – Masonry                                             */
-/* Tam tema uyumlu, katmanlı arka plan, okunabilir başlıklar           */
-/* =================================================================== */
+:root{
+  --rg-bg:#f6f5f1;
+  --rg-bg-dark:#0E2F25;
+  --rg-ink:#13251d;
+  --rg-muted:#6f7e75;
+  --rg-accent:#1a5d48;
+  --rg-surface:#fcfbf8;
+  --rg-stroke:rgba(16,42,32,.10);
+  --rg-radius:18px;
+  --rg-shadow:0 14px 36px rgba(0,0,0,.10);
+  --rg-shadow-2:0 22px 60px rgba(0,0,0,.16);
+}
 
-/* ===================== THEME TOKENS ===================== */
 .rg-wrap{
-  /* Brand */
-  --brand: #19bf73;
-  --brand-2: #0ea567;
-
-  /* Light tokens */
-  --rg-bg: transparent;
-  --rg-title: #0f1a14;
-  --rg-text: #0f1a14;
-  --rg-muted: #5e6e66;
-  --rg-surface: #ffffff;
-  --rg-border: rgba(10,42,28,.10);
-  --rg-shadow: 0 24px 60px rgba(16,48,36,.12);
-
-  /* Green ambient background tones (light) */
-  --rg-ambient-1: rgba(25,191,115,.22);
-  --rg-ambient-2: rgba(25,191,115,.10);
-  --rg-ambient-3: rgba(12,120,78,.06);
-
-  /* Card cosmetics for images */
-  --rg-img-radius: 16px;
-  --rg-img-shadow: 0 14px 36px rgba(12,45,31,.22);
-
-  position: relative;
-  padding: 48px 20px 72px;
-  background: var(--rg-bg);
-  color: var(--rg-text);
+  position:relative;
+  color:var(--rg-ink);
+  background:var(--rg-bg);
+  padding:clamp(28px,4vw,56px) 0 clamp(64px,6vw,92px);
+  overflow:hidden;
 }
-
-/* Dark override */
-html[data-theme="dark"] .rg-wrap,
-body[data-theme="dark"] .rg-wrap,
 .dark .rg-wrap{
-  --rg-title: #ecfff7;
-  --rg-text: #eaf7ef;
-  --rg-muted: #a8b8b0;
-  --rg-surface: #0f1613;
-  --rg-border: rgba(255,255,255,.08);
-  --rg-shadow: 0 30px 70px rgba(0,0,0,.45);
+  background: var(--rg-bg-dark);
+}
+.rg-shell{ max-width:1140px; margin:0 auto; padding:0 20px; }
 
-  /* Ambient – koyu fonda daha düşük opaklıklarla */
-  --rg-ambient-1: rgba(25,191,115,.16);
-  --rg-ambient-2: rgba(25,191,115,.09);
-  --rg-ambient-3: rgba(8,90,60,.04);
 
-  --rg-img-shadow: 0 18px 42px rgba(0,0,0,.35);
+.rg-aurora{
+  position:absolute; inset:0; z-index:0; pointer-events:none;
+  opacity:.95;
 }
 
-/* ===================== HEADER ===================== */
-.rg-top{ text-align:center; max-width:1100px; margin:0 auto 26px; }
+
+.rg-top, .rg-gallery, .rg-shell { position:relative; z-index:1; }
+
+
+
+
+
+
+.rg-top, .rg-gallery, .rg-shell { position:relative; z-index:1; }
+
+
+/* Başlık */
+.rg-top{ text-align:center; position:relative; z-index:1; }
 .rg-eyebrow{
-  display:inline-block; font-size:12px; letter-spacing:.25em; text-transform:uppercase;
-  color:var(--brand-2);
-  background: linear-gradient(90deg, rgba(25,191,115,.14), transparent 70%);
-  padding:6px 10px; border-radius:999px;
+  display:inline-block; margin-bottom:8px; padding:6px 12px;
+  background:#e7efe9; color:var(--rg-accent); border-radius:999px;
+  font-size:12px; font-weight:800; letter-spacing:.08em; text-transform:uppercase;
 }
-.rg-title{
-  font-family: Georgia, "Times New Roman", serif;
-  font-weight:800; color:var(--rg-title);
-  font-size: clamp(26px, 3.6vw, 42px);
-  margin: 10px 0 6px;
-}
-.rg-sub{ color:var(--rg-muted); max-width:68ch; margin:0 auto; line-height:1.7; }
+.rg-title{ margin:6px 0 6px; font-weight:800; font-size:clamp(24px,4.4vw,40px); }
+.rg-sub{ margin:0 auto 18px; color:var(--rg-muted); max-width:760px; }
 
-/* ===================== AMBIENT PANEL ===================== */
-/* Arka planlı kabuk – geniş, yumuşak yeşil gradyan + vignette */
-.rg-dome-shell{
-  position: relative;
-  width: min(1200px, 94vw);
-  margin: 18px auto 0;
-  padding: 18px;
-  border-radius: 18px;
-  border: 1px solid var(--rg-border);
+/* Masonry (CSS column) */
+/* Masonry (CSS column) — 4'lü düzen */
+.rg-gallery{
+  position:relative; z-index:1;
+  column-count: 4;          /* <<< 4 sütun */
+  column-gap: 18px;
+}
+
+/* Büyükten küçüğe kırılımlar */
+@media (max-width: 1200px){ .rg-gallery{ column-count: 3; } }  /* 3'lü */
+@media (max-width: 900px){  .rg-gallery{ column-count: 2; } }  /* 2'li */
+@media (max-width: 560px){  .rg-gallery{ column-count: 1; } }  /* tek sütun */
+
+
+/* Kart */
+.rg-item{ break-inside: avoid; margin: 0 0 18px; }
+.rg-card{
+  display:block; width:100%; padding:0; border:0; background:transparent; cursor:pointer;
+  border-radius: var(--rg-radius); overflow:hidden; position:relative;
   box-shadow: var(--rg-shadow);
-  overflow: visible;              /* kart gölgeleri kesilmesin */
+  background: linear-gradient(180deg, var(--rg-surface), #efe9db1f);
+  border:1px solid var(--rg-stroke);
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+.rg-card:hover{ transform: translateY(-4px); box-shadow: var(--rg-shadow-2); }
 
-  /* Çok katmanlı yeşil ambiyans (light/dark ile değişken) */
-  background:
-    radial-gradient(1200px 800px at 50% 20%, var(--rg-ambient-1), transparent 60%),
-    radial-gradient(1400px 900px at 50% 120%, var(--rg-ambient-2), transparent 60%),
-    radial-gradient(60% 80% at 50% 50%, var(--rg-ambient-3), transparent 70%),
-    linear-gradient(180deg, rgba(255,255,255,.72), rgba(255,255,255,.45));
+.rg-img{
+  display:block; width:100%; height:auto; object-fit:cover;
+  transform: scale(1.01);
+  transition: transform .5s ease;
+}
+.rg-card:hover .rg-img{ transform: scale(1.06); }
+
+/* Caption */
+.rg-cap{
+  position:absolute; left:10px; right:10px; bottom:10px;
+  padding:8px 10px; font-size:13px; font-weight:700; color:#123;
+  background: rgba(255,255,255,.85); backdrop-filter: blur(6px);
+  border-radius: 12px; border:1px solid rgba(16,42,32,.10);
+  box-shadow: 0 10px 22px rgba(0,0,0,.12);
 }
 
-/* Koyu tema panel yüzeyi */
-html[data-theme="dark"] .rg-dome-shell,
-body[data-theme="dark"] .rg-dome-shell,
-.dark .rg-dome-shell{
-  background:
-    radial-gradient(1200px 800px at 50% 20%, var(--rg-ambient-1), transparent 60%),
-    radial-gradient(1400px 900px at 50% 120%, var(--rg-ambient-2), transparent 60%),
-    radial-gradient(60% 80% at 50% 50%, var(--rg-ambient-3), transparent 70%),
-    linear-gradient(180deg, #0f1613, #0f1613);
+/* ===== Lightbox ===== */
+.rg-lightbox{
+  position:fixed; inset:0; z-index: 1000; display:grid; place-items:center;
+}
+.rg-backdrop{
+  position:absolute; inset:0; background:rgba(0,0,0,.62); backdrop-filter: blur(2px);
+}
+.rg-lightbox-inner{
+  position:relative; z-index:1; max-width:min(92vw,1100px); width:100%;
+  display:grid; gap:10px; justify-items:center;
+  padding: clamp(8px, 2vw, 16px);
+}
+.rg-lightbox-img{
+  max-width:100%; max-height: 78vh; width:auto; height:auto; border-radius: 14px;
+  box-shadow: 0 28px 80px rgba(0,0,0,.45);
+  background: #000;
+}
+.rg-lightbox-cap{
+  color:#fff; font-weight:700; padding:6px 10px; border-radius:12px;
+  background: rgba(255,255,255,.12); backdrop-filter: blur(8px);
+}
+.rg-counter{
+  position:absolute; right:18px; bottom:18px; color:#fff; font-weight:700; opacity:.9;
 }
 
-/* İçerik katmanı – masonry bunun içinde */
-.rg-masonry-stage{
-  position: relative;
-  z-index: 2;                     /* arka planın üstünde */
-  min-height: 280px;
+/* Close & Nav butonları */
+.rg-x{
+  position:absolute; top:16px; right:16px; z-index:1;
+  width:40px; height:40px; border-radius:50%;
+  border:1px solid rgba(255,255,255,.4); color:#fff; background: rgba(0,0,0,.45);
+  font-size:24px; line-height:40px; text-align:center; cursor:pointer;
+  transition: transform .18s ease, background .18s ease;
 }
+.rg-x:hover{ transform: scale(1.06); background: rgba(0,0,0,.6); }
 
-/* ===================== MASONRY KART GÖRSEL STİLLERİ ===================== */
-/* ReactBits Masonry'nin ürettiği markup'ı bilmesek de
-   kapsayıcı içindeki img/figure/a elementlerini güvenli biçimde stilliyoruz. */
-
-.rg-masonry-stage img{
-  display:block;
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  border-radius: var(--rg-img-radius);
-  box-shadow: var(--rg-img-shadow);
-  filter: saturate(.98) contrast(.98);
-  transition: transform .35s ease, filter .35s ease, box-shadow .3s ease;
+.rg-nav{
+  position:absolute; top:50%; transform: translateY(-50%);
+  width:46px; height:46px; border-radius:50%;
+  border:1px solid rgba(255,255,255,.4); color:#fff; background: rgba(0,0,0,.45);
+  font-size:28px; line-height:44px; text-align:center; cursor:pointer; z-index:1;
+  transition: transform .18s ease, background .18s ease;
 }
+.rg-prev{ left:16px; }
+.rg-next{ right:16px; }
+.rg-nav:hover{ transform: translateY(-50%) scale(1.06); background: rgba(0,0,0,.6); }
 
-.rg-masonry-stage a,
-.rg-masonry-stage figure,
-.rg-masonry-stage div{
-  border-radius: var(--rg-img-radius);
-  overflow: hidden;
-}
-
-/* Hover’a küçük parıltı */
-.rg-masonry-stage .masonry-item:hover img,
-.rg-masonry-stage a:hover img{
-  transform: scale(1.03);
-  filter: saturate(1) contrast(1);
-  box-shadow: 0 18px 48px rgba(12,45,31,.28);
-}
-
-/* Görsel başlık rozetleri (Masonry komponenti başlık render ediyorsa) */
-.rg-masonry-stage .masonry-caption{
-  position:absolute; left:10px; bottom:10px;
-  background: rgba(0,0,0,.48);
-  color:#fff; font-size:12px; padding:6px 10px;
-  border-radius: 10px;
-  backdrop-filter: blur(4px);
-  border: 1px solid rgba(255,255,255,.18);
-}
-
-/* ===================== RESPONSIVE ===================== */
-@media (max-width: 640px){
-  .rg-dome-shell{ padding: 14px; border-radius: 16px; }
-  .rg-masonry-stage img{ border-radius: 14px; }
+/* Motion tercihleri */
+@media (prefers-reduced-motion: reduce){
+  .rg-card, .rg-img, .rg-nav, .rg-x { transition: none !important; }
 }

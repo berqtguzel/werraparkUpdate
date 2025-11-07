@@ -1,371 +1,251 @@
 import React from "react";
-import { Head } from "@inertiajs/react";
 import "../../../css/contact.css";
 
-export default function ContactIndex() {
-    const execTeam = [
+const MailIcon = (props) => (
+    <svg
+        viewBox="0 0 24 24"
+        width="18"
+        height="18"
+        aria-hidden="true"
+        {...props}
+    >
+        <path
+            fill="currentColor"
+            d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Zm0 2v.01L12 11 4 6.01V6h16ZM4 18V8.24l7.4 4.94a1.5 1.5 0 0 0 1.2 0L20 8.24V18H4Z"
+        />
+    </svg>
+);
+const PhoneIcon = (props) => (
+    <svg
+        viewBox="0 0 24 24"
+        width="18"
+        height="18"
+        aria-hidden="true"
+        {...props}
+    >
+        <path
+            fill="currentColor"
+            d="M6.6 10.8a15.2 15.2 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25c1.1.36 2.3.55 3.6.55a1 1 0 0 1 1 1V20a2 2 0 0 1-2 2C9.7 22 2 14.3 2 4a2 2 0 0 1 2-2h3.5a1 1 0 0 1 1 1c0 1.3.19 2.5.55 3.6a1 1 0 0 1-.25 1L6.6 10.8Z"
+        />
+    </svg>
+);
+const PinIcon = (props) => (
+    <svg
+        viewBox="0 0 24 24"
+        width="18"
+        height="18"
+        aria-hidden="true"
+        {...props}
+    >
+        <path
+            fill="currentColor"
+            d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5Z"
+        />
+    </svg>
+);
+
+function TeamCard({ photo, name, title, email, phone }) {
+    return (
+        <article
+            className="ct-card"
+            role="group"
+            aria-label={`${name} – ${title}`}
+        >
+            <div className="ct-card__header">
+                <img
+                    src={photo}
+                    alt={`${name} fotoğrafı`}
+                    className="ct-card__avatar"
+                />
+                <div className="ct-card__titles">
+                    <h3 className="ct-card__name">{name}</h3>
+                    <p className="ct-card__role">{title}</p>
+                </div>
+            </div>
+            <ul className="ct-card__meta">
+                {email && (
+                    <li>
+                        <MailIcon />
+                        <a href={`mailto:${email}`}>{email}</a>
+                    </li>
+                )}
+                {phone && (
+                    <li>
+                        <PhoneIcon />
+                        <a href={`tel:${phone.replace(/\s+/g, "")}`}>{phone}</a>
+                    </li>
+                )}
+            </ul>
+        </article>
+    );
+}
+
+export default function ContactPage() {
+    const executives = [
         {
+            photo: "/images/team/sezai.jpg",
             name: "Sezai Koc",
-            role: "Generaldirektor des Werrapark Resorts Hotel",
+            title: "Generaldirektor des Werrapark Resorts Hotel",
             email: "sezai.koc@werrapark.de",
-            phone: "01702918717",
-            avatar: "/images/avatars/sezai.jpg",
+            phone: "0170 291 8717",
         },
         {
+            photo: "/images/team/ozgur.jpg",
             name: "Özgür Akkaynak",
-            role: "Operationsmanager des Werrapark Resorts Hotel",
-            email: "oezguer.akkaynak@werrapark.de",
-            phone: "015159098197",
-            avatar: "/images/avatars/ozgur.jpg",
+            title: "Operationsmanager des Werrapark Resorts Hotel",
+            email: "ozgur.akkaynak@werrapark.de",
+            phone: "0151 5909 8197",
         },
         {
+            photo: "/images/team/christina.jpg",
             name: "Christina Pahlahs",
-            role: "Leiterin der Personal- und Buchhaltungsabteilung des Werrapark Resorts Hotel",
+            title: "Leiterin der Personal- und Buchhaltungsabteilung des Werrapark Resorts Hotel",
             email: "christina.pahlahs@werrapark.de",
-            phone: "036874 385568",
-            avatar: "/images/avatars/christina.jpg",
+            phone: "03684 385 568",
         },
     ];
 
-    const resTeam = [
+    const reservations = [
         {
+            photo: "/images/team/steinitz.jpg",
             name: "Christian Steinitz",
-            role: "Hotelleiter",
+            title: "Hotelleiter",
             email: "info@werrapark.de",
-            phone: "036874 93718",
-            phone2: "036874 93788",
-            avatar: "/images/avatars/steinitz.jpg",
+            phone: "03684 93718",
         },
         {
+            photo: "/images/team/koch.jpg",
             name: "Christian Koch",
-            role: "Verantwortlich für Buchungen Werrapark Resorts Sommerberg Hotel",
+            title: "Verantwortlich für Buchungen – Werrapark Resorts Sommerberg Hotel",
             email: "info@werrapark-sommerberg.de",
             phone: "036870 256109",
-            avatar: "/images/avatars/koch.jpg",
         },
         {
+            photo: "/images/team/rossendahl.jpg",
             name: "Claudia Rosendahl",
-            role: "Verantwortlich für Buchungen Werrapark Resort Heubacher Höhe Hotel",
+            title: "Verantwortlich für Buchungen – Werrapark Resort Heubacher Höhe Hotel",
             email: "empfang-heubach@werrapark.de",
             phone: "036874 93706",
-            avatar: "/images/avatars/rosendahl.jpg",
         },
     ];
 
-    const [form, setForm] = React.useState({
-        name: "",
-        phone: "",
-        email: "",
-        message: "",
-        privacy: false,
-    });
-    const [sending, setSending] = React.useState(false);
-    const [sent, setSent] = React.useState(false);
-    const [error, setError] = React.useState("");
-
-    const canSubmit =
-        form.name.trim().length > 1 &&
-        /\S+@\S+\.\S+/.test(form.email) &&
-        form.message.trim().length > 5 &&
-        form.privacy &&
-        !sending;
-
-    const onSubmit = async (e) => {
+    const onSubmit = (e) => {
         e.preventDefault();
-        if (!canSubmit) return;
-        try {
-            setSending(true);
-            // Backend'e göndermek istersen:
-            // await router.post(route('contact.store'), form);
-            // Demo: mailto fallback
-            const subject = encodeURIComponent(
-                `Kontaktanfrage von ${form.name || "Gast"}`
-            );
-            const body = encodeURIComponent(
-                `Name: ${form.name}\nTelefon: ${form.phone}\nE-Mail: ${form.email}\n\nNachricht:\n${form.message}`
-            );
-            window.location.href = `mailto:info@werrapark.de?subject=${subject}&body=${body}`;
-            setSent(true);
-            setError("");
-        } catch (err) {
-            setError("Etwas ist schiefgelaufen. Bitte erneut versuchen.");
-        } finally {
-            setSending(false);
-        }
+        alert("Danke! Ihre Nachricht wurde lokal validiert. (Back-end bağla)");
     };
 
     return (
-        <div className="ct-wrap theme-auto">
-            <Head title="Kontakt" />
-            <div className="ct-bg">
-                <div className="ct-gradient ct-gradient-1" />
-                <div className="ct-gradient ct-gradient-2" />
-                <div className="ct-noise" aria-hidden />
-            </div>
-
-            <div className="ct-shell">
-                {/* SAYFA BAŞI */}
-                <header className="ct-hero">
-                    <span className="ct-badge">Werrapark</span>
-                    <h1 className="ct-title">Kontakt & Team</h1>
-                    <p className="ct-sub">
-                        Nehmen Sie Kontakt auf oder sprechen Sie direkt mit
-                        unserem Team.
+        <main className="ct-section" id="kontakt">
+            <div className="ct-container">
+                <header className="ct-header">
+                    <h1 className="ct-title">Kontakt</h1>
+                    <p className="ct-subtitle">
+                        Bize dilediğiniz kanaldan ulaşabilirsiniz. Yönetim ve
+                        rezervasyon ekiplerinin iletişim bilgileri aşağıdadır.
                     </p>
                 </header>
 
-                {/* EXEC TEAM */}
-                <section className="ct-section">
-                    <h2 className="ct-h2">Exekutivteam</h2>
-                    <div className="team-grid">
-                        {execTeam.map((m, i) => (
-                            <article
-                                key={i}
-                                className="team-card ct-card ct-glass"
-                            >
-                                <div className="team-top">
-                                    <img
-                                        className="avatar"
-                                        src={m.avatar}
-                                        alt={`${m.name} Avatar`}
-                                        onError={(e) =>
-                                            (e.currentTarget.style.visibility =
-                                                "hidden")
-                                        }
-                                    />
-                                    <div className="team-text">
-                                        <h3 className="name">{m.name}</h3>
-                                        <p className="role">{m.role}</p>
-                                    </div>
-                                </div>
-                                <ul className="contact-list">
-                                    <li>
-                                        <span className="ico">✉️</span>
-                                        <a href={`mailto:${m.email}`}>
-                                            {m.email}
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <span className="ico">📞</span>
-                                        <a href={`tel:${m.phone}`}>{m.phone}</a>
-                                    </li>
-                                </ul>
-                            </article>
+                <section aria-labelledby="exec-title" className="ct-block">
+                    <h2 id="exec-title" className="ct-block__title">
+                        Exekutivteam
+                    </h2>
+                    <div className="ct-grid">
+                        {executives.map((p) => (
+                            <TeamCard key={p.email} {...p} />
                         ))}
                     </div>
                 </section>
 
-                {/* RESERVIERUNGS-TEAM */}
-                <section className="ct-section">
-                    <h2 className="ct-h2">Reservierungs-Team</h2>
-                    <div className="team-grid">
-                        {resTeam.map((m, i) => (
-                            <article
-                                key={i}
-                                className="team-card ct-card ct-glass"
-                            >
-                                <div className="team-top">
-                                    <img
-                                        className="avatar"
-                                        src={m.avatar}
-                                        alt={`${m.name} Avatar`}
-                                        onError={(e) =>
-                                            (e.currentTarget.style.visibility =
-                                                "hidden")
-                                        }
-                                    />
-                                    <div className="team-text">
-                                        <h3 className="name">{m.name}</h3>
-                                        <p className="role">{m.role}</p>
-                                    </div>
-                                </div>
-                                <ul className="contact-list">
-                                    <li>
-                                        <span className="ico">✉️</span>
-                                        <a href={`mailto:${m.email}`}>
-                                            {m.email}
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <span className="ico">📞</span>
-                                        <a href={`tel:${m.phone}`}>{m.phone}</a>
-                                    </li>
-                                    {m.phone2 && (
-                                        <li>
-                                            <span className="ico">📞</span>
-                                            <a href={`tel:${m.phone2}`}>
-                                                {m.phone2}
-                                            </a>
-                                        </li>
-                                    )}
-                                </ul>
-                            </article>
+                {/* Reservations team */}
+                <section aria-labelledby="res-title" className="ct-block">
+                    <h2 id="res-title" className="ct-block__title">
+                        Reservierungs-Team
+                    </h2>
+                    <div className="ct-grid">
+                        {reservations.map((p) => (
+                            <TeamCard key={p.email} {...p} />
                         ))}
                     </div>
                 </section>
 
-                {/* İLETİŞİM BLOKU */}
-                <section className="ct-section">
-                    <div className="cta-grid">
-                        {/* SOL BİLGİ KARTI */}
-                        <aside
-                            className="info-card ct-card ct-glass"
-                            aria-label="Hotel Info"
-                        >
-                            <h3 className="cta-title">Kontakt aufnehmen</h3>
-                            <div className="info-list">
-                                <div className="row">
-                                    <span className="ico">📍</span>
-                                    <span>
-                                        Am Kirchberg 15, 98666
-                                        Masserberg-Schnett
-                                    </span>
-                                </div>
-                                <a className="row link" href="tel:036874205706">
-                                    <span className="ico">📞</span>
-                                    <span>036874 205706</span>
+                {/* Contact panel + form */}
+                <section aria-labelledby="form-title" className="ct-panel">
+                    <div className="ct-panel__info">
+                        <h2 id="form-title" className="ct-panel__title">
+                            Kontakt aufnehmen
+                        </h2>
+                        <ul className="ct-info">
+                            <li>
+                                <PinIcon />
+                                <span>
+                                    Am Kirchberg 15, 98666 Masserberg-Schnett
+                                </span>
+                            </li>
+                            <li>
+                                <PhoneIcon />
+                                <a href="tel:+493684205706">03684 205706</a>
+                            </li>
+                            <li>
+                                <MailIcon />
+                                <a href="mailto:info@werrapark.de">
+                                    info@werrapark.de
                                 </a>
-                                <a
-                                    className="row link"
-                                    href="mailto:info@werrapark.de"
-                                >
-                                    <span className="ico">✉️</span>
-                                    <span>info@werrapark.de</span>
-                                </a>
-                            </div>
-                        </aside>
+                            </li>
+                        </ul>
+                    </div>
 
-                        {/* SAĞ FORM */}
-                        <div className="form-card ct-card ct-glass">
-                            {sent ? (
-                                <div className="ct-success">
-                                    <span className="ico">✅</span>
-                                    <div>
-                                        <h4>Vielen Dank!</h4>
-                                        <p>
-                                            Ihre Nachricht wurde vorbereitet.
-                                            Wir melden uns zeitnah bei Ihnen.
-                                        </p>
-                                    </div>
-                                </div>
-                            ) : (
-                                <form onSubmit={onSubmit} noValidate>
-                                    {error && (
-                                        <div className="ct-error">
-                                            <span className="ico">⚠️</span>
-                                            <span>{error}</span>
-                                        </div>
-                                    )}
-
-                                    <div className="form-grid">
-                                        <div className="field">
-                                            <label htmlFor="name">Name*</label>
-                                            <input
-                                                id="name"
-                                                required
-                                                value={form.name}
-                                                onChange={(e) =>
-                                                    setForm((f) => ({
-                                                        ...f,
-                                                        name: e.target.value,
-                                                    }))
-                                                }
-                                                placeholder="Max Mustermann"
-                                                autoComplete="name"
-                                            />
-                                        </div>
-                                        <div className="field">
-                                            <label htmlFor="phone">
-                                                Telefon
-                                            </label>
-                                            <input
-                                                id="phone"
-                                                value={form.phone}
-                                                onChange={(e) =>
-                                                    setForm((f) => ({
-                                                        ...f,
-                                                        phone: e.target.value,
-                                                    }))
-                                                }
-                                                placeholder="+49 …"
-                                                autoComplete="tel"
-                                            />
-                                        </div>
-                                        <div className="field">
-                                            <label htmlFor="email">
-                                                E-Mail*
-                                            </label>
-                                            <input
-                                                id="email"
-                                                required
-                                                type="email"
-                                                value={form.email}
-                                                onChange={(e) =>
-                                                    setForm((f) => ({
-                                                        ...f,
-                                                        email: e.target.value,
-                                                    }))
-                                                }
-                                                placeholder="gast@example.com"
-                                                autoComplete="email"
-                                            />
-                                        </div>
-                                        <div className="field field--full">
-                                            <label htmlFor="message">
-                                                Nachricht*
-                                            </label>
-                                            <textarea
-                                                id="message"
-                                                rows={6}
-                                                required
-                                                value={form.message}
-                                                onChange={(e) =>
-                                                    setForm((f) => ({
-                                                        ...f,
-                                                        message: e.target.value,
-                                                    }))
-                                                }
-                                                placeholder="Wie können wir helfen?"
-                                            />
-                                        </div>
-                                        <label className="check field--full">
-                                            <input
-                                                type="checkbox"
-                                                checked={form.privacy}
-                                                onChange={(e) =>
-                                                    setForm((f) => ({
-                                                        ...f,
-                                                        privacy:
-                                                            e.target.checked,
-                                                    }))
-                                                }
-                                            />
-                                            <span>
-                                                Ich akzeptiere die{" "}
-                                                <a
-                                                    href="/impressum"
-                                                    target="_blank"
-                                                    rel="noreferrer"
-                                                >
-                                                    Datenschutzerklärung
-                                                </a>
-                                                .
-                                            </span>
-                                        </label>
-                                    </div>
-
-                                    <button
-                                        className="ct-btn"
-                                        disabled={!canSubmit}
-                                    >
-                                        {sending ? "Senden…" : "Senden"}
-                                    </button>
-                                </form>
-                            )}
+                    <form className="ct-form" onSubmit={onSubmit} noValidate>
+                        <div className="ct-field">
+                            <label htmlFor="name">Name</label>
+                            <input
+                                id="name"
+                                name="name"
+                                type="text"
+                                placeholder="Adınız"
+                                required
+                            />
                         </div>
-                    </div>
+
+                        <div className="ct-field">
+                            <label htmlFor="phone">Telefon</label>
+                            <input
+                                id="phone"
+                                name="phone"
+                                type="tel"
+                                placeholder="+49 …"
+                            />
+                        </div>
+
+                        <div className="ct-field">
+                            <label htmlFor="email">E-Mail</label>
+                            <input
+                                id="email"
+                                name="email"
+                                type="email"
+                                placeholder="ornek@mail.com"
+                                required
+                            />
+                        </div>
+
+                        <div className="ct-field ct-field--full">
+                            <label htmlFor="message">Nachricht</label>
+                            <textarea
+                                id="message"
+                                name="message"
+                                rows="6"
+                                placeholder="Mesajınız"
+                                required
+                            />
+                        </div>
+
+                        <div className="ct-actions">
+                            <button type="submit" className="ct-button">
+                                Senden
+                            </button>
+                        </div>
+                    </form>
                 </section>
             </div>
-        </div>
+        </main>
     );
 }

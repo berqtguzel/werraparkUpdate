@@ -87,6 +87,7 @@
   letter-spacing: .2px;
   background: var(--hero-glass-dark);
   line-height: 1.08;
+  color: white;
 }
 
 .hero-content > p{

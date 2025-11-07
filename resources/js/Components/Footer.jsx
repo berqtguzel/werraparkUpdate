@@ -192,7 +192,7 @@ export default function Footer() {
                             <a href="/impressum">Impressum</a>
                         </li>
                         <li>
-                            <a href="/contact">Kontakt</a>
+                            <a href="/kontakt">Kontakt</a>
                         </li>
                     </ul>
                 </div>

@@ -4,18 +4,29 @@ import ThemeToggle from "./ThemeToggle";
 import "../../css/header.css";
 
 export default function Header({ currentRoute }) {
-    // ---- nav tanımı ----
     const nav = [
         { label: "Home", href: "/", key: "home" },
         { label: "Über uns", href: "/uber-uns", key: "uberuns" },
         { label: "Historie", href: "/historie", key: "historie" },
         { label: "Gäste ABC", href: "/gaeste-abc", key: "gaeste-abc" },
-        { label: "Urlaubsthemen", href: "/urlaubsthemen", key: "urlaubsthemen" },
+        {
+            label: "Urlaubsthemen",
+            href: "/urlaubsthemen",
+            key: "urlaubsthemen",
+        },
         { label: "Galerie", href: "/galerie", key: "galerie" },
         { label: "Karriere", href: "/karriere", key: "karriere" },
         { label: "Bewertungen", href: "/bewertungen", key: "bewertungen" },
-        { label: "Veranstaltung", href: "/veranstaltung", key: "veranstaltung" },
-        { label: "Gutscheinshop", href: "/gutscheinshop", key: "gutscheinshop" },
+        {
+            label: "Veranstaltung",
+            href: "/veranstaltung",
+            key: "veranstaltung",
+        },
+        {
+            label: "Gutscheinshop",
+            href: "/gutscheinshop",
+            key: "gutscheinshop",
+        },
     ];
 
     const [open, setOpen] = React.useState(false);
@@ -84,7 +95,7 @@ export default function Header({ currentRoute }) {
                     </div>
 
                     <div className="wh-topbar__right">
-                        <a href="/contact" className="wh-btn wh-btn--ghost">
+                        <a href="/kontakt" className="wh-btn wh-btn--ghost">
                             Kontakt
                         </a>
                         <a href="/impressum" className="wh-btn wh-btn--ghost">

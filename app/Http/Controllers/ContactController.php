@@ -9,7 +9,7 @@ class ContactController extends Controller
 {
     public function index()
     {
-        // Inertia React/Vue sayfanı buraya bağla
+
         return Inertia::render('kontakt/Index', [
             'title' => 'Kontakt',
             'subtitle' => 'Wir helfen Ihnen gern weiter.',
@@ -26,9 +26,6 @@ class ContactController extends Controller
             'privacy' => ['accepted'],
         ]);
 
-        // TODO: Mail gönder / DB'ye kaydet
-        // Mail::to('info@werrapark.de')->send(new \App\Mail\ContactMail($data));
-        // ContactMessage::create($data);
 
         return back()->with('flash', [
             'type' => 'success',
