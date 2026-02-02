@@ -1,0 +1,249 @@
+/* ================= THEME TOKENS ================= */
+.ex-wrap{
+  /* Brand */
+  --brand: #18b86a;
+  --brand-2: #0ea567;
+
+  /* Light */
+  --ex-bg: #edf5f0;
+  --ex-surface: #ffffff;
+  --ex-text: #0f1a14;
+  --ex-muted: #50645c;
+  --ex-accent: #0f1a14;
+  --ex-border: rgba(10,42,28,.10);
+  --ex-soft: rgba(15,35,26,.05);
+  --ex-ring: rgba(24,184,106,.45);
+  --ex-shadow: 0 22px 60px rgba(16,48,36,.12);
+
+  /* Badge */
+  --badge-bg: linear-gradient(135deg, #10b565, #0c8f56);
+  --badge-grid: rgba(255,255,255,.06);
+
+  position: relative;
+  padding: 56px 20px 72px;
+  background:
+    radial-gradient(900px 600px at 8% -10%, rgba(24,184,106,.14), transparent 60%),
+    linear-gradient(180deg, var(--ex-bg), #e8f2ec 60%, #e3efe8);
+  color: var(--ex-text);
+}
+
+/* ================= DARK OVERRIDE ================= */
+html[data-theme="dark"] .ex-wrap,
+body[data-theme="dark"] .ex-wrap,
+.dark .ex-wrap{
+  --ex-bg: #0c1210;
+  --ex-surface: #0f1613;
+
+  /* Metinleri beyaza çek */
+  --ex-text: #ffffff;
+  --ex-muted: rgba(255,255,255,.88);
+  --ex-accent: #ffffff;
+
+  --ex-border: rgba(255,255,255,.20);
+  --ex-soft: rgba(255,255,255,.10);
+  --ex-shadow: 0 28px 70px rgba(0,0,0,.45);
+
+  --badge-bg: linear-gradient(135deg, #15c374, #0ea567);
+  --badge-grid: rgba(0,0,0,.15);
+
+  /* Koyu arka plan degrade */
+  background:
+    radial-gradient(1200px 800px at 8% -10%, rgba(24,184,106,.12), transparent 60%),
+    linear-gradient(180deg, #0b1411, #0a100e 60%, #0a0f0d);
+}
+
+/* Güvenli görünürlük – koyu temada metinlere hafif gölge */
+html[data-theme="dark"] .ex-wrap .ex-title,
+html[data-theme="dark"] .ex-wrap .ex-desc,
+html[data-theme="dark"] .ex-wrap .ex-meta-label,
+html[data-theme="dark"] .ex-wrap .ex-link,
+html[data-theme="dark"] .ex-wrap .ex-content {
+  color: #fff !important;
+  text-shadow: 0 2px 12px rgba(0,0,0,.35);
+}
+html[data-theme="dark"] .ex-wrap .ex-link:hover{
+  color: #b7ffe0 !important;
+  border-color: rgba(183,255,224,.65);
+}
+
+/* ================= LAYOUT ================= */
+.ex-container{
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: 42px;
+  align-items: start;
+  position: relative;
+  z-index: 1;
+}
+
+/* background pattern right */
+.ex-pattern{
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: min(40vw, 720px);
+  opacity: .25;
+  pointer-events: none;
+  -webkit-mask-image: radial-gradient(120% 120% at 0% 50%, #000, transparent 70%);
+          mask-image: radial-gradient(120% 120% at 0% 50%, #000, transparent 70%);
+  background:
+    radial-gradient(16px 16px at 12px 12px, transparent 12px, currentColor 13px) 0 0 / 72px 72px,
+    radial-gradient(16px 16px at 36px 36px, transparent 12px, currentColor 13px) 0 0 / 72px 72px;
+  color: var(--ex-soft);
+}
+
+/* ================= LEFT: MEDIA ================= */
+.ex-media{
+  position: relative;
+  margin: 0;
+  border-radius: 18px;
+  overflow: hidden;
+  background: var(--ex-surface);
+  border: 1px solid var(--ex-border);
+  box-shadow: var(--ex-shadow);
+}
+.ex-media img{
+  display: block;
+  width: 100%; height: auto;
+  object-fit: cover;
+  filter: saturate(.98) contrast(.98);
+  transition: transform .5s ease, filter .5s ease;
+}
+.ex-media:hover img{
+  transform: scale(1.02);
+  filter: saturate(1) contrast(1);
+}
+
+/* Badge */
+.ex-badge{
+  position: absolute;
+  left: 20px; bottom: 20px;
+  display: grid;
+  align-content: center;
+  gap: 6px;
+  min-width: 210px;
+  padding: 18px 22px;
+  color: #fff;
+  background:
+    radial-gradient(200% 120% at 0% 0%, rgba(255,255,255,.08), transparent 40%),
+    var(--badge-bg);
+  border-radius: 10px;
+  box-shadow: 0 16px 36px rgba(0,0,0,.35);
+  border: 1px solid rgba(255,255,255,.18);
+  overflow: hidden;
+}
+.ex-badge::after{
+  content:"";
+  position:absolute; inset:0;
+  background:
+    linear-gradient(90deg, var(--badge-grid) 1px, transparent 1px) 0 0/18px 18px,
+    linear-gradient(0deg, var(--badge-grid) 1px, transparent 1px) 0 0/18px 18px;
+  pointer-events:none;
+}
+.ex-badge-num{
+  font-size: clamp(28px, 5vw, 44px);
+  font-weight: 800;
+  letter-spacing: .5px;
+  line-height: 1;
+}
+.ex-badge-sub{
+  font-size: 12px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  opacity: .95;
+}
+
+/* ================= RIGHT: CONTENT ================= */
+.ex-content{ padding-top: 6px; }
+
+.ex-eyebrow{
+  display: inline-block;
+  font-size: 12px;
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  color: var(--brand-2);
+  background: linear-gradient(90deg, rgba(24,184,106,.15), transparent 70%);
+  padding: 6px 10px;
+  border-radius: 999px;
+}
+
+.ex-title{
+  margin: 10px 0 12px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 800;
+  font-size: clamp(24px, 3.6vw, 44px);
+  line-height: 1.08;
+  color: var(--ex-accent);
+  text-wrap: balance;
+}
+
+.ex-desc{
+  margin: 0 0 18px;
+  color: var(--ex-muted);
+  line-height: 1.7;
+  max-width: 60ch;
+}
+
+.ex-rule{
+  height: 1px;
+  border: 0;
+  background: linear-gradient(90deg, transparent, var(--ex-border), transparent);
+  margin: 16px 0 14px;
+}
+
+/* meta blocks */
+.ex-meta{
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 18px 28px;
+  align-items: center;
+}
+.ex-meta-block{}
+.ex-meta-label{
+  font-size: 12px;
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  color: var(--ex-muted);
+  margin-bottom: 8px;
+}
+.ex-link{
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--ex-text);
+  text-decoration: none;
+  border-bottom: 1px dashed rgba(24,184,106,.35);
+  transition: color .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+.ex-icon{ width: 18px; height: 18px; color: var(--brand-2); }
+.ex-link:hover{
+  color: var(--brand-2);
+  border-color: rgba(24,184,106,.75);
+}
+
+/* social buttons */
+.ex-social{ display: flex; gap: 10px; }
+.ex-social-btn{
+  display: inline-grid; place-items: center;
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  color: var(--ex-text);
+  border: 1px solid var(--ex-border);
+  background: linear-gradient(180deg, rgba(255,255,255,.05), transparent);
+  box-shadow: 0 1px 0 rgba(255,255,255,.04) inset;
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+.ex-social-btn:hover{
+  transform: translateY(-1px);
+  border-color: rgba(24,184,106,.55);
+  box-shadow: 0 0 0 4px var(--ex-ring);
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 1024px){
+  .ex-container{ grid-template-columns: 1fr; gap: 28px; }
+  .ex-pattern{ width: 60vw; opacity: .2; }
+  .ex-meta{ grid-template-columns: 1fr; }
+  .ex-media .ex-badge{ left: 16px; bottom: 16px; }
+}

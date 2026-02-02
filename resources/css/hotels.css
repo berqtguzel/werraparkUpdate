@@ -1,0 +1,197 @@
+:root {
+  --hotel-green: #1f8155;
+  --hotel-green-light: #57b489;
+  --hotel-dark-bg: #0f172a;
+  --hotel-light-bg: #f8fafc;
+  --hotel-card-bg: rgba(255,255,255,.8);
+  --hotel-card-border: rgba(31,129,85,.15);
+  --hotel-text: #0f172a;
+  --hotel-shadow: 0 10px 25px rgba(0,0,0,.08);
+}
+
+
+.hotels-section {
+  padding: clamp(48px, 6vw, 84px) 20px;
+  transition: background .4s ease;
+}
+.dark .hotels-section, [data-theme="dark"] .hotels-section {
+  background: var(--hotel-dark-bg);
+}
+
+.hotels-container { max-width: 1280px; margin-inline:auto; }
+.hotels-title {
+  text-align:center;
+  font-size: clamp(26px, 3vw, 42px);
+  font-weight: 800;
+  margin-bottom: clamp(28px, 5vw, 52px);
+  color: white;
+}
+
+.hotels-subtitle{
+  margin:-20px auto 28px;
+  max-width:780px;
+  text-align:center;
+  color: white;
+  font-size: clamp(14px, 1.8vw, 16px);
+}
+
+/* GRID */
+.hotel-grid{
+  display:grid;
+  gap: clamp(14px, 2vw, 24px);
+  grid-template-columns: repeat(5, minmax(0,1fr)); /* desktop 5 */
+  align-items: stretch;
+}
+
+@media (max-width: 1400px){ .hotel-grid{ grid-template-columns: repeat(4, minmax(0,1fr)); } }
+@media (max-width: 1100px){ .hotel-grid{ grid-template-columns: repeat(3, minmax(0,1fr)); } }
+@media (max-width: 820px) { .hotel-grid{ grid-template-columns: repeat(2, minmax(0,1fr)); } }
+@media (max-width: 520px) { .hotel-grid{ grid-template-columns: 1fr; } }
+
+/* ElectricBorder WRAPPER
+   (reactbits kapsayıcısı hücreyi tam doldursun, taşma yapmasın) */
+.hotel-eb{ width:100%; height:100%; display:flex; }
+.hotel-eb > *{ flex:1; display:flex; }
+
+/* CARD (iç kutu) */
+.hotel-card{
+  background: var(--hotel-card-bg);
+  border: 1px solid var(--hotel-card-border);
+  border-radius: 16px;
+  box-shadow: var(--hotel-shadow);
+  backdrop-filter: blur(10px) saturate(1.08);
+  -webkit-backdrop-filter: blur(10px) saturate(1.08);
+  transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+  display:flex; flex-direction:column; height:100%;
+  will-change: transform;
+}
+.hotel-card:hover{
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px rgba(0,0,0,.15);
+  border-color: var(--hotel-green-light);
+}
+
+/* IMAGE sabit oran + keskinlik */
+.hotel-image{ aspect-ratio: 16 / 9; overflow:hidden; }
+.hotel-image img{
+  width:100%; height:100%; object-fit:cover; object-position:center;
+  display:block; filter:saturate(1.02) contrast(1.02);
+  border-bottom:1px solid var(--hotel-card-border);
+}
+
+/* BODY */
+.hotel-body{ padding: 18px; display:grid; gap: 10px; grid-auto-rows: max-content; }
+.hotel-body h3{
+  font-size: clamp(0.98rem, 1.3vw, 1.1rem);
+  font-weight: 800; line-height: 1.25; color: var(--hotel-text);
+  text-align:center; margin-bottom: 2px;
+}
+
+/* RATING */
+.hotel-rating{ display:flex; justify-content:center; gap:4px; }
+.star{ color:#94a3b8; transition: color .2s ease; }
+.star.active{ color: var(--hotel-green-light); }
+
+/* CONTACT */
+.hotel-contact{ margin-top:auto; display:grid; gap:8px; }
+.hotel-link{
+  display:inline-flex; align-items:center; gap:8px;
+  color: var(--hotel-text); text-decoration:none; font-size:.66rem;
+  transition: color .2s ease, transform .15s ease;
+  overflow-wrap:anywhere;
+}
+.hotel-link:hover{ color: var(--hotel-green); transform: translateY(-1px); }
+
+/* ElectricBorder ile çakışmayı önle */
+.eb-reset{ border:none; box-shadow:none; overflow:hidden; background: var(--hotel-card-bg); }
+
+/* Small tweaks */
+@media (max-width: 820px){
+  .hotel-image{ aspect-ratio: 4 / 3; }
+}
+@media (max-width: 520px){
+  .hotel-body{ padding: 16px; }
+}
+
+.hotels-section{
+  position: relative;
+  overflow: hidden;
+}
+
+/* Canvas/surface katmanını kartların arkasına al */
+.pixeltrail-bg{
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none; /* tıklamaları engelleme */
+}
+
+/* içerik üstte kalsın */
+.hotels-container{ position: relative; z-index: 1; }
+
+/* Yumuşak üst–alt fade (arka planın dikkat dağıtmaması için) */
+.pixeltrail-bg::after{
+  content:"";
+  position:absolute; inset:0;
+  pointer-events:none;
+  /* üstte hafif beyaz/yeşil perde, altta vignette */
+  background:
+    radial-gradient(120% 90% at 50% 10%,
+      rgba(255,255,255,.65) 0%,
+      rgba(255,255,255,.25) 35%,
+      rgba(255,255,255,0) 60%),
+    radial-gradient(120% 100% at 50% 120%,
+      rgba(0,0,0,.18) 0%,
+      rgba(0,0,0,0) 55%);
+}
+
+/* Dark temada daha koyu perde */
+.dark .pixeltrail-bg::after,
+[data-theme="dark"] .pixeltrail-bg::after{
+  background:
+    radial-gradient(120% 90% at 50% 10%,
+      rgba(15,23,42,.55) 0%,
+      rgba(15,23,42,.28) 35%,
+      rgba(15,23,42,0) 60%),
+    radial-gradient(120% 100% at 50% 120%,
+      rgba(0,0,0,.32) 0%,
+      rgba(0,0,0,0) 55%);
+}
+
+.pixeltrail-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0.6;
+  mix-blend-mode: overlay;
+}
+.dark .pixeltrail-bg {
+  opacity: 0.4;
+  mix-blend-mode: soft-light;
+}
+.hotels-section{
+  position: relative;
+  isolation: isolate;
+
+}
+
+.pixeltrail-bg{
+  position:absolute; inset:0;
+  pointer-events:none;
+  z-index:1;
+  mix-blend-mode: normal !important;   /* ← KRİTİK */
+  opacity: 1 !important;
+}
+
+/* canvas/svg tam dolsun */
+.pixeltrail-bg > *{
+  width:100% !important;
+  height:100% !important;
+  display:block;
+}
+
+/* Tema fark etmesin – beyazlatmayı tamamen devre dışı bıraktık */
+:root.dark .pixeltrail-bg,
+:root[class~="dark"] .pixeltrail-bg{ mix-blend-mode: normal !important; }

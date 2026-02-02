@@ -1,0 +1,108 @@
+:root {
+  --vp-max: 1280px;
+  --vp-ink: #e5e7eb;
+  --vp-ink-strong: #f8fafc;
+  --vp-bg: #11181f; /* bölüm arka planı */
+  --vp-accent: #22c55e; /* play butonu/cta vurgusu */
+}
+
+.vp-section {
+  background: var(--vp-bg);
+  padding: 36px 0 44px;
+}
+
+.vp-shell {
+  max-width: var(--vp-max);
+  margin-inline: auto;
+  padding: 0 1rem;
+}
+
+.vp-title {
+  margin: 0 0 18px;
+  color: var(--vp-ink-strong);
+  text-align: center;
+  font-size: clamp(1.4rem, 1rem + 2.2vw, 2.6rem);
+  font-weight: 800;
+  letter-spacing: -.02em;
+}
+
+/* 16:9 kutu */
+.vp-aspect {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 30px 60px rgba(0,0,0,.35);
+}
+
+/* Poster butonu */
+.vp-poster {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: block;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+}
+
+.vp-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(1.03) contrast(1.03);
+  transition: transform .45s ease, filter .45s ease;
+}
+
+.vp-poster:hover .vp-img {
+  transform: scale(1.02);
+  filter: saturate(1.08) contrast(1.07) brightness(1.02);
+}
+
+/* Orta play ikonu */
+.vp-play {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  transition: transform .2s ease;
+}
+.vp-poster:hover .vp-play { transform: scale(1.04); }
+
+/* Alt CTA şeridi (görseldeki yeşil şerit havası) */
+.vp-cta {
+  position: absolute;
+  left: 1.2rem;
+  bottom: 1rem;
+  background: color-mix(in oklab, var(--vp-accent) 92%, #fff 0%);
+  color: #083d18;
+  font-weight: 800;
+  border-radius: 10px;
+  padding: .55rem .9rem;
+  box-shadow: 0 10px 20px rgba(34, 197, 94, .25);
+  font-size: clamp(.85rem, .78rem + .4vw, 1.05rem);
+}
+
+/* Video iframe */
+.vp-iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+  background: #000;
+}
+
+/* Focus görünürlüğü */
+.vp-poster:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 3px rgba(34, 197, 94, .4);
+  border-radius: 12px;
+}

@@ -1,0 +1,128 @@
+/* ========= WERRAPARK FOOTER =========
+   Header’daki değişken paletiyle uyumlu çalışır. */
+
+:root{
+  --wh-brand:#17833b;
+  --wh-brand-700:#11652d;
+  --wh-ink:#e5f6eb;
+  --wh-ink-soft:#cfe6d6;
+
+  --wh-deep:#0e2a18;      /* koyu yeşil arka plan */
+  --wh-deeper:#0a2113;    /* daha koyu alt bar */
+  --wh-line:rgba(255,255,255,.16);
+
+  --wh-shadow: 0 20px 60px rgba(0,0,0,.35);
+}
+
+@media (prefers-color-scheme: light){
+  :root{
+    --wh-ink:#f0fff5;
+    --wh-ink-soft:#dff6e7;
+  }
+}
+
+/* Görsel erişilebilirlik */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+/* Container helper */
+.wh-container{max-width:1200px;margin-inline:auto;padding-inline:20px}
+
+/* ===== ÜST CTA ŞERİDİ ===== */
+.wh-foot-cta{
+  background:linear-gradient(90deg, var(--wh-brand-700), var(--wh-brand));
+  color:#fff;
+}
+.wh-foot-cta__inner{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:18px 0;
+}
+.wh-foot-cta h3{
+  margin:0; font-weight:800; letter-spacing:.2px;
+}
+
+/* ===== ANA BLOK ===== */
+.wh-foot{
+  color:var(--wh-ink);
+  background:var(--wh-deep);
+}
+.wh-foot-main{
+  padding:40px 0 22px;
+  border-top:1px solid rgba(255,255,255,.08);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+}
+.wh-foot-grid{
+  display:grid; gap:26px;
+  grid-template-columns: 1fr;
+}
+@media(min-width:840px){
+  .wh-foot-grid{grid-template-columns: 1.4fr 1fr 1fr 1.4fr}
+}
+
+/* Marka */
+.wh-foot-brand{display:inline-flex;align-items:center}
+.wh-foot-logo{height:40px;width:auto;display:block;filter:drop-shadow(0 4px 10px rgba(0,0,0,.4))}
+
+.wh-foot-col{min-width:0}
+.wh-foot-title{
+  margin:8px 0 10px; color:#fff; font-size:1.05rem; font-weight:800; letter-spacing:.2px;
+}
+.wh-foot-text{color:var(--wh-ink-soft); margin:10px 0; line-height:1.65}
+
+/* Sosyal */
+.wh-foot-socials{display:flex; gap:10px; margin-top:10px}
+.wh-foot-social{
+  display:grid; place-items:center; width:36px; height:36px; border-radius:10px;
+  color:#0b2013; background:#fff; text-decoration:none; box-shadow:var(--wh-shadow);
+}
+.wh-foot-social:hover{transform:translateY(-1px)}
+.wh-foot-social svg{width:18px;height:18px}
+
+/* Link list */
+.wh-foot-list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.wh-foot-list a{
+  color:var(--wh-ink); text-decoration:none; opacity:.9;
+}
+.wh-foot-list a:hover{opacity:1; text-decoration:underline}
+
+/* Newsletter */
+.wh-foot-news{display:flex; gap:8px; margin-top:10px}
+.wh-input{
+  flex:1; min-width:160px;
+  border-radius:12px; border:1px solid var(--wh-line); background:rgba(255,255,255,.06);
+  color:#fff; padding:10px 12px; outline:none;
+}
+.wh-input::placeholder{color:rgba(255,255,255,.7)}
+.wh-input:focus{box-shadow:0 0 0 4px rgba(23,131,59,.25); border-color:#fff}
+
+/* Butonlar (header ile uyumlu) */
+.wh-btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:.5rem;
+  border-radius:999px; padding:10px 16px; font-weight:800; border:1px solid transparent; cursor:pointer; text-decoration:none;
+  transition:background .2s ease, transform .06s ease, color .2s ease;
+}
+.wh-btn:active{transform:translateY(1px)}
+.wh-btn--primary{background:#fff;color:#0b2013}
+.wh-btn--primary:hover{background:#f4fff7}
+.wh-btn--invert{background:#0b2013;color:#fff;border-color:rgba(255,255,255,.2)}
+.wh-btn--invert:hover{background:#081810}
+
+/* ===== ALT ÇİZGİ ===== */
+.wh-foot-bottom{
+  background:var(--wh-deeper);
+  border-top:1px solid rgba(255,255,255,.08);
+}
+.wh-foot-bottom__inner{
+  display:flex; align-items:center; justify-content:space-between; gap:14px; padding:14px 0;
+  color:var(--wh-ink-soft);
+}
+.wh-foot-copy{margin:0}
+.wh-foot-mini{list-style:none;margin:0;padding:0;display:flex;gap:16px;flex-wrap:wrap}
+.wh-foot-mini a{color:var(--wh-ink-soft); text-decoration:none}
+.wh-foot-mini a:hover{text-decoration:underline}
+
+/* Mobil düzenlemeler */
+@media(max-width:640px){
+  .wh-foot-cta__inner{flex-direction:column; align-items:flex-start}
+  .wh-foot-news{flex-direction:column}
+  .wh-foot-bottom__inner{flex-direction:column; align-items:flex-start}
+}
