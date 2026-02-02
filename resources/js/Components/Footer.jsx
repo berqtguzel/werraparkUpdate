@@ -1,6 +1,6 @@
 import React from "react";
 import { usePage } from "@inertiajs/react";
-import "../../css/footer.css";
+import "../../css/Footer.css";
 
 export default function Footer() {
     const { props } = usePage();
