@@ -23,6 +23,17 @@ img{max-width:100%;display:block;height:auto}
   position:relative;          /* ribbons için gerekli */
   isolation:isolate;
 }
+.dark .og-wrap{
+    --og-bg:#0f1210;
+    --og-ink:#eaf7ef;
+    --og-muted:#a9b7af;
+    --og-accent:#8ee7c8;
+    --og-accent-2:#8ee7c8;
+    --og-surface:#141814;
+    --og-pill:#213127;
+    --og-shadow:0 14px 40px rgba(0,0,0,.50);
+    --og-border:1px solid rgba(255,255,255,.08);
+}
 
 /* ----- Başlık ----- */
 .og-head{text-align:center;max-width:920px;margin:0 auto 20px}
@@ -96,6 +107,7 @@ img{max-width:100%;display:block;height:auto}
   color:#213729;font-weight:700;font-size:14px;box-shadow:0 8px 20px rgba(0,0,0,.08);
   transition:transform .2s ease,box-shadow .2s ease,background .2s ease
 }
+.dark .og-btn{color: white;}
 .og-btn:hover{transform:translateY(-2px);box-shadow:0 14px 28px rgba(0,0,0,.12)}
 .og-btn:active{transform:translateY(0)}
 .og-btn--ghost{background:#fff;color:var(--og-accent-2);border:var(--og-border)}

@@ -6,49 +6,40 @@ use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Tightenco\Ziggy\Ziggy;
 
-
-use App\Http\Controllers\GlobalWebsiteController;
-use App\Http\Controllers\MenuController;
+use App\Services\GlobalWebsiteService;
+use App\Services\MenuService;
 
 class HandleInertiaRequests extends Middleware
 {
-    /**
-     * The root template that is loaded on the first page visit.
-     *
-     * @var string
-     */
     protected $rootView = 'app';
 
-    /**
-     * Determine the current asset version.
-     */
-    public function version(Request $request): string|null
+    public function __construct(
+        private GlobalWebsiteService $globalWebsiteService,
+        private MenuService $menuService
+    ) {}
+
+    public function version(Request $request): ?string
     {
-        $tenantId = env("OMR_TENANT_ID", null);
-
-        $locale = app()->getLocale();
-
         return parent::version($request);
     }
 
-    /**
-     * Define the props that are shared by default.
-     *
-     * @return array<string, mixed>
-     */
     public function share(Request $request): array
     {
+        $locale = app()->getLocale();
+
         return array_merge(parent::share($request), [
-            "global" => [
-                "websites" => GlobalWebsiteController::fetchGlobalWebsites(),
-                "menu" => MenuController::fetchMenuData(),
+
+            'global' => [
+                'tenantId' => config('omr.tenant_id'),
+                'locale'   => $locale,
+                'websites' => $this->globalWebsiteService->getWebsites($locale),
+                'menu'     => $this->menuService->getMenu($locale),
             ],
 
-            'ziggy' => function () use ($request) {
-                return array_merge((new Ziggy)->toArray(), [
-                    'location' => $request->url(),
-                ]);
-            },
+            'ziggy' => fn () => array_merge(
+                (new Ziggy)->toArray(),
+                ['location' => $request->url()]
+            ),
         ]);
     }
 }

@@ -1,9 +1,3 @@
-/* ----------------------------------------------------
-   Werrapark • Team Grid — Premium UI
-   (light/dark uyumlu, eşit kart yüksekliği, pattern bg)
------------------------------------------------------*/
-
-/* ==== 1) Palet ve gölgeler ==== */
 :root{
   --tg-bg:#f5f4ef;
   --tg-ink:#13251d;
@@ -11,11 +5,11 @@
   --tg-accent:#1a5d48;
   --tg-pill:#efe9db;
 
-  /* yüzey ve gradyan için 2 ton */
-  --tg-surface:#fcfbf8;
+
+    --tg-surface:#fcfbf8;
   --tg-surface-2:#f0ede6;
 
-  /* çerçeve ve highlight */
+
   --tg-stroke:rgba(22, 38, 30, 0.08);
   --tg-glow:rgba(26,93,72,.12);
 
@@ -43,7 +37,6 @@
 *{box-sizing:border-box}
 img{display:block;max-width:100%;height:auto}
 
-/* ==== 2) Section + arka plan ==== */
 .tg-section{
   position:relative;
   padding:clamp(28px,4vw,56px) 20px clamp(64px,6vw,96px);
@@ -53,7 +46,6 @@ img{display:block;max-width:100%;height:auto}
 }
 .tg-shell{max-width:1120px;margin:0 auto}
 
-/* Mesh/gradient — pattern’in ALTINDA kalsın diye -1 */
 .tg-meshbg::before,
 .tg-meshbg::after{
   content:"";
@@ -71,7 +63,6 @@ img{display:block;max-width:100%;height:auto}
   filter:blur(18px);
 }
 
-/* Werrapark pattern (Dizinde büyük L!) */
 .tg-pattern{
   position:absolute; inset:0; z-index:0; pointer-events:none;
   background-image:url("/images/Logo/werrapark.png");
@@ -86,7 +77,7 @@ img{display:block;max-width:100%;height:auto}
   mix-blend-mode:screen;
 }
 
-/* ==== 3) Başlık ==== */
+
 .tg-head{text-align:center; position:relative; z-index:1}
 .tg-eyebrow{
   display:inline-block; margin-bottom:8px; padding:6px 10px;
@@ -104,7 +95,7 @@ img{display:block;max-width:100%;height:auto}
 .tg-card:nth-child(4){ animation-delay:.12s }
 @keyframes tg-fade-up{ from{ opacity:0; transform: translateY(8px) } to{ opacity:1; transform: translateY(0) } }
 
-/* ==== 4) GRID ==== */
+
 .tg-grid{
   --cols:3;
   position:relative; z-index:1;
@@ -114,22 +105,22 @@ img{display:block;max-width:100%;height:auto}
 @media (max-width:1024px){.tg-grid{--cols:2}}
 @media (max-width:640px){ .tg-grid{--cols:1} }
 
-/* HERO: merkezde tek kart */
+
 .tg-hero{ display:flex; justify-content:center; margin:6px 0 18px; }
 .tg-card--hero{ width:min(460px,100%); }
 
-/* Alttaki satır: hepsi eşit */
+
 .tg-grid--row{ --cols:3; grid-template-columns:repeat(var(--cols),minmax(0,1fr)); }
 @media (max-width:1024px){ .tg-grid--row{ --cols:2 } }
 @media (max-width:640px){  .tg-grid--row{ --cols:1 } }
 
-/* ==== 5) KART – premium yüzey ==== */
+
 .tg-card{
   position:relative;
   border-radius:var(--tg-radius);
   overflow:hidden;
 
-  /* sıcak yüzey gradyanı + ince çerçeve */
+
   background:linear-gradient(180deg, var(--tg-surface) 0%, var(--tg-surface-2) 100%);
   border:1px solid var(--tg-stroke);
 
@@ -148,14 +139,14 @@ img{display:block;max-width:100%;height:auto}
 
 }
 
-/* İç vignette */
+
 .tg-card::after{
   content:""; position:absolute; inset:0; pointer-events:none; border-radius:inherit;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.4),
               inset 0 -60px 80px rgba(0,0,0,.05);
 }
 
-/* Hover/focus aurası */
+
 .tg-card:hover,
 .tg-card:focus-within{
   transform:translateY(-4px);
@@ -163,10 +154,9 @@ img{display:block;max-width:100%;height:auto}
   border-color:rgba(26,93,72,.16);
 }
 
-/* Görseller kart köşelerine uysun */
 .tg-card canvas, .tg-card img{ border-radius:16px; }
 
-/* ==== 6) Üst isim bandı ==== */
+
 .tg-namebar{
   position:absolute; left:12px; top:12px;
   display:inline-flex; align-items:center; gap:8px;

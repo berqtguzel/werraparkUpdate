@@ -6,6 +6,8 @@ import "../../css/header.css";
 export default function Header({ currentRoute }) {
     const { props } = usePage();
     const global = props.global;
+    const { page, locale } = usePage().props;
+
     const headerMenu = global.menu.data[0];
 
     const nav = [
@@ -40,7 +42,7 @@ export default function Header({ currentRoute }) {
         return () => (document.body.style.overflow = "");
     }, [open]);
 
-    console.log("Menu", headerMenu);
+    console.log(props);
     return (
         <header className="wh-header" role="banner">
             <div className="wh-topbar">

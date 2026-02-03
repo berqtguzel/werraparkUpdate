@@ -2,6 +2,9 @@ import React from "react";
 import "../../../css/team-grid.css";
 import demoTeam from "@/Data/demoData";
 import TiltedCard from "../ReactBits/Components/TiltedCard";
+import ScrollStack, {
+    ScrollStackItem,
+} from "../ReactBits/Components/ScrollStack";
 
 /* yardımcılar */
 const norm = (s = "") =>
@@ -56,7 +59,11 @@ function CardInfo({ title, handle, email, phone, website }) {
                     </a>
                 )}
                 {phone && (
-                    <a className="tg-chip tg-chip--link" href={`tel:${phone}`} aria-label="Anrufen">
+                    <a
+                        className="tg-chip tg-chip--link"
+                        href={`tel:${phone}`}
+                        aria-label="Anrufen"
+                    >
                         <svg width="14" height="14" viewBox="0 0 24 24">
                             <path
                                 fill="currentColor"
@@ -94,7 +101,7 @@ export default function TeamGrid({
     const list = Array.isArray(people) && people.length ? people : demoTeam;
 
     let leadIdx = list.findIndex((p) =>
-        norm(p.name || "").includes("sezai koc")
+        norm(p.name || "").includes("sezai koc"),
     );
     if (leadIdx < 0) leadIdx = 0;
     const lead = list[leadIdx];
@@ -110,7 +117,8 @@ export default function TeamGrid({
                     <span className="tg-eyebrow">werrapark</span>
                     <h2 className="tg-heading">{heading}</h2>
                     <p className="tg-sub">
-                        Lernen Sie die Menschen kennen, die Ihren Aufenthalt besonders machen.
+                        Lernen Sie die Menschen kennen, die Ihren Aufenthalt
+                        besonders machen.
                     </p>
                 </header>
 
