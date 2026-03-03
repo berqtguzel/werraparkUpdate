@@ -1,10 +1,8 @@
-/* ================= THEME TOKENS ================= */
 .ex-wrap{
-  /* Brand */
   --brand: #18b86a;
   --brand-2: #0ea567;
 
-  /* Light */
+
   --ex-bg: #edf5f0;
   --ex-surface: #ffffff;
   --ex-text: #0f1a14;
@@ -15,7 +13,7 @@
   --ex-ring: rgba(24,184,106,.45);
   --ex-shadow: 0 22px 60px rgba(16,48,36,.12);
 
-  /* Badge */
+
   --badge-bg: linear-gradient(135deg, #10b565, #0c8f56);
   --badge-grid: rgba(255,255,255,.06);
 
@@ -27,14 +25,12 @@
   color: var(--ex-text);
 }
 
-/* ================= DARK OVERRIDE ================= */
 html[data-theme="dark"] .ex-wrap,
 body[data-theme="dark"] .ex-wrap,
 .dark .ex-wrap{
   --ex-bg: #0c1210;
   --ex-surface: #0f1613;
 
-  /* Metinleri beyaza çek */
   --ex-text: #ffffff;
   --ex-muted: rgba(255,255,255,.88);
   --ex-accent: #ffffff;
@@ -46,13 +42,13 @@ body[data-theme="dark"] .ex-wrap,
   --badge-bg: linear-gradient(135deg, #15c374, #0ea567);
   --badge-grid: rgba(0,0,0,.15);
 
-  /* Koyu arka plan degrade */
+
   background:
     radial-gradient(1200px 800px at 8% -10%, rgba(24,184,106,.12), transparent 60%),
     linear-gradient(180deg, #0b1411, #0a100e 60%, #0a0f0d);
 }
 
-/* Güvenli görünürlük – koyu temada metinlere hafif gölge */
+
 html[data-theme="dark"] .ex-wrap .ex-title,
 html[data-theme="dark"] .ex-wrap .ex-desc,
 html[data-theme="dark"] .ex-wrap .ex-meta-label,
@@ -66,7 +62,7 @@ html[data-theme="dark"] .ex-wrap .ex-link:hover{
   border-color: rgba(183,255,224,.65);
 }
 
-/* ================= LAYOUT ================= */
+
 .ex-container{
   max-width: 1200px;
   margin: 0 auto;
@@ -78,7 +74,7 @@ html[data-theme="dark"] .ex-wrap .ex-link:hover{
   z-index: 1;
 }
 
-/* background pattern right */
+
 .ex-pattern{
   position: absolute;
   inset: 0 0 0 auto;
@@ -93,7 +89,6 @@ html[data-theme="dark"] .ex-wrap .ex-link:hover{
   color: var(--ex-soft);
 }
 
-/* ================= LEFT: MEDIA ================= */
 .ex-media{
   position: relative;
   margin: 0;
@@ -115,7 +110,7 @@ html[data-theme="dark"] .ex-wrap .ex-link:hover{
   filter: saturate(1) contrast(1);
 }
 
-/* Badge */
+
 .ex-badge{
   position: absolute;
   left: 20px; bottom: 20px;
@@ -154,7 +149,7 @@ html[data-theme="dark"] .ex-wrap .ex-link:hover{
   opacity: .95;
 }
 
-/* ================= RIGHT: CONTENT ================= */
+
 .ex-content{ padding-top: 6px; }
 
 .ex-eyebrow{
@@ -192,7 +187,7 @@ html[data-theme="dark"] .ex-wrap .ex-link:hover{
   margin: 16px 0 14px;
 }
 
-/* meta blocks */
+
 .ex-meta{
   display: grid;
   grid-template-columns: 1fr auto;
@@ -222,7 +217,7 @@ html[data-theme="dark"] .ex-wrap .ex-link:hover{
   border-color: rgba(24,184,106,.75);
 }
 
-/* social buttons */
+
 .ex-social{ display: flex; gap: 10px; }
 .ex-social-btn{
   display: inline-grid; place-items: center;
@@ -240,7 +235,7 @@ html[data-theme="dark"] .ex-wrap .ex-link:hover{
   box-shadow: 0 0 0 4px var(--ex-ring);
 }
 
-/* ================= RESPONSIVE ================= */
+
 @media (max-width: 1024px){
   .ex-container{ grid-template-columns: 1fr; gap: 28px; }
   .ex-pattern{ width: 60vw; opacity: .2; }

@@ -34,13 +34,9 @@
 
 
 
-
-
-
 .rg-top, .rg-gallery, .rg-shell { position:relative; z-index:1; }
 
 
-/* Başlık */
 .rg-top{ text-align:center; position:relative; z-index:1; }
 .rg-eyebrow{
   display:inline-block; margin-bottom:8px; padding:6px 12px;
@@ -50,21 +46,18 @@
 .rg-title{ margin:6px 0 6px; font-weight:800; font-size:clamp(24px,4.4vw,40px); }
 .rg-sub{ margin:0 auto 18px; color:var(--rg-muted); max-width:760px; }
 
-/* Masonry (CSS column) */
-/* Masonry (CSS column) — 4'lü düzen */
 .rg-gallery{
   position:relative; z-index:1;
-  column-count: 4;          /* <<< 4 sütun */
+  column-count: 4;
   column-gap: 18px;
 }
 
-/* Büyükten küçüğe kırılımlar */
-@media (max-width: 1200px){ .rg-gallery{ column-count: 3; } }  /* 3'lü */
-@media (max-width: 900px){  .rg-gallery{ column-count: 2; } }  /* 2'li */
-@media (max-width: 560px){  .rg-gallery{ column-count: 1; } }  /* tek sütun */
+
+@media (max-width: 1200px){ .rg-gallery{ column-count: 3; } }
+@media (max-width: 900px){  .rg-gallery{ column-count: 2; } }
+@media (max-width: 560px){  .rg-gallery{ column-count: 1; } }
 
 
-/* Kart */
 .rg-item{ break-inside: avoid; margin: 0 0 18px; }
 .rg-card{
   display:block; width:100%; padding:0; border:0; background:transparent; cursor:pointer;
@@ -83,21 +76,20 @@
 }
 .rg-card:hover .rg-img{ transform: scale(1.06); }
 
-/* Caption */
 .rg-cap{
   position:absolute; left:10px; right:10px; bottom:10px;
   padding:8px 10px; font-size:13px; font-weight:700; color:#123;
-  background: rgba(255,255,255,.85); backdrop-filter: blur(6px);
+  background: rgba(255,255,255,.85);
   border-radius: 12px; border:1px solid rgba(16,42,32,.10);
   box-shadow: 0 10px 22px rgba(0,0,0,.12);
 }
 
-/* ===== Lightbox ===== */
+
 .rg-lightbox{
   position:fixed; inset:0; z-index: 1000; display:grid; place-items:center;
 }
 .rg-backdrop{
-  position:absolute; inset:0; background:rgba(0,0,0,.62); backdrop-filter: blur(2px);
+  position:absolute; inset:0; background:rgba(0,0,0,.62);
 }
 .rg-lightbox-inner{
   position:relative; z-index:1; max-width:min(92vw,1100px); width:100%;
@@ -111,13 +103,12 @@
 }
 .rg-lightbox-cap{
   color:#fff; font-weight:700; padding:6px 10px; border-radius:12px;
-  background: rgba(255,255,255,.12); backdrop-filter: blur(8px);
+  background: rgba(255,255,255,.12);
 }
 .rg-counter{
   position:absolute; right:18px; bottom:18px; color:#fff; font-weight:700; opacity:.9;
 }
 
-/* Close & Nav butonları */
 .rg-x{
   position:absolute; top:16px; right:16px; z-index:1;
   width:40px; height:40px; border-radius:50%;
@@ -138,7 +129,7 @@
 .rg-next{ right:16px; }
 .rg-nav:hover{ transform: translateY(-50%) scale(1.06); background: rgba(0,0,0,.6); }
 
-/* Motion tercihleri */
+
 @media (prefers-reduced-motion: reduce){
   .rg-card, .rg-img, .rg-nav, .rg-x { transition: none !important; }
 }

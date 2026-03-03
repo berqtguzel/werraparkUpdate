@@ -1,16 +1,15 @@
 "use client";
 
 import React from "react";
+import { Link, usePage } from "@inertiajs/react";
 import "../../../css/travel-themes.css";
 
-/* ColorBends – ReactBits/Backgrounds/ColorBends */
-const ColorBends = React.lazy(() =>
-    import("../ReactBits/Backgrounds/ColorBends").then((m) => ({
+const Particles = React.lazy(() =>
+    import("../ReactBits/Backgrounds/Particles").then((m) => ({
         default: m.default || m,
-    }))
+    })),
 );
 
-/** Örnek veri – props.items ile override edebilirsin */
 const THEMES = [
     {
         id: "wellness",
@@ -66,38 +65,33 @@ export default function TravelThemes({
 Als Fan von frischer Luft und Bewegung schätzen Sie unberührte Natur und abwechslungsreiche
 Bewegungsmöglichkeiten? Suchen Sie Ihr Urlaubsthema – wir kümmern uns um den Rest.`,
     ctaPrimary = { label: "Alle Urlaubsthemen", href: "#" },
-    ctaSecondary = { label: "Bestpreis Buchung", href: "#" },
+    ctaSecondary = { label: "Bestpreis Buchung", href: "/offers" },
     items = THEMES,
 }) {
     const [feature, ...rest] = items;
     const [mounted, setMounted] = React.useState(false);
     React.useEffect(() => setMounted(true), []);
 
+    const { props } = usePage();
+    const locale = props?.locale ?? "de";
+
     return (
         <section className="tt3-wrap tt3-with-bends" aria-label="Urlaubsthemen">
-            {/* ===== ColorBends Background (yeşil tema) ===== */}
             {mounted && (
                 <React.Suspense fallback={null}>
-                    <div className="tt3-bends-layer" aria-hidden="true">
-                        <ColorBends
-                            className="tt3-bends"
-                            rotation={38}
-                            autoRotate={5.5} /* derece/sn */
-                            speed={0.22} /* zaman ölçeği */
-                            transparent
-                            scale={1}
-                            frequency={1.1}
-                            warpStrength={0.9}
-                            mouseInfluence={0.75}
-                            parallax={0.35}
-                            noise={0.06}
-                            /* renk paleti: CSS değişkenlerinden gelir */
-                            colors={[
-                                "#12B363", // zümrüt
-                                "#0D8D4E", // orman
-                                "#0A6B3E", // yosun
-                                "#053624", // gece çam
-                            ]}
+                    <div className="tt3-particles-layer" aria-hidden="true">
+                        <Particles
+                            className="tt3-particles"
+                            particleCount={200}
+                            particleSpread={8}
+                            speed={0.08}
+                            moveParticlesOnHover
+                            particleHoverFactor={0.7}
+                            alphaParticles
+                            particleBaseSize={200}
+                            sizeRandomness={0.9}
+                            cameraDistance={18}
+                            particleColors={["#19bf73", "#0ea567", "#8ee7c8"]}
                         />
                     </div>
                 </React.Suspense>
@@ -113,7 +107,7 @@ Bewegungsmöglichkeiten? Suchen Sie Ihr Urlaubsthema – wir kümmern uns um den
                     <div className="tt3-cta">
                         <a
                             className="tt3-btn tt3-btn--primary"
-                            href={ctaPrimary.href}
+                            href={ctaPrimary.href || `/${locale}/urlaubsthemen`}
                         >
                             {ctaPrimary.label}
                         </a>
@@ -128,9 +122,13 @@ Bewegungsmöglichkeiten? Suchen Sie Ihr Urlaubsthema – wir kümmern uns um den
 
                 <div className="tt3-head-mosaic" aria-hidden="true">
                     {/* Büyük özellik kartı */}
-                    <a
+                    <Link
                         className="tt3-mosaic-item tt3-mosaic--xl"
-                        href={feature?.href || "#"}
+                        href={
+                            feature
+                                ? `/${locale}/urlaubsthemen/${feature.id}`
+                                : `/${locale}/urlaubsthemen`
+                        }
                         tabIndex={-1}
                     >
                         <img src={feature?.image} alt="" />
@@ -138,23 +136,23 @@ Bewegungsmöglichkeiten? Suchen Sie Ihr Urlaubsthema – wir kümmern uns um den
                             <strong>{feature?.title}</strong>
                             <span>{feature?.excerpt}</span>
                         </div>
-                    </a>
+                    </Link>
 
                     {/* İki orta, bir dar görsel */}
                     {rest.slice(0, 3).map((t, i) => (
-                        <a
+                        <Link
                             key={t.id}
                             className={`tt3-mosaic-item ${
                                 i === 2 ? "tt3-mosaic--tall" : ""
                             }`}
-                            href={t.href}
+                            href={`/${locale}/urlaubsthemen/${t.id}`}
                             tabIndex={-1}
                         >
                             <img src={t.image} alt="" />
                             <div className="tt3-mosaic-overlay">
                                 <strong>{t.title}</strong>
                             </div>
-                        </a>
+                        </Link>
                     ))}
                 </div>
             </div>
@@ -180,20 +178,20 @@ Bewegungsmöglichkeiten? Suchen Sie Ihr Urlaubsthema – wir kümmern uns um den
                             <h3 className="tt3-card-title">{t.title}</h3>
                             <p className="tt3-card-excerpt">{t.excerpt}</p>
                             <div className="tt3-card-actions">
-                                <a
+                                <Link
                                     className="tt3-link"
-                                    href={t.href}
+                                    href={`/${locale}/urlaubsthemen/${t.id}`}
                                     aria-label={`${t.title} – mehr lesen`}
                                 >
                                     Mehr lesen
-                                </a>
-                                <a
+                                </Link>
+                                <Link
                                     className="tt3-chip"
-                                    href={t.href}
+                                    href={`/${locale}/urlaubsthemen/${t.id}`}
                                     aria-label={`${t.title} – entdecken`}
                                 >
                                     Entdecken
-                                </a>
+                                </Link>
                             </div>
                         </div>
 

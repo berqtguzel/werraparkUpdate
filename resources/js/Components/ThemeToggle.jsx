@@ -1,37 +1,46 @@
 import { useTheme } from "../Context/ThemeContext";
+import "../../css/theme-toggle.css";
 
 export default function ThemeToggle() {
     const { theme, toggleTheme } = useTheme();
+    const isDark = theme === "dark";
+    const nextThemeLabel = isDark ? "light" : "dark";
 
     return (
         <button
             onClick={toggleTheme}
-            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-            aria-label={`Toggle ${theme === "light" ? "dark" : "light"} mode`}
+            className={`ttgl ${isDark ? "is-dark" : "is-light"}`}
+            aria-label={`Switch to ${nextThemeLabel} mode`}
+            aria-checked={isDark}
+            role="switch"
+            type="button"
         >
-            {theme === "light" ? (
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                >
-                    <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
-                </svg>
-            ) : (
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                >
-                    <path
-                        fillRule="evenodd"
-                        d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
-                        clipRule="evenodd"
-                    />
-                </svg>
-            )}
+            <span className="ttgl-track" aria-hidden="true">
+                <span className="ttgl-icon ttgl-icon--sun">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <circle
+                            cx="12"
+                            cy="12"
+                            r="4"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                        />
+                        <path
+                            d="M12 2.6v2.1M12 19.3v2.1M4.7 4.7l1.5 1.5M17.8 17.8l1.5 1.5M2.6 12h2.1M19.3 12h2.1M4.7 19.3l1.5-1.5M17.8 6.2l1.5-1.5"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                        />
+                    </svg>
+                </span>
+                <span className="ttgl-icon ttgl-icon--moon">
+                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path d="M20.7 14.3a8.5 8.5 0 1 1-11-11 1 1 0 0 1 1.3 1.2A6.8 6.8 0 0 0 19.5 13a1 1 0 0 1 1.2 1.3Z" />
+                    </svg>
+                </span>
+                <span className="ttgl-thumb" />
+            </span>
+            <span className="ttgl-label">{isDark ? "Dark" : "Light"}</span>
         </button>
     );
 }

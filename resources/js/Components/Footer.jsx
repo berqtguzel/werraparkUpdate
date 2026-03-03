@@ -4,8 +4,15 @@ import "../../css/Footer.css";
 
 export default function Footer() {
     const { props } = usePage();
-    const global = props.global;
-    const footerMenu = global.menu.data[1];
+
+    const global = props?.global ?? null;
+
+    const footerMenu = global?.menu?.data?.[1] ?? null;
+
+    const footerItems = Array.isArray(footerMenu?.items)
+        ? footerMenu.items
+        : [];
+
     const year = new Date().getFullYear();
 
     return (
@@ -33,6 +40,7 @@ export default function Footer() {
                                 className="wh-foot-logo"
                             />
                         </a>
+
                         <p className="wh-foot-text">
                             Natur, Ruhe und Genuss im Thüringer Wald. Der
                             Werrapark vereint komfortable Zimmer, regionale
@@ -56,6 +64,7 @@ export default function Footer() {
                                     />
                                 </svg>
                             </a>
+
                             <a
                                 href="#"
                                 aria-label="Instagram"
@@ -92,17 +101,37 @@ export default function Footer() {
                     </div>
 
                     <nav className="wh-foot-col" aria-label="Schnellzugriff">
-                        {footerMenu && (
+                        {footerMenu ? (
                             <>
                                 <h4 className="wh-foot-title">
-                                    {footerMenu.name}
+                                    {footerMenu?.name ?? "Schnellzugriff"}
                                 </h4>
+
                                 <ul className="wh-foot-list">
-                                    {footerMenu.items.map((item) => (
-                                        <li key={item.id}>
-                                            <a href={item.url}>{item.name}</a>
+                                    {footerItems.map((item, idx) => (
+                                        <li key={item?.id ?? item?.key ?? idx}>
+                                            <a href={item?.url ?? "#"}>
+                                                {item?.name ?? "Link"}
+                                            </a>
                                         </li>
                                     ))}
+                                </ul>
+                            </>
+                        ) : (
+                            <>
+                                <h4 className="wh-foot-title">
+                                    Schnellzugriff
+                                </h4>
+                                <ul className="wh-foot-list">
+                                    <li>
+                                        <a href="/offers">Angebote</a>
+                                    </li>
+                                    <li>
+                                        <a href="/kontakt">Kontakt</a>
+                                    </li>
+                                    <li>
+                                        <a href="/impressum">Impressum</a>
+                                    </li>
                                 </ul>
                             </>
                         )}
@@ -133,6 +162,7 @@ export default function Footer() {
 
                     <div className="wh-foot-col">
                         <h4 className="wh-foot-title">Kontakt</h4>
+
                         <address className="wh-foot-text not-italic">
                             R.-Breitscheid-Straße 41–45
                             <br />
@@ -140,6 +170,7 @@ export default function Footer() {
                             <br />
                             Deutschland
                         </address>
+
                         <p className="wh-foot-text">
                             Tel{" "}
                             <a href="tel:+4936870800">+49 (0) 36870 / 800</a>
@@ -175,7 +206,6 @@ export default function Footer() {
                 </div>
             </div>
 
-            {/* Alt: telif / mini-nav */}
             <div className="wh-foot-bottom">
                 <div className="wh-container wh-foot-bottom__inner">
                     <p className="wh-foot-copy">

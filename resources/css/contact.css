@@ -1,12 +1,5 @@
-/* resources/js/css/contact.css
-   Kontakt – modern, erişilebilir, responsive (Light + Dark kesin ayrım)
-*/
 
-/* ==============================
-   1) TEMA DEĞİŞKENLERİ
-============================== */
 :root {
-  /* LIGHT (varsayılan) */
   --ct-bg:            #f5f7f6;
   --ct-surface:       #ffffff;
   --ct-muted-surface: #f0f5f2;
@@ -14,7 +7,7 @@
   --ct-muted:         #5b6b63;
   --ct-line:          #dfe8e3;
 
-  --ct-accent:        #16a34a;  /* green */
+  --ct-accent:        #16a34a;
   --ct-accent-2:      #22c55e;
   --ct-accent-3:      #0ea5e9;
 
@@ -28,7 +21,7 @@
 }
 html { color-scheme: light; }
 
-/* DARK’i manuel açmak için: <html class="dark"> */
+
 html.dark {
   --ct-bg:            #0b0f0d;
   --ct-surface:       #101814;
@@ -40,7 +33,7 @@ html.dark {
 }
 html.dark { color-scheme: dark; }
 
-/* Sistem teması – yalnızca .dark sınıfı yoksa devreye girer */
+
 @media (prefers-color-scheme: dark) {
   html:not(.dark) {
     --ct-bg:            #0b0f0d;
@@ -54,15 +47,13 @@ html.dark { color-scheme: dark; }
   html:not(.dark) { color-scheme: dark; }
 }
 
-/* Global arkaplan (override’ları kesmek için) */
+
 html, body, #app {
   background: var(--ct-bg);
   color: var(--ct-text);
 }
 
-/* ==============================
-   2) GENEL KAPSAYICI + BAŞLIKLAR
-============================== */
+
 .ct-section {
   background:
     radial-gradient(1000px 420px at 50% -10%, color-mix(in oklab, var(--ct-accent) 18%, transparent) 0%, transparent 70%),
@@ -92,15 +83,11 @@ html.dark .ct-section {
 }
 .ct-subtitle { color: var(--ct-muted); max-width: 70ch; margin:.75rem auto 0; }
 
-/* ==============================
-   3) BLOK BAŞLIKLARI
-============================== */
+
 .ct-block { margin-top: clamp(10px, 3vw, 24px); }
 .ct-block__title { text-align:center; font-size: clamp(1.4rem, 2.5vw, 2rem); margin: 0 0 14px; }
 
-/* ==============================
-   4) KİŞİ KARTLARI (GRID)
-============================== */
+
 .ct-grid {
   display:grid;
   grid-template-columns: repeat(3, minmax(0,1fr));
@@ -135,9 +122,7 @@ html.dark .ct-section {
 .ct-card__meta a{ color:var(--ct-text); text-decoration:none; }
 .ct-card__meta a:hover{ text-decoration:underline; }
 
-/* ==============================
-   5) ADRES PANELİ + FORM
-============================== */
+
 .ct-panel{
   display:grid; grid-template-columns: 1fr 1.4fr; gap: var(--ct-gap);
   margin-top: clamp(24px, 6vw, 48px);
@@ -157,6 +142,30 @@ html.dark .ct-panel__info{
 .ct-info li{ display:flex; align-items:center; gap:10px; color:var(--ct-text); }
 .ct-info a{ color:var(--ct-text); text-decoration:none; }
 .ct-info a:hover{ text-decoration: underline; }
+
+
+.ct-map-placeholder{
+  margin-top: 16px;
+  border-radius: var(--ct-radius-lg);
+  border: 1px dashed color-mix(in oklab, var(--ct-accent) 50%, var(--ct-line));
+  background:
+    radial-gradient(100% 150% at 0% 0%, color-mix(in oklab, var(--ct-accent) 16%, transparent), transparent 60%),
+    radial-gradient(100% 150% at 100% 100%, color-mix(in oklab, var(--ct-accent-3) 16%, transparent), transparent 60%),
+    color-mix(in oklab, var(--ct-muted-surface) 70%, #ffffff 30%);
+}
+.ct-map-inner{
+  padding: 14px 16px 16px;
+  display:grid; gap:6px;
+}
+.ct-map-badge{
+  display:inline-flex; align-items:center; justify-content:center;
+  padding:4px 10px; border-radius:999px;
+  font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
+  background: rgba(0,0,0,.12); color:#f9fafb;
+}
+.ct-map-text{
+  margin:4px 0 0; font-size:.9rem; color:var(--ct-muted);
+}
 
 .ct-form{
   background: var(--ct-surface);
@@ -183,7 +192,7 @@ html.dark .ct-panel__info{
   background: color-mix(in oklab, var(--ct-muted-surface) 80%, white 20%);
 }
 
-/* invalid / valid yardımcı sınıfları */
+
 .ct-field .is-invalid{ border-color:#ef4444 !important; box-shadow: 0 0 0 3px rgba(239,68,68,.25); }
 .ct-field .is-valid  { border-color:#22c55e !important; box-shadow: 0 0 0 3px rgba(34,197,94,.25); }
 
@@ -199,14 +208,12 @@ html.dark .ct-panel__info{
 .ct-button:active{ transform: translateY(0); }
 .ct-button:focus-visible{ outline:none; box-shadow: var(--ct-ring); }
 
-/* ==============================
-   6) KÜÇÜK İYİLEŞTİRMELER
-============================== */
+
 .ct-section ::selection{
   background: color-mix(in oklab, var(--ct-accent) 35%, transparent);
 }
 
-/* Chrome/Safari autofill */
+
 input:-webkit-autofill,
 textarea:-webkit-autofill{
   -webkit-text-fill-color: var(--ct-text);
@@ -214,10 +221,10 @@ textarea:-webkit-autofill{
   transition: background-color 5000s ease-in-out 0s;
 }
 
-/* Hareket tercihi */
+
 @media (prefers-reduced-motion: reduce){
   .ct-card, .ct-button, .ct-field input, .ct-field textarea { transition: none !important; }
 }
 
-/* Küçük ekran kart yüksekliği */
+
 @media (max-width:480px){ :root{ --ct-card-h: 220px; } }

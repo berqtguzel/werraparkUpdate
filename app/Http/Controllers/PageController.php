@@ -2,75 +2,54 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class PageController extends Controller
 {
     public function show(string $locale, string $slug)
     {
-        $base       = rtrim(config('omr.api_base'), '/');
-        $tenant     = config('omr.tenant_id');
-        $mainTenant = config('omr.main_tenant') ?: $tenant;
-
         $locale = strtolower($locale);
         $slug   = strtolower($slug);
 
-        if (!$tenant) {
-            abort(500, 'OMR_TENANT_ID missing');
-        }
+        // Demo içerikler (API yok)
+        $pages = [
+            'historie' => [
+                'title'   => $locale === 'en' ? 'History' : 'Historie',
+                'content' => $locale === 'en'
+                    ? '<p>This is a demo page. Replace with real content later.</p>'
+                    : '<p>Bu bir demo sayfasıdır. Daha sonra gerçek içerikle değiştirilebilir.</p>',
+            ],
+            'rooms' => [
+                'title'   => $locale === 'en' ? 'Rooms' : 'Zimmer',
+                'content' => $locale === 'en'
+                    ? '<p>Demo rooms description.</p>'
+                    : '<p>Demo oda açıklaması.</p>',
+            ],
+            'spa' => [
+                'title'   => 'Spa',
+                'content' => $locale === 'en'
+                    ? '<p>Demo spa content.</p>'
+                    : '<p>Demo spa içeriği.</p>',
+            ],
+            // İstersen diğer slug’ları da buraya ekleyebilirsin
+        ];
 
-        $cacheKey = "page_show:{$mainTenant}:{$locale}:{$slug}";
+        // slug listede var ama içerik tanımlı değilse de demo üret
+        $pageData = $pages[$slug] ?? [
+            'title'   => ucfirst($slug),
+            'content' => $locale === 'en'
+                ? '<p>Demo page. Content will be added.</p>'
+                : '<p>Demo sayfa. İçerik daha sonra eklenecek.</p>',
+        ];
 
-        $pageData = Cache::remember($cacheKey, now()->addHours(1), function () use (
-            $base,
-            $mainTenant,
-            $locale,
-            $slug,
-            $tenant
-        ) {
-            try {
-                $response = Http::timeout(10)
-                    ->withHeaders([
-                        'X-Tenant-ID' => $mainTenant,
-                    ])
-                    ->get("{$base}/v1/pages/{$slug}", [
-                        'tenant' => $mainTenant,
-                        'locale' => $locale,
-                    ]);
+        // Frontend'in bekleyeceği şekilde payload
+        $pageData = array_merge($pageData, [
+            'slug'    => $slug,
+            'locale'  => $locale,
+            'is_demo' => true,
+        ]);
 
-                if (!$response->successful()) {
-                    Log::warning('Page API failed', [
-                        'slug'   => $slug,
-                        'status' => $response->status(),
-                        'tenant' => $tenant,
-                        'locale' => $locale,
-                    ]);
-                    return null;
-                }
-
-                $data = $response->json('data');
-
-                return is_array($data) ? $data : null;
-
-            } catch (\Throwable $e) {
-                Log::error('Error fetching page data', [
-                    'slug'   => $slug,
-                    'error'  => $e->getMessage(),
-                    'tenant' => $tenant,
-                    'locale' => $locale,
-                ]);
-                return null;
-            }
-        });
-
-        if (!$pageData) {
-            abort(404);
-        }
-
-        return Inertia::render('Page', [
+        return Inertia::render('Dynamic/Page', [
             'page'   => $pageData,
             'locale' => $locale,
         ]);

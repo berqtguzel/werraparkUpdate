@@ -6,27 +6,41 @@ export default function VideoPromo({
     poster = "/public/images/Thumbnail2.webp",
     videoId = "dQw4w9WgXcQ",
     alt = "Werbevideo Vorschaubild",
+    subtitle = "Ein kurzer Einblick in Atmosphare, Natur und Erlebnisse im Werrapark Resort.",
 }) {
     const [playing, setPlaying] = React.useState(false);
 
-    const src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&hl=de`;
+    const src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&hl=de&playsinline=1`;
 
     return (
         <section className="vp-section">
             <div className="vp-shell">
-                <h2 className="vp-title">{title}</h2>
+                <header className="vp-head">
+                    <span className="vp-eyebrow">Video</span>
+                    <h2 className="vp-title">{title}</h2>
+                    <p className="vp-subtitle">{subtitle}</p>
+                </header>
 
-                <div className="vp-aspect">
+                <div className={`vp-aspect ${playing ? "is-playing" : ""}`}>
                     {playing ? (
-                        <iframe
-                            className="vp-iframe"
-                            src={src}
-                            title={title}
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
-                            loading="lazy"
-                            referrerPolicy="no-referrer-when-downgrade"
-                        />
+                        <>
+                            <iframe
+                                className="vp-iframe"
+                                src={src}
+                                title={title}
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                                loading="lazy"
+                                referrerPolicy="no-referrer-when-downgrade"
+                            />
+                            <button
+                                type="button"
+                                className="vp-reset"
+                                onClick={() => setPlaying(false)}
+                            >
+                                Vorschau
+                            </button>
+                        </>
                     ) : (
                         <button
                             type="button"
@@ -35,22 +49,26 @@ export default function VideoPromo({
                             aria-label="Video abspielen"
                         >
                             <img className="vp-img" src={poster} alt={alt} />
+                            <span className="vp-vignette" aria-hidden="true" />
                             <span className="vp-play" aria-hidden="true">
-                                <svg viewBox="0 0 64 64" width="64" height="64">
+                                <svg viewBox="0 0 72 72" width="72" height="72">
                                     <circle
-                                        cx="32"
-                                        cy="32"
-                                        r="30"
-                                        fill="rgba(34,197,94,.9)"
+                                        cx="36"
+                                        cy="36"
+                                        r="34"
+                                        fill="rgba(16,185,129,.92)"
                                     />
                                     <polygon
-                                        points="26,20 48,32 26,44"
+                                        points="30,23 52,36 30,49"
                                         fill="#fff"
                                     />
                                 </svg>
                             </span>
+                            <span className="vp-meta" aria-hidden="true">
+                                Werrapark Resort Film
+                            </span>
                             <span className="vp-cta">
-                                Schauen Sie sich unser Werbevideo an
+                                Jetzt ansehen
                             </span>
                         </button>
                     )}

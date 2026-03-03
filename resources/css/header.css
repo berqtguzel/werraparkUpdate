@@ -1,22 +1,16 @@
-/* ==================================================
-   WERRAPARK – GREEN NATURE THEME (FINAL)
-   ================================================== */
 
-/* ---------- Design Tokens ---------- */
 :root{
-  /* Brand Greens */
   --wp-green-950:#062e22;
   --wp-green-900:#0a3a29;
   --wp-green-800:#0f4b34;
   --wp-green-700:#155d3f;
   --wp-green-600:#1a6f4a;
-  --wp-green-500:#1f8155;  /* primary */
+  --wp-green-500:#1f8155;
   --wp-green-400:#2a9765;
   --wp-green-300:#57b489;
   --wp-green-200:#9ad7bd;
-  --wp-green-100:#e6f6ee;  /* subtle bg */
+  --wp-green-100:#e6f6ee;
 
-  /* Neutrals */
   --wp-ink-900:#0f172a;
   --wp-ink-800:#1f2937;
   --wp-ink-700:#334155;
@@ -27,20 +21,20 @@
   --wp-ink-100:#f1f5f9;
   --wp-white:#ffffff;
 
-  /* Surfaces & Effects */
+
   --wp-glass: rgba(255,255,255,.88);
   --wp-border: #e5efe9;
   --wp-shadow-sm: 0 4px 16px rgba(2,6,23,.06);
   --wp-shadow:    0 14px 36px rgba(2,6,23,.10);
   --wp-ring:      rgba(31,129,85,.28);
 
-  /* Layout */
+
   --wp-container: 1200px;
   --wp-radius: 12px;
   --wp-radius-lg: 16px;
 }
 
-/* ---------- Auto Dark Mode (OS tercihine göre) ---------- */
+
 @media (prefers-color-scheme: dark){
   :root{
     --wp-glass: rgba(12,18,24,.86);
@@ -59,7 +53,7 @@
   }
 }
 
-/* ---------- Manual Dark Mode Override (.dark / data-theme) ---------- */
+
 .dark, [data-theme="dark"]{
   --wp-glass: rgba(12,18,24,.86);
   --wp-ink-900:#e5e7eb;
@@ -76,18 +70,15 @@
   --wp-green-100: rgba(31,129,85,.14);
 }
 
-/* ---------- Reduced Motion ---------- */
+
 @media (prefers-reduced-motion: reduce){
   *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
 }
 
-/* ---------- Utilities ---------- */
+
 .wh-container{max-width:var(--wp-container);margin-inline:auto;padding-inline:20px}
 
-/* ==================================================
-   TOPBAR
-   ================================================== */
-/* LIGHT: üst bar açık yeşil degrade */
+
 .wh-topbar{
   color: var(--wp-white);
   background: linear-gradient(
@@ -98,7 +89,7 @@
   );
 }
 
-/* DARK: üst bar gri-siyah degrade */
+
 @media (prefers-color-scheme: dark){
   .wh-topbar{
     background: linear-gradient(90deg, #0e1116, #161a1f 55%, #1b2026);
@@ -112,7 +103,7 @@
 }
 
 .wh-topbar__inner{
-  height:44px; display:flex; align-items:center; justify-content:space-between; gap:12px;
+  height:52px; display:flex; align-items:center; justify-content:space-between; gap:12px;
 }
 .wh-topbar__left, .wh-topbar__right{display:flex; align-items:center; gap:16px}
 
@@ -142,10 +133,10 @@
   box-shadow:0 0 0 2px rgba(255,255,255,.15) inset;
 }
 
-/* Topbar buttons */
+
 .wh-btn{
   display:inline-flex; align-items:center; justify-content:center; gap:.5rem;
-  height:30px; padding:0 12px; border-radius:999px; font-weight:700; font-size:13px;
+  height:34px; padding:0 14px; border-radius:999px; font-weight:700; font-size:13px;
   border:1px solid transparent; text-decoration:none; cursor:pointer;
   transition:background .18s ease, color .18s ease, box-shadow .18s ease, transform .06s ease;
 }
@@ -155,7 +146,7 @@
 }
 .wh-btn--ghost:hover{background:rgba(255,255,255,.12)}
 
-/* ThemeToggle çerçevesi */
+
 .wh-theme-toggle button{
   border:1px solid var(--wp-ink-200);
   background:var(--wp-white);
@@ -175,16 +166,15 @@
   z-index: 200;
 }
 
-/* LIGHT: navwrap aydınlık cam */
+
 .wh-navwrap{
   background:var(--wp-glass);
-  backdrop-filter:saturate(1.08) blur(10px);
   border-bottom:1px solid var(--wp-border);
   box-shadow:var(--wp-shadow-sm);
   position:relative;
 }
 
-/* DARK: navwrap koyu yeşil yüzey */
+
 @media (prefers-color-scheme: dark){
   .wh-navwrap{
     background: linear-gradient(180deg, var(--wp-green-900), var(--wp-green-800));
@@ -199,7 +189,7 @@
   box-shadow: 0 1px 0 rgba(0,0,0,.5);
 }
 
-/* Alt kısımda doğayı çağrıştıran ince ışıma */
+
 .wh-navwrap::after{
   content:""; position:absolute; left:0; right:0; bottom:-1px; height:6px;
   background:linear-gradient(90deg, transparent, rgba(31,129,85,.28), transparent);
@@ -207,12 +197,12 @@
 }
 
 .wh-nav__inner{
-  min-height:84px; display:grid; grid-template-columns:auto 1fr auto; gap:16px; align-items:center;
+  min-height:98px; display:grid; grid-template-columns:auto 1fr auto; gap:18px; align-items:center;
 }
 
-/* Branding (logo geçişleri) */
+
 .wh-brand{display:inline-flex; align-items:center; gap:10px; text-decoration:none}
-.wh-brand__logo{height:44px; width:auto; display:block}
+.wh-brand__logo{height:54px; width:auto; display:block}
 .wh-brand__logo--dark{display:none}
 @media (prefers-color-scheme: dark){
   .wh-brand__logo--light{display:none}
@@ -221,14 +211,14 @@
 .dark .wh-brand__logo--light, [data-theme="dark"] .wh-brand__logo--light{display:none}
 .dark .wh-brand__logo--dark,  [data-theme="dark"] .wh-brand__logo--dark{display:block}
 
-/* Desktop Nav */
+
 .wh-nav-desktop{display:none; align-items:center; gap:10px; white-space:nowrap}
 @media (min-width:1024px){ .wh-nav-desktop{display:flex} }
 
-/* Linkler */
+
 .wh-link{
   position:relative; display:inline-flex; align-items:center; gap:8px;
-  padding:12px 14px; border-radius:12px; text-decoration:none;
+  padding:14px 16px; border-radius:12px; text-decoration:none;
   color:var(--wp-ink-700); font-weight:700;
   transition:background .18s ease, color .18s ease, box-shadow .18s ease;
   white-space:nowrap; line-height:1;
@@ -246,7 +236,7 @@
 }
 .wh-link:hover::after{transform:scaleX(1)}
 
-/* DARK: link kontrast ve hover */
+
 @media (prefers-color-scheme: dark){
   .wh-link{ color:#eaf8f2; }
   .wh-link:hover,
@@ -298,7 +288,7 @@
   box-shadow:0 0 0 4px color-mix(in srgb, var(--wp-green-500) 30%, transparent), 0 0 0 8px var(--wp-ring);
 }
 
-/* Hamburger */
+
 .wh-hamburger{
   display:inline-flex; flex-direction:column; gap:4px; padding:10px 9px;
   border:1px solid var(--wp-ink-200); border-radius:10px; background:#fff; cursor:pointer;
@@ -316,9 +306,7 @@
 }
 @media (min-width:1024px){ .wh-hamburger{display:none} }
 
-/* ==================================================
-   MOBILE DRAWER
-   ================================================== */
+
 .wh-drawer{position:fixed; inset:0; z-index:80; pointer-events:none}
 .wh-drawer.is-open{pointer-events:auto}
 
@@ -334,11 +322,10 @@
   border-left:1px solid var(--wp-border);
   box-shadow:var(--wp-shadow);
   transform:translateX(100%); transition:transform .28s ease;
-  backdrop-filter:saturate(1.04) blur(10px);
   display:flex; flex-direction:column;
 }
 .wh-drawer.is-open .wh-drawer__panel{transform:translateX(0)}
-/* DARK: drawer panel koyu yeşil */
+
 .dark .wh-drawer__panel, [data-theme="dark"] .wh-drawer__panel{
   background: linear-gradient(180deg, var(--wp-green-900), var(--wp-green-800));
   border-left-color: rgba(255,255,255,.08);
@@ -351,7 +338,7 @@
 }
 .wh-brand--sm .wh-brand__logo{height:34px}
 
-/* Drawer sağ üst (ThemeToggle + kapat) */
+
 .wh-drawer__actions{display:flex; align-items:center; gap:8px}
 .wh-drawer__actions > button{
   border:1px solid var(--wp-ink-200);
@@ -415,9 +402,6 @@
   padding-top:12px; border-top:1px solid var(--wp-border);
 }
 
-/* ==================================================
-   ACCESSIBILITY
-   ================================================== */
 :where(a,button,[href],.wh-link,.wh-m-link,.wh-btn){outline:none}
 :where(a,button,.wh-link,.wh-m-link,.wh-btn):focus-visible{
   box-shadow:0 0 0 3px rgba(87,180,137,.45), 0 0 0 7px var(--wp-ring);
@@ -425,14 +409,13 @@
   border-radius:10px;
 }
 
-/* ==================================================
-   RESPONSIVE TWEAKS
-   ================================================== */
+
 @media (max-width:1023.98px){
   .wh-nav__inner{grid-template-columns:1fr auto}
+  .wh-topbar__inner{height:46px}
+  .wh-nav__inner{min-height:88px}
+  .wh-brand__logo{height:48px}
 }
 
-/* ==================================================
-   POLISH
-   ================================================== */
+
 .wh-navwrap .wh-nav__inner{position:relative}

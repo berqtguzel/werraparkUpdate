@@ -1,11 +1,11 @@
 import React from "react";
 import "../../../css/team-grid.css";
 import demoTeam from "@/Data/demoData";
-import TiltedCard from "../ReactBits/Components/TiltedCard";
-import ScrollStack, {
-    ScrollStackItem,
-} from "../ReactBits/Components/ScrollStack";
-
+const Particles = React.lazy(() =>
+    import("../ReactBits/Backgrounds/Particles").then((m) => ({
+        default: m.default || m,
+    })),
+);
 /* yardımcılar */
 const norm = (s = "") =>
     s
@@ -32,6 +32,21 @@ function NameBar({ name }) {
     return (
         <div className="tg-namebar">
             <span className="tg-namebar__text">{name}</span>
+        </div>
+    );
+}
+
+function TeamMedia({ src, name }) {
+    return (
+        <div className="tg-media">
+            <img
+                src={src}
+                alt={`${name || "Profil"} image`}
+                className="tg-media__img"
+            />
+            <span className="tg-media__overlay" aria-hidden="true" />
+            <span className="tg-media__shine" aria-hidden="true" />
+            <NameBar name={name} />
         </div>
     );
 }
@@ -112,6 +127,25 @@ export default function TeamGrid({
     return (
         <section className="tg-section tg-meshbg">
             <div className="tg-pattern" aria-hidden="true" />
+
+            <React.Suspense fallback={null}>
+                <div className="tt3-particles-layer" aria-hidden="true">
+                    <Particles
+                        className="tt3-particles"
+                        particleCount={200}
+                        particleSpread={8}
+                        speed={0.08}
+                        moveParticlesOnHover
+                        particleHoverFactor={0.7}
+                        alphaParticles
+                        particleBaseSize={200}
+                        sizeRandomness={0.9}
+                        cameraDistance={18}
+                        particleColors={["#19bf73", "#0ea567", "#8ee7c8"]}
+                    />
+                </div>
+            </React.Suspense>
+
             <div className="tg-shell">
                 <header className="tg-head">
                     <span className="tg-eyebrow">werrapark</span>
@@ -124,24 +158,13 @@ export default function TeamGrid({
 
                 <div className="tg-hero">
                     <article className="tg-card tg-card--hero">
-                        <TiltedCard
-                            imageSrc={
+                        <TeamMedia
+                            src={
                                 lead?.image ||
                                 lead?.avatar ||
                                 "/images/avatar-placeholder.png"
                             }
-                            altText={`${lead?.name || "Profil"} image`}
-                            captionText=""
-                            containerWidth="100%"
-                            containerHeight="440px"
-                            imageWidth="100%"
-                            imageHeight="100%"
-                            scaleOnHover={1.06}
-                            rotateAmplitude={12}
-                            showMobileWarning={false}
-                            showTooltip={false}
-                            displayOverlayContent
-                            overlayContent={<NameBar name={lead?.name} />}
+                            name={lead?.name}
                         />
                         <CardInfo
                             title={lead?.title}
@@ -165,21 +188,7 @@ export default function TeamGrid({
                                 className="tg-card tg-card--equal"
                                 key={p.email || p.name || i}
                             >
-                                <TiltedCard
-                                    imageSrc={src}
-                                    altText={`${p.name || "Profil"} image`}
-                                    captionText=""
-                                    containerWidth="100%"
-                                    containerHeight="360px"
-                                    imageWidth="100%"
-                                    imageHeight="100%"
-                                    scaleOnHover={1.05}
-                                    rotateAmplitude={10}
-                                    showMobileWarning={false}
-                                    showTooltip={false}
-                                    displayOverlayContent
-                                    overlayContent={<NameBar name={p.name} />}
-                                />
+                                <TeamMedia src={src} name={p.name} />
                                 <CardInfo
                                     title={p.title}
                                     handle={handle}

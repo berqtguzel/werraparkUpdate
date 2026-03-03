@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { Link, usePage } from "@inertiajs/react";
 import { FiCheck, FiMapPin, FiHome, FiChevronRight } from "react-icons/fi";
 import "../../../css/rooms-showcase.css";
 
@@ -20,7 +21,7 @@ const DATA = {
             name: "Hotel Heubacher Höhe",
             location: "Masserberg • OT Heubach",
             image: "/images/template2.png",
-            cta: { label: "Hotel Erkunden", href: "/heubach" },
+            cta: { label: "Hotel Erkunden", slug: "heubach" },
             items: [
                 "13 Einzelzimmer 16 qm",
                 "13 Standard Doppelzimmer 16–20 qm",
@@ -34,7 +35,7 @@ const DATA = {
             name: "Hotel Frankenblick",
             location: "Masserberg • OT Schnett",
             image: "/images/template2.png",
-            cta: { label: "Hotel Erkunden", href: "/frankenblick" },
+            cta: { label: "Hotel Erkunden", slug: "frankenblick" },
             items: [
                 "12 Einzelzimmer 16 qm",
                 "44 Doppelzimmer 18–20 qm",
@@ -46,7 +47,7 @@ const DATA = {
             name: "Hotel Sommerberg",
             location: "Masserberg • OT Fehrenbach",
             image: "/images/template2.png",
-            cta: { label: "Hotel Erkunden", href: "/sommerberg" },
+            cta: { label: "Hotel Erkunden", slug: "sommerberg" },
             items: [
                 "2 Einzelzimmer 15 qm",
                 "60 Doppelzimmer 15–20 qm",
@@ -73,45 +74,52 @@ const DATA = {
 const Title = ({ children }) => <h2 className="rs-title">{children}</h2>;
 const Eyebrow = ({ children }) => <div className="rs-eyebrow">{children}</div>;
 
-const HotelCard = ({ hotel }) => (
-    <article className="rs-card" aria-labelledby={`h-${hotel.id}`}>
-        {hotel.image && (
-            <>
-                <img
-                    className="rs-card__media"
-                    src={hotel.image}
-                    alt=""
-                    aria-hidden="true"
-                />
-                <span className="rs-card__shade" aria-hidden="true" />
-            </>
-        )}
+const HotelCard = ({ hotel, locale }) => {
+    const href =
+        hotel.cta?.slug && locale
+            ? `/${locale}/hotels/${hotel.cta.slug}`
+            : hotel.cta?.href || "/rooms";
 
-        <div className="rs-card__head">
-            <div className="rs-card__meta">
-                <FiMapPin className="rs-icon" aria-hidden />
-                <span>{hotel.location}</span>
+    return (
+        <article className="rs-card" aria-labelledby={`h-${hotel.id}`}>
+            {hotel.image && (
+                <>
+                    <img
+                        className="rs-card__media"
+                        src={hotel.image}
+                        alt=""
+                        aria-hidden="true"
+                    />
+                    <span className="rs-card__shade" aria-hidden="true" />
+                </>
+            )}
+
+            <div className="rs-card__head">
+                <div className="rs-card__meta">
+                    <FiMapPin className="rs-icon" aria-hidden />
+                    <span>{hotel.location}</span>
+                </div>
+                <h3 id={`h-${hotel.id}`} className="rs-card__title">
+                    {hotel.name}
+                </h3>
             </div>
-            <h3 id={`h-${hotel.id}`} className="rs-card__title">
-                {hotel.name}
-            </h3>
-        </div>
 
-        <ul className="rs-list">
-            {hotel.items.map((t, i) => (
-                <li key={i}>
-                    <FiCheck className="rs-icon" aria-hidden />
-                    <span>{t}</span>
-                </li>
-            ))}
-        </ul>
+            <ul className="rs-list">
+                {hotel.items.map((t, i) => (
+                    <li key={i}>
+                        <FiCheck className="rs-icon" aria-hidden />
+                        <span>{t}</span>
+                    </li>
+                ))}
+            </ul>
 
-        <a className="rs-cta" href={hotel.cta.href}>
-            {hotel.cta.label}
-            <FiChevronRight />
-        </a>
-    </article>
-);
+            <Link className="rs-cta" href={href}>
+                {hotel.cta.label}
+                <FiChevronRight />
+            </Link>
+        </article>
+    );
+};
 
 const HomesCard = ({ homes }) => (
     <article className="rs-card rs-card--wide" aria-labelledby="homes-title">
@@ -159,6 +167,9 @@ export default function RoomsShowcase({
     const [mounted, setMounted] = React.useState(false);
     React.useEffect(() => setMounted(true), []);
 
+    const { props } = usePage();
+    const locale = props?.locale ?? "de";
+
     return (
         <section className="rs-wrap rs-with-bg" aria-labelledby="rooms-title">
             {mounted && (
@@ -200,7 +211,7 @@ export default function RoomsShowcase({
 
             <div className="rs-grid">
                 {data.hotels.map((h) => (
-                    <HotelCard key={h.id} hotel={h} />
+                    <HotelCard key={h.id} hotel={h} locale={locale} />
                 ))}
             </div>
 

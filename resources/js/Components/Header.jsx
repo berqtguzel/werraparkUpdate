@@ -5,35 +5,51 @@ import "../../css/header.css";
 
 export default function Header({ currentRoute }) {
     const { props } = usePage();
-    const global = props.global;
-    const { page, locale } = usePage().props;
+    const locale = props?.locale ?? "de";
+    // Null-safe: global her sayfada gelmeyebilir (ilk render / bazı page’ler)
+    const global = props?.global ?? null;
 
-    const headerMenu = global.menu.data[0];
+    // Menu yapısı da her zaman dolu olmayabilir
+    const headerMenu = global?.menu?.data?.[0] ?? null;
 
-    const nav = [
-        { label: "Home", href: "/", key: "home" },
-        { label: "Über uns", href: "/uber-uns", key: "uberuns" },
-        { label: "Historie", href: "/historie", key: "historie" },
-        { label: "Gäste ABC", href: "/gaeste-abc", key: "gaeste-abc" },
+    // items yoksa boş array (map patlamasın)
+    const items = Array.isArray(headerMenu?.items) ? headerMenu.items : [];
+
+    // Eğer backend’den menü gelmezse, senin hardcoded nav fallback olsun istersen:
+    const fallbackNav = [
+        { name: "Home", url: "/", key: "home" },
+        { name: "Über uns", url: "/uber-uns", key: "uberuns" },
+        { name: "Historie", url: `/${locale}/historie`, key: "historie" },
+        { name: "Gäste ABC", url: `/${locale}/gaeste-abc`, key: "gaeste-abc" },
         {
-            label: "Urlaubsthemen",
-            href: "/urlaubsthemen",
+            name: "Urlaubsthemen",
+            url: `/${locale}/urlaubsthemen`,
             key: "urlaubsthemen",
         },
-        { label: "Galerie", href: "/galerie", key: "galerie" },
-        { label: "Karriere", href: "/karriere", key: "karriere" },
-        { label: "Bewertungen", href: "/bewertungen", key: "bewertungen" },
+        { name: "Galerie", url: `/${locale}/galerie`, key: "galerie" },
+        { name: "Karriere", url: `/${locale}/karriere`, key: "karriere" },
         {
-            label: "Veranstaltung",
-            href: "/veranstaltung",
+            name: "Bewertungen",
+            url: `/${locale}/bewertungen`,
+            key: "bewertungen",
+        },
+        {
+            name: "Veranstaltung",
+            url: `/${locale}/veranstaltung`,
             key: "veranstaltung",
         },
         {
-            label: "Gutscheinshop",
-            href: "/gutscheinshop",
+            name: "Gutscheinshop",
+            url: `/${locale}/gutscheinshop`,
             key: "gutscheinshop",
         },
     ];
+
+    // Desktop menü için: global menü gelmişse onu, yoksa fallback
+    const desktopNav = items.length ? items : fallbackNav;
+
+    // Mobile menü için senin eski nav yapın: aynı fallback’i kullanalım
+    const mobileNav = fallbackNav;
 
     const [open, setOpen] = React.useState(false);
 
@@ -42,7 +58,6 @@ export default function Header({ currentRoute }) {
         return () => (document.body.style.overflow = "");
     }, [open]);
 
-    console.log(props);
     return (
         <header className="wh-header" role="banner">
             <div className="wh-topbar">
@@ -52,7 +67,7 @@ export default function Header({ currentRoute }) {
                             href="mailto:info@werrapark.de"
                             className="wh-toplink"
                         >
-                            <span className="wh-ico" aria-hidden>
+                            <span className="wh-ico" aria-hidden="true">
                                 <svg viewBox="0 0 24 24" aria-hidden="true">
                                     <path
                                         d="M4 6h16v12H4z"
@@ -70,8 +85,9 @@ export default function Header({ currentRoute }) {
                             </span>
                             info@werrapark.de
                         </a>
+
                         <a href="tel:+4936874205706" className="wh-toplink">
-                            <span className="wh-ico" aria-hidden>
+                            <span className="wh-ico" aria-hidden="true">
                                 <svg viewBox="0 0 24 24" aria-hidden="true">
                                     <path
                                         d="M6.6 10.8a15 15 0 006.6 6.6l2.2-2.2a1 1 0 011-.25 11 11 0 003.5.56 1 1 0 011 1v3.2a1 1 0 01-1 1A17 17 0 013 5a1 1 0 011-1h3.2a1 1 0 011 1 11 11 0 00.56 3.5 1 1 0 01-.25 1z"
@@ -83,11 +99,12 @@ export default function Header({ currentRoute }) {
                             </span>
                             036874&nbsp;205706
                         </a>
+
                         <a
                             href="tel:+4915123408937"
                             className="wh-toplink hide-sm"
                         >
-                            <span className="wh-ico" aria-hidden>
+                            <span className="wh-ico" aria-hidden="true">
                                 <svg viewBox="0 0 24 24" aria-hidden="true">
                                     <path
                                         d="M6.6 10.8a15 15 0 006.6 6.6l2.2-2.2a1 1 0 011-.25 11 11 0 003.5.56 1 1 0 011 1v3.2a1 1 0 01-1 1A17 17 0 013 5a1 1 0 011-1h3.2a1 1 0 011 1 11 11 0 00.56 3.5 1 1 0 01-.25 1z"
@@ -108,6 +125,7 @@ export default function Header({ currentRoute }) {
                         <a href="/impressum" className="wh-btn wh-btn--ghost">
                             Impressum
                         </a>
+
                         <div className="wh-socials">
                             <a
                                 href="#"
@@ -155,6 +173,7 @@ export default function Header({ currentRoute }) {
                             </a>
                         </div>
 
+                        {/* Desktop theme toggle istiyorsan aç */}
                         <div className="wh-theme-toggle">
                             <ThemeToggle />
                         </div>
@@ -166,12 +185,12 @@ export default function Header({ currentRoute }) {
                 <div className="wh-container wh-nav__inner">
                     <Link href="/" className="wh-brand" aria-label="Startseite">
                         <img
-                            src="/images/logo.svg"
+                            src="/images/Logo/werrapark-logo-white.png"
                             alt="Werrapark Resort"
                             className="wh-brand__logo wh-brand__logo--light"
                         />
                         <img
-                            src="/images/logo.svg"
+                            src="/images/Logo/werrapark-logo.png"
                             alt=""
                             className="wh-brand__logo wh-brand__logo--dark"
                         />
@@ -181,17 +200,22 @@ export default function Header({ currentRoute }) {
                         className="wh-nav-desktop"
                         aria-label="Hauptnavigation"
                     >
-                        {headerMenu.items.map((n) => (
-                            <Link
-                                key={n.key}
-                                href={n.url}
-                                className={`wh-link ${
-                                    currentRoute === n.key ? "is-active" : ""
-                                }`}
-                            >
-                                {n.name}
-                            </Link>
-                        ))}
+                        {desktopNav.map((n, idx) => {
+                            const key = n?.key ?? n?.slug ?? idx;
+                            const url = n?.url ?? n?.href ?? "#";
+                            const name = n?.name ?? n?.label ?? "Link";
+
+                            return (
+                                <Link
+                                    key={key}
+                                    href={url}
+                                    className={`wh-link ${currentRoute === (n?.key ?? "") ? "is-active" : ""}`}
+                                >
+                                    {name}
+                                </Link>
+                            );
+                        })}
+
                         <div className="wh-nav-ctas">
                             <Link
                                 href="/group-booking"
@@ -214,6 +238,7 @@ export default function Header({ currentRoute }) {
                         aria-label="Menü öffnen"
                         aria-expanded={open}
                         onClick={() => setOpen(true)}
+                        type="button"
                     >
                         <span />
                         <span />
@@ -231,8 +256,13 @@ export default function Header({ currentRoute }) {
                     className="wh-drawer__backdrop"
                     onClick={() => setOpen(false)}
                     aria-label="Menü kapat"
+                    type="button"
                 />
-                <aside className="wh-drawer__panel" role="dialog" aria-modal>
+                <aside
+                    className="wh-drawer__panel"
+                    role="dialog"
+                    aria-modal="true"
+                >
                     <div className="wh-drawer__head">
                         <Link
                             href="/"
@@ -245,13 +275,14 @@ export default function Header({ currentRoute }) {
                                 className="wh-brand__logo"
                             />
                         </Link>
+
                         <div className="wh-drawer__actions">
-                            {/* Tema düğmesi (mobil panel üst sağ) */}
                             <ThemeToggle />
                             <button
                                 className="wh-close"
                                 onClick={() => setOpen(false)}
                                 aria-label="Menü kapat"
+                                type="button"
                             >
                                 ×
                             </button>
@@ -259,18 +290,22 @@ export default function Header({ currentRoute }) {
                     </div>
 
                     <div className="wh-drawer__body">
-                        {nav.map((n) => (
-                            <Link
-                                key={`m-${n.key}`}
-                                href={n.href}
-                                className={`wh-m-link ${
-                                    currentRoute === n.key ? "is-active" : ""
-                                }`}
-                                onClick={() => setOpen(false)}
-                            >
-                                {n.label}
-                            </Link>
-                        ))}
+                        {mobileNav.map((n, idx) => {
+                            const key = n?.key ?? idx;
+                            const href = n?.href ?? n?.url ?? "#";
+                            const label = n?.label ?? n?.name ?? "Link";
+
+                            return (
+                                <Link
+                                    key={`m-${key}`}
+                                    href={href}
+                                    className={`wh-m-link ${currentRoute === (n?.key ?? "") ? "is-active" : ""}`}
+                                    onClick={() => setOpen(false)}
+                                >
+                                    {label}
+                                </Link>
+                            );
+                        })}
 
                         <div className="wh-m-ctas">
                             <Link

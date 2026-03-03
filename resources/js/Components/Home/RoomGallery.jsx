@@ -32,7 +32,7 @@ export default function RoomsGallery({
                 src: p.src,
                 title: p.title || "",
             })),
-        [photos]
+        [photos],
     );
 
     const [open, setOpen] = useState(false);
@@ -45,11 +45,11 @@ export default function RoomsGallery({
     const close = useCallback(() => setOpen(false), []);
     const prev = useCallback(
         () => setIndex((i) => (i - 1 + items.length) % items.length),
-        [items.length]
+        [items.length],
     );
     const next = useCallback(
         () => setIndex((i) => (i + 1) % items.length),
-        [items.length]
+        [items.length],
     );
 
     useEffect(() => {
@@ -70,7 +70,7 @@ export default function RoomsGallery({
                 <Aurora
                     colorStops={["#7AE2B3", "#9FE5C7", "#1A5D48"]}
                     speed={0.7}
-                    blend={0}
+                    blend={0.8}
                     amplitude={0.6}
                 />
             </div>

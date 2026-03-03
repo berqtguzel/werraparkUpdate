@@ -3,7 +3,7 @@ const OFFERS = [
     id: "native",
     title: "EINHEIMISCHEN",
     subtitle: "PAKET",
-    image: "/images/Logo/logo.png",
+    image: "/images/template1.webp",
     alt: "Einheimischen Paket",
     kicker: "",
     badge: "/images/Logo/logo.png",
@@ -13,7 +13,7 @@ const OFFERS = [
     id: "ai-heubach",
     title: "ALL INCLUSIVE",
     subtitle: "HEUBACHER HÖHE",
-    image: "/images/offers/ai-heubach.jpg",
+    image: "/images/template1.webp",
     alt: "All Inclusive Heubacher Höhe",
     badge: "/images/offers/logo-mini.svg",
     href: "#"
@@ -22,7 +22,7 @@ const OFFERS = [
     id: "ai-frankenblick",
     title: "ALL INCLUSIVE",
     subtitle: "FRANKENBLICK",
-    image: "/images/offers/ai-frankenblick.jpg",
+    image: "/images/template1.webp",
     alt: "All Inclusive Frankenblick",
     badge: "/images/offers/logo-mini.svg",
     href: "#"
@@ -31,7 +31,7 @@ const OFFERS = [
     id: "ai-sommerberg",
     title: "ALL INCLUSIVE",
     subtitle: "HOTEL SOMMERBERG",
-    image: "/images/offers/ai-sommerberg.jpg",
+    image: "/images/template1.webp",
     alt: "All Inclusive Hotel Sommerberg",
     badge: "/images/offers/logo-mini.svg",
     href: "#"
@@ -49,7 +49,7 @@ const OFFERS = [
     id: "hp-heubach",
     title: "HALBPENSION",
     subtitle: "HEUBACHER HÖHE",
-    image: "/images/offers/hp-heubach.jpg",
+    image: "/images/template1.webp",
     alt: "Halbpension Heubacher Höhe",
     badge: "/images/template1.webp",
     href: "#"
@@ -58,7 +58,7 @@ const OFFERS = [
     id: "hp-frankenblick",
     title: "HALBPENSION",
     subtitle: "FRANKENBLICK",
-    image: "/images/offers/hp-frankenblick.jpg",
+    image: "/images/template1.webp",
     alt: "Halbpension Frankenblick",
     badge: "/images/offers/logo-mini.svg",
     href: "#"
@@ -67,7 +67,7 @@ const OFFERS = [
     id: "hp-sommerberg",
     title: "HALBPENSION",
     subtitle: "HOTEL SOMMERBERG",
-    image: "/images/offers/hp-sommerberg.jpg",
+    image: "/images/template1.webp",
     alt: "Halbpension Hotel Sommerberg",
     badge: "/images/offers/logo-mini.svg",
     href: "#"

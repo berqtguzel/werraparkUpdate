@@ -1,14 +1,9 @@
-/* =====================================================
-   TRAVEL THEMES v3 — Mozaik Vitrin + Premium Kart Izgarası
-   Light/Dark tema, a11y, performans dostu
-   ===================================================== */
 
-/* ---------- Tokens ---------- */
 .tt3-wrap{
   --brand: #19bf73;
   --brand-2: #0ea567;
 
-  /* light */
+
   --tt3-text: #0f1a14;
   --tt3-muted: #586a63;
   --tt3-surface: #ffffff;
@@ -24,7 +19,7 @@
   color: var(--tt3-text);
 }
 
-/* dark */
+
 html[data-theme="dark"] .tt3-wrap,
 body[data-theme="dark"] .tt3-wrap,
 .dark .tt3-wrap{
@@ -40,7 +35,7 @@ body[data-theme="dark"] .tt3-wrap,
   background: var(--tt3-bg);
 }
 
-/* ---------- Header Layout ---------- */
+
 .tt3-header{
   max-width: 1200px;
   margin: 0 auto;
@@ -54,7 +49,7 @@ body[data-theme="dark"] .tt3-wrap,
   .tt3-header{ grid-template-columns: 1fr; }
 }
 
-/* Left text */
+
 .tt3-head-text{ align-self: center; }
 .tt3-eyebrow{
   display:inline-block; font-size:12px; letter-spacing:.25em; text-transform:uppercase;
@@ -75,7 +70,6 @@ html[data-theme="dark"] .tt3-title,
 
 .tt3-desc{ color: var(--tt3-muted); line-height: 1.7; margin: 0 0 16px; max-width: 62ch; }
 
-/* CTA buttons */
 .tt3-cta{ display:flex; gap:12px; flex-wrap: wrap; }
 .tt3-btn{
   appearance:none; border-radius:12px; font-weight:800; letter-spacing:.02em;
@@ -92,7 +86,7 @@ html[data-theme="dark"] .tt3-title,
 html[data-theme="dark"] .tt3-btn--ghost{ color: #fff; border-color: rgba(255,255,255,.22); }
 .tt3-btn--ghost:hover{ transform: translateY(-1px); box-shadow: 0 0 0 4px rgba(25,191,115,.28); }
 
-/* Right mosaic preview */
+
 .tt3-head-mosaic{
   position: relative;
   border-radius: 20px;
@@ -130,10 +124,10 @@ html[data-theme="dark"] .tt3-btn--ghost{ color: #fff; border-color: rgba(255,255
 .tt3-mosaic-overlay strong{ font-size: 16px; letter-spacing:.04em; }
 .tt3-mosaic-overlay span{ font-size: 13px; opacity:.95; }
 
-/* ---------- Grid Cards ---------- */
+
 .tt3-grid{
   --col: 3;
-  max-width: 1200px; margin: 18px auto 64px; padding: 0 20px;
+  max-width: 1200px; margin: 18px auto 0; padding: 0 20px;
   display:grid; grid-template-columns: repeat(var(--col), minmax(0,1fr)); gap: 22px;
 }
 @media (max-width: 1100px){ .tt3-grid{ --col: 3; } }
@@ -143,6 +137,7 @@ html[data-theme="dark"] .tt3-btn--ghost{ color: #fff; border-color: rgba(255,255
 .tt3-card{
   position: relative; border-radius: 18px; overflow:hidden;
   background: var(--tt3-surface); border:1px solid var(--tt3-border);
+  margin-bottom: 10px;
   box-shadow: var(--tt3-shadow);
   display:grid; grid-template-rows: auto 1fr;
   transition: transform .18s ease, box-shadow .2s ease, border-color .2s ease;
@@ -195,18 +190,18 @@ html[data-theme="dark"] .tt3-btn--ghost{ color: #fff; border-color: rgba(255,255
   box-shadow: 0 0 0 4px rgba(25,191,115,.28);
 }
 
-/* reduce motion */
+
 @media (prefers-reduced-motion: reduce){
   .tt3-mosaic-item img, .tt3-card, .tt3-card-media img, .tt3-btn { transition:none !important; }
 }
-/* ===== ColorBends background for TravelThemes (green theme) ===== */
+
 .tt3-with-bends{
   position: relative;
-  isolation: isolate; /* arka planı içerikten ayır */
-  overflow: clip;     /* taşmaları temiz tut */
+  isolation: isolate;
+  overflow: clip;
 }
 
-/* light palet (yeşil) */
+
 .tt3-with-bends{
   --tt3-bend-1: #19bf73;
   --tt3-bend-2: #0ea567;
@@ -214,7 +209,6 @@ html[data-theme="dark"] .tt3-btn--ghost{ color: #fff; border-color: rgba(255,255
   --tt3-bend-4: #063b2a;
 }
 
-/* dark için biraz daha parlak/akuş */
 html[data-theme="dark"] .tt3-with-bends,
 body[data-theme="dark"] .tt3-with-bends,
 .dark .tt3-with-bends{
@@ -224,14 +218,18 @@ body[data-theme="dark"] .tt3-with-bends,
   --tt3-bend-4: #0a5a3c;
 }
 
-/* ColorBends katmanı */
-.tt3-bends-layer{
+
+.tt3-particles-layer{
   position: absolute;
   inset: 0;
-  z-index: 0;            /* içerikten altta */
+  z-index: 0;
   pointer-events: none;
 }
-.tt3-bends{ width: 100%; height: 100%; }
+.tt3-particles{
+  width: 100%;
+  height: 100%;
+  opacity: .55;
+  filter: saturate(1.05);
+}
 
-/* içerik katmanları her zaman üstte */
 .tt3-header, .tt3-grid{ position: relative; z-index: 1; }

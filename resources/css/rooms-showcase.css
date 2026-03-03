@@ -1,42 +1,33 @@
-/* =================================================================== */
-/* RESORT SECTION (Rooms/Hotels – Cards over image)                    */
-/* Tam tema uyumlu, okunabilir metin, responsive, a11y odak destekli  */
-/* =================================================================== */
-
-/* ===================== THEME (local scope) ===================== */
 .rs-wrap{
-  /* brand */
+
   --brand: #19bf73;
   --brand-2: #0ea567;
 
-  /* section base (kart DIŞI metinler için) */
+
   --rs-bg: transparent;
-  --rs-title: #0f1a14;     /* bölüm başlığı */
-  --rs-text: #0f1a14;      /* bölüm gövde */
+  --rs-title: #0f1a14;
+  --rs-text: #0f1a14;
   --rs-muted: #5f6f67;
 
-  /* yüzey ve efektler */
+
   --rs-surface: #ffffff;
   --rs-card: #ffffff;
   --rs-border: rgba(10,42,28,.10);
   --rs-shadow: 0 24px 60px rgba(16,48,36,.12);
   --rs-glass: rgba(255,255,255,.75);
 
-  /* FOTO ÜSTÜ (on-photo) — LIGHT: beyaz metin paleti */
   --rs-onphoto: #ffffff;
   --rs-onphoto-muted: rgba(255,255,255,.92);
   --rs-onphoto-border: rgba(255,255,255,.28);
   --rs-onphoto-glass: rgba(255,255,255,.16);
 
-  /* arka gölge/şade yoğunluğu (foto üstünde) */
-  --rs-shade: .88; /* 0.78–.92 arası; light için biraz güçlü */
 
+  --rs-shade: .88;
   padding: 48px 20px 72px;
   background: var(--rs-bg);
   color: var(--rs-text);
 }
 
-/* ===================== DARK OVERRIDE ===================== */
 html[data-theme="dark"] .rs-wrap,
 body[data-theme="dark"] .rs-wrap,
 .dark .rs-wrap{
@@ -50,7 +41,6 @@ body[data-theme="dark"] .rs-wrap,
   --rs-shadow: 0 30px 70px rgba(0,0,0,.45);
   --rs-glass: rgba(18,26,23,.6);
 
-  /* FOTO ÜSTÜ (on-photo) — DARK */
   --rs-onphoto: #ecfff7;
   --rs-onphoto-muted: rgba(255,255,255,.88);
   --rs-onphoto-border: rgba(255,255,255,.28);
@@ -59,7 +49,6 @@ body[data-theme="dark"] .rs-wrap,
   --rs-shade: .82;
 }
 
-/* ===================== HEAD ===================== */
 .rs-top{
   max-width: 1100px;
   margin: 0 auto 26px;
@@ -89,7 +78,6 @@ body[data-theme="dark"] .rs-wrap,
   line-height: 1.7;
 }
 
-/* ===================== GRID ===================== */
 .rs-grid{
   --col: 3;
   display: grid;
@@ -101,7 +89,6 @@ body[data-theme="dark"] .rs-wrap,
 @media (max-width: 1100px){ .rs-grid{ --col: 2; } }
 @media (max-width: 720px){ .rs-grid{ --col: 1; } }
 
-/* ===================== CARD ===================== */
 .rs-card{
   position: relative;
   display: grid;
@@ -119,7 +106,6 @@ body[data-theme="dark"] .rs-wrap,
   min-height: 320px;
   transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
 
-  /* on-photo metinler için default renk & okunurluk gölgesi */
   color: var(--rs-onphoto);
   text-shadow: 0 2px 10px rgba(0,0,0,.35);
 }
@@ -129,14 +115,12 @@ body[data-theme="dark"] .rs-wrap,
   box-shadow: 0 22px 60px rgba(12,45,31,.22);
 }
 
-/* wide (Ferienhäuser) */
 .rs-card--wide{
   max-width: 1100px;
   margin: 18px auto 0;
   min-height: 380px;
 }
 
-/* background image + shade */
 .rs-card__media{
   position: absolute; inset: 0;
   width: 100%; height: 100%; object-fit: cover;
@@ -159,7 +143,6 @@ body[data-theme="dark"] .rs-wrap,
 }
 .rs-card:hover .rs-card__shade{ opacity: calc(var(--rs-shade) + .07); }
 
-/* header + meta */
 .rs-card__head{ display: grid; gap: 6px; }
 .rs-card__title{
   margin: 0;
@@ -174,7 +157,6 @@ body[data-theme="dark"] .rs-wrap,
 }
 .rs-icon{ width: 18px; height: 18px; color: var(--brand-2); }
 
-/* list */
 .rs-list{
   list-style: none; margin: 4px 0 6px; padding: 0;
   display: grid; gap: 8px;
@@ -185,7 +167,6 @@ body[data-theme="dark"] .rs-wrap,
 }
 .rs-list li .rs-icon{ margin-top: 2px; }
 
-/* CTA */
 .rs-cta{
   margin-top: 6px;
   justify-self: start;
@@ -216,7 +197,6 @@ body[data-theme="dark"] .rs-wrap,
     0 0 0 6px rgba(25,191,115,.20);
 }
 
-/* ===================== ACCESSIBILITY & TWEAKS ===================== */
 @media (prefers-reduced-motion: reduce){
   .rs-card,
   .rs-card__media,
@@ -224,31 +204,32 @@ body[data-theme="dark"] .rs-wrap,
   .rs-cta{ transition: none !important; }
 }
 
-/* Küçük ekran yoğunluğu */
+
 @media (max-width: 560px){
   .rs-card{ padding: 16px 14px; border-radius: 16px; }
 }
 
-/* Link tıklanabilirlik netliği */
+
 .rs-card a{ position: relative; z-index: 1; }
 
 
 .rs-wrap.rs-with-bg{
   position: relative;
   z-index: 0;
-  background-color: #CFE3D7;
-
+  --rs-bg: #CFE3D7;
+  background: var(--rs-bg);
 }
 
-/* Dark tema override */
 html[data-theme="dark"] .rs-wrap.rs-with-bg,
 body[data-theme="dark"] .rs-wrap.rs-with-bg,
 .dark .rs-wrap.rs-with-bg{
+  --rs-bg: radial-gradient(1200px 800px at 20% -10%, rgba(15,118,110,.25), transparent 55%),
+           radial-gradient(1400px 900px at 80% 110%, rgba(6,95,70,.2), transparent 60%),
+           #020617;
   --rs-dot-base: rgba(255, 255, 255, 0.09);
   --rs-dot-active: rgba(255, 255, 255, 0.58);
 }
 
-/* İçerik DotGrid'in üstünde kalsın */
 .rs-top,
 .rs-grid,
 .rs-card,
@@ -257,7 +238,6 @@ body[data-theme="dark"] .rs-wrap.rs-with-bg,
   z-index: 1;
 }
 
-/* İsteğe bağlı: Grid arkaplanına hafif radial vignette */
 .rs-with-bg::before{
   content:"";
   position:absolute; inset:0;

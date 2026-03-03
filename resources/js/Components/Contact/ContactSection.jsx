@@ -192,6 +192,20 @@ export default function ContactPage() {
                                 </a>
                             </li>
                         </ul>
+
+                        {/* Map placeholder – sonra API ile dinamik doldurulacak */}
+                        <div
+                            className="ct-map-placeholder"
+                            aria-label="Karte – Werrapark Resort Lage"
+                        >
+                            <div className="ct-map-inner">
+                                <span className="ct-map-badge">Map</span>
+                                <p className="ct-map-text">
+                                    Hier wird später eine interaktive Karte mit
+                                    API-Daten eingebunden.
+                                </p>
+                            </div>
+                        </div>
                     </div>
 
                     <form className="ct-form" onSubmit={onSubmit} noValidate>

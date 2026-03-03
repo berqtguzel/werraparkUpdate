@@ -2,7 +2,7 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
-/* Light Theme Variables */
+
 :root {
   --background: 0 0% 100%;
   --foreground: 222.2 84% 4.9%;
@@ -49,7 +49,7 @@
   --ring: 224.3 76.3% 48%;
 }
 
-/* Base styles */
+
 * {
   border-color: hsl(var(--border));
 }
@@ -59,9 +59,10 @@ body {
   color: hsl(var(--foreground));
 }
 
-/* Ensure headings are legible in both light/dark */
+
 :where(h1,h2,h3,h4,h5,h6){
   color: hsl(var(--foreground));
 }
 
 html, body { overflow-x: hidden; scroll-behavior: smooth; }
+

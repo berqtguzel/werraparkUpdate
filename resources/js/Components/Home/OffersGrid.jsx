@@ -1,4 +1,5 @@
 import React, { useMemo, useEffect, useState } from "react";
+import { Link, usePage } from "@inertiajs/react";
 import FlowingMenu from "../ReactBits/Components/FlowingMenu";
 import Ribbons from "../ReactBits/Animations/Ribbons";
 import "../../../css/offers-grid.css";
@@ -40,6 +41,9 @@ const OffersGrid = () => {
         ? ["#8EE7C8", "#67C9A8", "#9FE5C7"]
         : ["#1B5E4A", "#2F7D68", "#9AD7C2"];
 
+    const { props } = usePage();
+    const locale = props?.locale ?? "de";
+
     return (
         <section className="og-wrap">
             <header className="og-head">
@@ -55,9 +59,9 @@ const OffersGrid = () => {
                 {OFFERS?.length ? (
                     OFFERS.map((o, idx) => (
                         <article className="og-card" key={o.id || idx}>
-                            <a
+                            <Link
                                 className="og-card-media"
-                                href={o.href || "#"}
+                                href={`/${locale}/offers/${o.id}`}
                                 aria-label={`${o.title} detaylarına git`}
                             >
                                 <img
@@ -87,7 +91,7 @@ const OffersGrid = () => {
                                         />
                                     </svg>
                                 </button>
-                            </a>
+                            </Link>
                             <div className="og-card-body">
                                 <h3 className="og-card-title">{o.title}</h3>
                                 {o.subtitle && (
@@ -118,16 +122,19 @@ const OffersGrid = () => {
                                     </div>
                                 )}
                                 <div className="og-actions">
-                                    <a className="og-btn" href={o.href || "#"}>
+                                    <Link
+                                        className="og-btn"
+                                        href={`/${locale}/offers/${o.id}`}
+                                    >
                                         Detayları Gör
-                                    </a>
+                                    </Link>
                                     {o.cta && (
-                                        <a
+                                        <Link
                                             className="og-btn og-btn--ghost"
-                                            href={o.href || "#"}
+                                            href={`/${locale}/offers/${o.id}`}
                                         >
                                             {o.cta}
-                                        </a>
+                                        </Link>
                                     )}
                                 </div>
                             </div>
