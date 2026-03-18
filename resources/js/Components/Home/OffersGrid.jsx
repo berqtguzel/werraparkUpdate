@@ -1,9 +1,33 @@
-import React, { useMemo, useEffect, useState } from "react";
+import React, { useMemo, useEffect, useState, useRef, useCallback } from "react";
 import { Link, usePage } from "@inertiajs/react";
 import FlowingMenu from "../ReactBits/Components/FlowingMenu";
-import Ribbons from "../ReactBits/Animations/Ribbons";
+import Cubes from "../ReactBits/Backgrounds/Cubes";
 import "../../../css/offers-grid.css";
 import OFFERS from "@/Data/OffersData";
+import { useTranslation } from "@/i18n";
+
+function useReveal(threshold = 0.15) {
+    const ref = useRef(null);
+    const [visible, setVisible] = useState(false);
+
+    useEffect(() => {
+        const el = ref.current;
+        if (!el) return;
+        const io = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setVisible(true);
+                    io.disconnect();
+                }
+            },
+            { threshold },
+        );
+        io.observe(el);
+        return () => io.disconnect();
+    }, [threshold]);
+
+    return [ref, visible];
+}
 
 const OffersGrid = () => {
     const items = useMemo(
@@ -13,7 +37,7 @@ const OffersGrid = () => {
                 text: o.subtitle ? `${o.title} — ${o.subtitle}` : o.title,
                 image: o.image,
             })),
-        []
+        [],
     );
 
     const [isDark, setIsDark] = useState(false);
@@ -22,7 +46,7 @@ const OffersGrid = () => {
         const check = () =>
             setIsDark(
                 document.documentElement.classList.contains("dark") ||
-                    (mq ? mq.matches : false)
+                    (mq ? mq.matches : false),
             );
         check();
         mq && mq.addEventListener?.("change", check);
@@ -43,26 +67,40 @@ const OffersGrid = () => {
 
     const { props } = usePage();
     const locale = props?.locale ?? "de";
+    const { t } = useTranslation();
+
+    const [headRef, headVisible] = useReveal(0.12);
+    const [gridRef, gridVisible] = useReveal(0.06);
 
     return (
         <section className="og-wrap">
-            <header className="og-head">
-                <div className="og-eyebrow">Sonderangebote</div>
-                <h2 className="og-title">Information zu den Angeboten</h2>
+            <div className="og-background"></div>
+            <header
+                ref={headRef}
+                className={`og-head ${headVisible ? "og-revealed" : "og-hidden"}`}
+            >
+                <div className="og-eyebrow">{t("offers.eyebrow")}</div>
+                <h2 className="og-title">{t("offers.title")}</h2>
                 <p className="og-subtitle">
-                    Pakete und saisonale Angebote, die wir für Sie ausgewählt
-                    haben. Sie können die Details in den Karten überprüfen.
+                    {t("offers.subtitle")}
                 </p>
             </header>
 
-            <div className="og-grid">
+            <div
+                ref={gridRef}
+                className={`og-grid ${gridVisible ? "og-revealed" : "og-hidden"}`}
+            >
                 {OFFERS?.length ? (
                     OFFERS.map((o, idx) => (
-                        <article className="og-card" key={o.id || idx}>
+                        <article
+                            className="og-card og-card-anim"
+                            key={o.id || idx}
+                            style={{ "--card-i": idx }}
+                        >
                             <Link
                                 className="og-card-media"
                                 href={`/${locale}/offers/${o.id}`}
-                                aria-label={`${o.title} detaylarına git`}
+                                aria-label={o.title}
                             >
                                 <img
                                     src={o.image}
@@ -77,7 +115,7 @@ const OffersGrid = () => {
                                 <button
                                     className="og-fav"
                                     type="button"
-                                    aria-label="Favorilere ekle"
+                                    aria-label={t("offers.addFavorite")}
                                 >
                                     <svg
                                         width="18"
@@ -126,7 +164,7 @@ const OffersGrid = () => {
                                         className="og-btn"
                                         href={`/${locale}/offers/${o.id}`}
                                     >
-                                        Detayları Gör
+                                        {t("offers.viewDetails")}
                                     </Link>
                                     {o.cta && (
                                         <Link

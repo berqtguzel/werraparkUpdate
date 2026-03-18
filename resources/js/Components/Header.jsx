@@ -1,244 +1,226 @@
 import React from "react";
 import { Link, usePage } from "@inertiajs/react";
 import ThemeToggle from "./ThemeToggle";
+import LanguageSwitcher from "./LanguageSwitcher";
+import { ensureLocaleInUrl } from "@/utils/url";
+import {
+    filterLegalItems,
+    deduplicateByUrl,
+    ensureTreeNoDuplicates,
+} from "@/utils/menuUtils";
 import "../../css/header.css";
+
+function buildNavFromApi(apiMenu, locale) {
+    if (!Array.isArray(apiMenu) || !apiMenu.length) return null;
+
+    const headerMenu =
+        apiMenu.find(
+            (m) =>
+                m.location === "header" ||
+                m.type === "header" ||
+                m.slug === "header",
+        ) ?? apiMenu[0];
+
+    let items = headerMenu?.items ?? headerMenu?.children ?? [];
+    if (!items.length) return null;
+
+    items = ensureTreeNoDuplicates(items);
+    if (!items.length) return null;
+
+    const result = items.map((item) => {
+        const rawUrl = item.url?.startsWith("http")
+            ? item.url
+            : item.url?.startsWith("/")
+              ? item.url
+              : `/${locale}/${item.slug ?? item.url ?? ""}`;
+        const url = ensureLocaleInUrl(rawUrl, locale);
+
+        const entry = {
+            name: item.name ?? item.title ?? "",
+            url,
+            key: item.slug ?? item.key ?? "",
+        };
+
+        if (item.children?.length || item.items?.length) {
+            entry.children = (item.children ?? item.items).map((child) => {
+                const childRaw = child.url?.startsWith("http")
+                    ? child.url
+                    : child.url?.startsWith("/")
+                      ? child.url
+                      : `/${locale}/${child.slug ?? child.url ?? ""}`;
+                return {
+                    name: child.name ?? child.title ?? "",
+                    url: ensureLocaleInUrl(childRaw, locale),
+                    key: child.slug ?? child.key ?? "",
+                };
+            });
+        }
+
+        return entry;
+    });
+
+    const filtered = filterLegalItems(result);
+    const deduped = deduplicateByUrl(filtered);
+    return deduped.length ? deduped : null;
+}
+
+const DEFAULT_LOGO_LIGHT = "/images/Logo/werrapark-logo-white.png";
+const DEFAULT_LOGO_DARK = "/images/Logo/werrapark-logo.png";
 
 export default function Header({ currentRoute }) {
     const { props } = usePage();
     const locale = props?.locale ?? "de";
-    // Null-safe: global her sayfada gelmeyebilir (ilk render / bazı page’ler)
-    const global = props?.global ?? null;
+    const apiMenu = props?.global?.menu;
+    const branding = props?.global?.settings?.branding ?? {};
+    const contact = props?.global?.settings?.contact ?? {};
 
-    // Menu yapısı da her zaman dolu olmayabilir
-    const headerMenu = global?.menu?.data?.[0] ?? null;
+    const logoLight = branding.logo ?? DEFAULT_LOGO_LIGHT;
+    const logoDark =
+        branding.dark_logo ?? branding.darklogo ?? DEFAULT_LOGO_DARK;
 
-    // items yoksa boş array (map patlamasın)
-    const items = Array.isArray(headerMenu?.items) ? headerMenu.items : [];
-
-    // Eğer backend’den menü gelmezse, senin hardcoded nav fallback olsun istersen:
-    const fallbackNav = [
-        { name: "Home", url: "/", key: "home" },
-        { name: "Über uns", url: "/uber-uns", key: "uberuns" },
-        { name: "Historie", url: `/${locale}/historie`, key: "historie" },
-        { name: "Gäste ABC", url: `/${locale}/gaeste-abc`, key: "gaeste-abc" },
-        {
-            name: "Urlaubsthemen",
-            url: `/${locale}/urlaubsthemen`,
-            key: "urlaubsthemen",
-        },
-        { name: "Galerie", url: `/${locale}/galerie`, key: "galerie" },
-        { name: "Karriere", url: `/${locale}/karriere`, key: "karriere" },
-        {
-            name: "Bewertungen",
-            url: `/${locale}/bewertungen`,
-            key: "bewertungen",
-        },
-        {
-            name: "Veranstaltung",
-            url: `/${locale}/veranstaltung`,
-            key: "veranstaltung",
-        },
-        {
-            name: "Gutscheinshop",
-            url: `/${locale}/gutscheinshop`,
-            key: "gutscheinshop",
-        },
-    ];
-
-    // Desktop menü için: global menü gelmişse onu, yoksa fallback
-    const desktopNav = items.length ? items : fallbackNav;
-
-    // Mobile menü için senin eski nav yapın: aynı fallback’i kullanalım
-    const mobileNav = fallbackNav;
+    const contactEmail = contact.email ?? contact.mail ?? "info@werrapark.de";
+    const contactPhone =
+        contact.phone ?? contact.tel ?? contact.telephone ?? "+4936874205706";
 
     const [open, setOpen] = React.useState(false);
+    const [mobileSub, setMobileSub] = React.useState(null);
 
     React.useEffect(() => {
         document.body.style.overflow = open ? "hidden" : "";
         return () => (document.body.style.overflow = "");
     }, [open]);
 
+    const fallbackNav = [
+        {
+            name: "Home",
+            url: locale === "de" ? "/" : `/${locale}`,
+            key: "home",
+        },
+        { name: "Über uns", url: `/${locale}/uber-uns`, key: "uberuns" },
+        { name: "Galerie", url: `/${locale}/galerie`, key: "galerie" },
+        { name: "Karriere", url: `/${locale}/karriere`, key: "karriere" },
+    ];
+
+    const navFromApi = React.useMemo(
+        () => buildNavFromApi(apiMenu, locale),
+        [apiMenu, locale],
+    );
+
+    const desktopNav = navFromApi ?? fallbackNav;
+    const mobileNav = navFromApi ?? fallbackNav;
+
     return (
-        <header className="wh-header" role="banner">
+        <header className="wh-header">
             <div className="wh-topbar">
                 <div className="wh-container wh-topbar__inner">
                     <div className="wh-topbar__left">
                         <a
-                            href="mailto:info@werrapark.de"
+                            href={`mailto:${contactEmail}`}
                             className="wh-toplink"
                         >
-                            <span className="wh-ico" aria-hidden="true">
-                                <svg viewBox="0 0 24 24" aria-hidden="true">
-                                    <path
-                                        d="M4 6h16v12H4z"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="1.5"
-                                    />
-                                    <path
-                                        d="M4 7l8 6 8-6"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="1.5"
-                                    />
-                                </svg>
-                            </span>
-                            info@werrapark.de
-                        </a>
-
-                        <a href="tel:+4936874205706" className="wh-toplink">
-                            <span className="wh-ico" aria-hidden="true">
-                                <svg viewBox="0 0 24 24" aria-hidden="true">
-                                    <path
-                                        d="M6.6 10.8a15 15 0 006.6 6.6l2.2-2.2a1 1 0 011-.25 11 11 0 003.5.56 1 1 0 011 1v3.2a1 1 0 01-1 1A17 17 0 013 5a1 1 0 011-1h3.2a1 1 0 011 1 11 11 0 00.56 3.5 1 1 0 01-.25 1z"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="1.5"
-                                    />
-                                </svg>
-                            </span>
-                            036874&nbsp;205706
+                            {contactEmail}
                         </a>
 
                         <a
-                            href="tel:+4915123408937"
-                            className="wh-toplink hide-sm"
+                            href={`tel:${contactPhone.replace(/\s/g, "")}`}
+                            className="wh-toplink"
                         >
-                            <span className="wh-ico" aria-hidden="true">
-                                <svg viewBox="0 0 24 24" aria-hidden="true">
-                                    <path
-                                        d="M6.6 10.8a15 15 0 006.6 6.6l2.2-2.2a1 1 0 011-.25 11 11 0 003.5.56 1 1 0 011 1v3.2a1 1 0 01-1 1A17 17 0 013 5a1 1 0 011-1h3.2a1 1 0 011 1 11 11 0 00.56 3.5 1 1 0 01-.25 1z"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="1.5"
-                                    />
-                                </svg>
-                            </span>
-                            0151&nbsp;23408937
+                            {contactPhone}
                         </a>
                     </div>
-
                     <div className="wh-topbar__right">
-                        <a href="/kontakt" className="wh-btn wh-btn--ghost">
-                            Kontakt
-                        </a>
-                        <a href="/impressum" className="wh-btn wh-btn--ghost">
-                            Impressum
-                        </a>
-
-                        <div className="wh-socials">
-                            <a
-                                href="#"
-                                aria-label="Facebook"
-                                className="wh-social"
-                            >
-                                <svg viewBox="0 0 24 24" aria-hidden="true">
-                                    <path
-                                        d="M14 9h3V6h-3c-1.7 0-3 1.3-3 3v3H8v3h3v6h3v-6h3l1-3h-4V9c0-.6.4-1 1-1z"
-                                        fill="currentColor"
-                                    />
-                                </svg>
-                            </a>
-                            <a
-                                href="#"
-                                aria-label="Instagram"
-                                className="wh-social"
-                            >
-                                <svg viewBox="0 0 24 24" aria-hidden="true">
-                                    <rect
-                                        x="4"
-                                        y="4"
-                                        width="16"
-                                        height="16"
-                                        rx="4"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="1.5"
-                                    />
-                                    <circle
-                                        cx="12"
-                                        cy="12"
-                                        r="3.5"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="1.5"
-                                    />
-                                    <circle
-                                        cx="17.5"
-                                        cy="6.5"
-                                        r="1"
-                                        fill="currentColor"
-                                    />
-                                </svg>
-                            </a>
-                        </div>
-
-                        {/* Desktop theme toggle istiyorsan aç */}
-                        <div className="wh-theme-toggle">
-                            <ThemeToggle />
-                        </div>
+                        <LanguageSwitcher locale={locale} />
+                        <ThemeToggle />
                     </div>
                 </div>
             </div>
 
             <div className="wh-navwrap">
                 <div className="wh-container wh-nav__inner">
-                    <Link href="/" className="wh-brand" aria-label="Startseite">
+                    <Link href="/" className="wh-brand">
                         <img
-                            src="/images/Logo/werrapark-logo-white.png"
-                            alt="Werrapark Resort"
+                            src={logoLight}
+                            alt={
+                                branding.site_name ??
+                                branding.siteName ??
+                                "Logo"
+                            }
                             className="wh-brand__logo wh-brand__logo--light"
                         />
+
                         <img
-                            src="/images/Logo/werrapark-logo.png"
-                            alt=""
+                            src={logoDark}
+                            alt={
+                                branding.site_name ??
+                                branding.siteName ??
+                                "Logo"
+                            }
                             className="wh-brand__logo wh-brand__logo--dark"
                         />
                     </Link>
 
-                    <nav
-                        className="wh-nav-desktop"
-                        aria-label="Hauptnavigation"
-                    >
-                        {desktopNav.map((n, idx) => {
-                            const key = n?.key ?? n?.slug ?? idx;
-                            const url = n?.url ?? n?.href ?? "#";
-                            const name = n?.name ?? n?.label ?? "Link";
+                    <nav className="wh-nav-desktop">
+                        {desktopNav.map((n, i) => {
+                            const hasChildren = n.children?.length;
 
                             return (
-                                <Link
-                                    key={key}
-                                    href={url}
-                                    className={`wh-link ${currentRoute === (n?.key ?? "") ? "is-active" : ""}`}
-                                >
-                                    {name}
-                                </Link>
+                                <div key={i} className="wh-nav-item">
+                                    <Link
+                                        href={n.url}
+                                        className={`wh-link ${currentRoute === n.key ? "is-active" : ""}`}
+                                    >
+                                        {n.name}
+
+                                        {hasChildren && (
+                                            <span className="wh-arrow">▾</span>
+                                        )}
+                                    </Link>
+
+                                    {hasChildren && (
+                                        <div className="wh-dropdown">
+                                            {n.children.map((c, j) => (
+                                                <Link
+                                                    key={j}
+                                                    href={c.url}
+                                                    className="wh-dropdown-link"
+                                                >
+                                                    {c.name}
+                                                </Link>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
                             );
                         })}
-
-                        <div className="wh-nav-ctas">
-                            <Link
-                                href="/group-booking"
-                                className="wh-btn wh-btn--light"
-                            >
-                                Gruppenbuchung
-                            </Link>
-                            <Link
-                                href="/offers"
-                                className="wh-btn wh-btn--primary"
-                            >
-                                Bestpreis buchen
-                            </Link>
-                        </div>
                     </nav>
 
-                    {/* Hamburger */}
+                    <div className="wh-nav-ctas wh-ctas-desktop">
+                        <a
+                            href="https://bookings.tripmakery.com/de/h/brV2ODN9RoGB?p=1&s=INTERNAL_RATING&a=0&c=0"
+                            className="wh-btn wh-btn--light"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            data-track
+                            data-track-id="header-gruppenbuchung"
+                            data-track-label="Gruppenbuchung"
+                        >
+                            Gruppenbuchung
+                        </a>
+                        <a
+                            href="https://www.secure-hotel-booking.com/d-edge/Werrapark-Hotels-Masserberg-GmbH-Co-KG/JKR8/tr-TR?_gl=1*1b09wi9*_gcl_au*MTUzMDE3MDYyMy4xNzY2NjQ3NjY1"
+                            className="wh-btn wh-btn--primary"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            data-track
+                            data-track-id="header-bestpreis"
+                            data-track-label="Bestpreis buchen"
+                        >
+                            Bestpreis buchen
+                        </a>
+                    </div>
                     <button
                         className="wh-hamburger"
-                        aria-label="Menü öffnen"
-                        aria-expanded={open}
                         onClick={() => setOpen(true)}
-                        type="button"
                     >
                         <span />
                         <span />
@@ -247,96 +229,133 @@ export default function Header({ currentRoute }) {
                 </div>
             </div>
 
-            {/* MOBILE DRAWER */}
-            <div
-                className={`wh-drawer ${open ? "is-open" : ""}`}
-                aria-hidden={!open}
-            >
+            <div className={`wh-drawer ${open ? "is-open" : ""}`}>
                 <button
                     className="wh-drawer__backdrop"
                     onClick={() => setOpen(false)}
-                    aria-label="Menü kapat"
-                    type="button"
                 />
-                <aside
-                    className="wh-drawer__panel"
-                    role="dialog"
-                    aria-modal="true"
-                >
+
+                <aside className="wh-drawer__panel">
                     <div className="wh-drawer__head">
                         <Link
                             href="/"
-                            className="wh-brand wh-brand--sm"
                             onClick={() => setOpen(false)}
+                            className="wh-brand"
                         >
                             <img
-                                src="/images/logo.svg"
-                                alt="Werrapark Resort"
-                                className="wh-brand__logo"
+                                src={logoLight}
+                                alt={
+                                    branding.site_name ??
+                                    branding.siteName ??
+                                    "Logo"
+                                }
+                                className="wh-brand__logo wh-brand__logo--light"
+                            />
+
+                            <img
+                                src={logoLight}
+                                alt={
+                                    branding.site_name ??
+                                    branding.siteName ??
+                                    "Logo"
+                                }
+                                className="wh-brand__logo wh-brand__logo--dark"
                             />
                         </Link>
 
-                        <div className="wh-drawer__actions">
-                            <ThemeToggle />
-                            <button
-                                className="wh-close"
-                                onClick={() => setOpen(false)}
-                                aria-label="Menü kapat"
-                                type="button"
-                            >
-                                ×
-                            </button>
-                        </div>
+                        <button
+                            className="wh-close"
+                            onClick={() => setOpen(false)}
+                        >
+                            ×
+                        </button>
                     </div>
 
                     <div className="wh-drawer__body">
-                        {mobileNav.map((n, idx) => {
-                            const key = n?.key ?? idx;
-                            const href = n?.href ?? n?.url ?? "#";
-                            const label = n?.label ?? n?.name ?? "Link";
+                        {mobileNav.map((n, i) => {
+                            const hasChildren = n.children?.length;
 
                             return (
-                                <Link
-                                    key={`m-${key}`}
-                                    href={href}
-                                    className={`wh-m-link ${currentRoute === (n?.key ?? "") ? "is-active" : ""}`}
-                                    onClick={() => setOpen(false)}
-                                >
-                                    {label}
-                                </Link>
+                                <div key={i}>
+                                    <button
+                                        className="wh-m-link"
+                                        onClick={() =>
+                                            hasChildren
+                                                ? setMobileSub(
+                                                      mobileSub === i
+                                                          ? null
+                                                          : i,
+                                                  )
+                                                : setOpen(false)
+                                        }
+                                    >
+                                        {n.name}
+
+                                        {hasChildren && <span>▾</span>}
+                                    </button>
+
+                                    {hasChildren && mobileSub === i && (
+                                        <div className="wh-m-sub">
+                                            {n.children.map((c, j) => (
+                                                <Link
+                                                    key={j}
+                                                    href={c.url}
+                                                    className="wh-m-sublink"
+                                                    onClick={() =>
+                                                        setOpen(false)
+                                                    }
+                                                >
+                                                    {c.name}
+                                                </Link>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
                             );
                         })}
-
                         <div className="wh-m-ctas">
-                            <Link
-                                href="/group-booking"
+                            <LanguageSwitcher locale={locale} />
+                            <a
+                                href="https://bookings.tripmakery.com/de/h/brV2ODN9RoGB?p=1&s=INTERNAL_RATING&a=0&c=0"
                                 className="wh-btn wh-btn--light wh-btn--block"
+                                target="_blank"
+                                rel="noopener noreferrer"
                                 onClick={() => setOpen(false)}
+                                data-track
+                                data-track-id="mobile-gruppenbuchung"
+                                data-track-label="Gruppenbuchung"
                             >
                                 Gruppenbuchung
-                            </Link>
-                            <Link
-                                href="/offers"
+                            </a>
+
+                            <a
+                                href="https://www.secure-hotel-booking.com/d-edge/Werrapark-Hotels-Masserberg-GmbH-Co-KG/JKR8/tr-TR/HotelSelection?_gl=1*1b09wi9*_gcl_au*MTUzMDE3MDYyMy4xNzY2NjQ3NjY1"
                                 className="wh-btn wh-btn--primary wh-btn--block"
+                                target="_blank"
+                                rel="noopener noreferrer"
                                 onClick={() => setOpen(false)}
+                                data-track
+                                data-track-id="mobile-bestpreis"
+                                data-track-label="Bestpreis buchen"
                             >
                                 Bestpreis buchen
-                            </Link>
-                        </div>
+                            </a>
 
-                        <div className="wh-m-contact">
-                            <a
-                                href="mailto:info@werrapark.de"
-                                className="wh-toplink"
-                            >
-                                info@werrapark.de
-                            </a>
-                            <a href="tel:+4936874205706" className="wh-toplink">
-                                036874&nbsp;205706
-                            </a>
-                            <a href="tel:+4915123408937" className="wh-toplink">
-                                0151&nbsp;23408937
-                            </a>
+                            <div className="wh-topbar__left">
+                                <a
+                                    href={`mailto:${contactEmail}`}
+                                    className="wh-toplink"
+                                >
+                                    {contactEmail}
+                                </a>
+
+                                <a
+                                    href={`tel:${contactPhone.replace(/\s/g, "")}`}
+                                    className="wh-toplink"
+                                >
+                                    {contactPhone}
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </aside>

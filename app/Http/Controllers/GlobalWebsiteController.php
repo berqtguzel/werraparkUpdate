@@ -18,7 +18,7 @@ class GlobalWebsiteController extends Controller
         }
 
         try {
-            $response = Http::timeout(5)->get('https://omerdogan.de/api/global/websites');
+            $response = Http::timeout(5)->get('https://omerdogan.de/api/');
 
             if ($response->successful()) {
                 $data = $response->json();

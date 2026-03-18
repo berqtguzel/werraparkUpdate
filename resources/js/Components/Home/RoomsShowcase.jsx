@@ -2,83 +2,60 @@
 
 import React from "react";
 import { Link, usePage } from "@inertiajs/react";
-import { FiCheck, FiMapPin, FiHome, FiChevronRight } from "react-icons/fi";
+import { FiCheck, FiMapPin, FiChevronRight } from "react-icons/fi";
 import "../../../css/rooms-showcase.css";
+import { ROOM_LIST } from "@/Data/RoomsData";
+import { useTranslation } from "@/i18n";
 
-// DotGrid'i lazy yükleyelim (ReactBits > Backgrounds > DotGrid)
 const DotGrid = React.lazy(() =>
     import("../ReactBits/Backgrounds/DotGrid").then((m) => ({
         default: m.default || m,
-    }))
+    })),
 );
 
-const DATA = {
-    title: "Unsere besten Zimmer",
-    intro: "Wir bieten Ihnen in unserem exklusiven Hotel eine unvergessliche Erfahrung – vereint mit Komfort und Design. Entspannen Sie in modern gestalteten Zimmern und großzügigen Ferienhäusern.",
-    hotels: [
-        {
-            id: "heubach",
-            name: "Hotel Heubacher Höhe",
-            location: "Masserberg • OT Heubach",
-            image: "/images/template2.png",
-            cta: { label: "Hotel Erkunden", slug: "heubach" },
-            items: [
-                "13 Einzelzimmer 16 qm",
-                "13 Standard Doppelzimmer 16–20 qm",
-                "32 Comfort Doppelzimmer 18–20qm 2+1 (Couch teilweise)",
-                "20 Zwei­raum-Studios 28–30 qm",
-                "15 Familienzimmer 40 qm (2 Schlafzimmer, 2 Betten, 1 Zustellbett möglich)",
-            ],
-        },
-        {
-            id: "frankenblick",
-            name: "Hotel Frankenblick",
-            location: "Masserberg • OT Schnett",
-            image: "/images/template2.png",
-            cta: { label: "Hotel Erkunden", slug: "frankenblick" },
-            items: [
-                "12 Einzelzimmer 16 qm",
-                "44 Doppelzimmer 18–20 qm",
-                "20 Zweiraum-Studios 28–30 qm (Schlafzimmer + Wohnbereich)",
-            ],
-        },
-        {
-            id: "sommerberg",
-            name: "Hotel Sommerberg",
-            location: "Masserberg • OT Fehrenbach",
-            image: "/images/template2.png",
-            cta: { label: "Hotel Erkunden", slug: "sommerberg" },
-            items: [
-                "2 Einzelzimmer 15 qm",
-                "60 Doppelzimmer 15–20 qm",
-                "9 Familienzimmer 26 qm (2 Schlafzimmer mit je 2 Betten, 1 Zustellbett möglich)",
-                "11 Studios 30 qm (Doppelbett + Couch)",
-            ],
-        },
-    ],
-    homes: {
-        title: "Ferienhäuser",
-        image: "/images/template2.png",
-        cta: { label: "Alle Ferienhäuser", href: "/ferienhaeuser" },
-        items: [
-            "24 Einheiten gesamt",
-            "Typ A – 2 Schlafzimmer + Küche / Wohnraum (ca. 62 qm)",
-            "Typ C – 2 Schlafzimmer (1 DB + 1 EB), groß (96 qm) – zwei SZ + 1 Kinderzimmer",
-            "Typ B – 3 Schlafzimmer (davon 2 mit Doppelbett + 1 Etagenbett) – 74 qm",
-            "Typ A – Kamin (62 qm) – zwei Schlafzimmer mit Doppelbett",
-            "Alle Häuser: großer Wohn-/Essbereich, Sat-TV, Telefon, Schlafcouch, komplett ausgestattete Küchen, Bad/WC, Terrasse, Gartenmöbel (Sommer).",
-        ],
-    },
-};
+function matchStaticSlug(apiRoom) {
+    if (apiRoom.slug && ROOM_LIST.some((r) => r.id === apiRoom.slug)) {
+        return apiRoom.slug;
+    }
+    const nameLC = (apiRoom.name ?? apiRoom.hotel_name ?? "").toLowerCase();
+    const match = ROOM_LIST.find(
+        (r) => nameLC.includes(r.id) || r.hotelName.toLowerCase().includes(nameLC.split(" ")[0]),
+    );
+    return match?.id ?? apiRoom.slug ?? String(apiRoom.id);
+}
+
+function normalizeApiRooms(apiRooms) {
+    if (!apiRooms?.length) return null;
+    return apiRooms.map((r) => {
+        const slug = matchStaticSlug(r);
+        return {
+            id: slug,
+            name: r.name ?? r.hotel_name ?? "",
+            location: r.location ?? "",
+            image: r.image ?? r.hero_image ?? "/images/template2.png",
+            items: r.room_types ?? r.categories ?? [],
+            cta: { slug },
+        };
+    });
+}
+
+function buildFallbackHotels() {
+    return ROOM_LIST.map((r) => ({
+        id: r.id,
+        name: r.hotelName,
+        location: r.location,
+        image: r.heroImage,
+        items: r.roomTypes,
+        cta: { slug: r.id },
+    }));
+}
 
 const Title = ({ children }) => <h2 className="rs-title">{children}</h2>;
 const Eyebrow = ({ children }) => <div className="rs-eyebrow">{children}</div>;
 
 const HotelCard = ({ hotel, locale }) => {
-    const href =
-        hotel.cta?.slug && locale
-            ? `/${locale}/hotels/${hotel.cta.slug}`
-            : hotel.cta?.href || "/rooms";
+    const { t } = useTranslation();
+    const href = `/${locale}/rooms/${hotel.cta?.slug ?? hotel.id}`;
 
     return (
         <article className="rs-card" aria-labelledby={`h-${hotel.id}`}>
@@ -105,70 +82,34 @@ const HotelCard = ({ hotel, locale }) => {
             </div>
 
             <ul className="rs-list">
-                {hotel.items.map((t, i) => (
+                {(hotel.items || []).map((item, i) => (
                     <li key={i}>
                         <FiCheck className="rs-icon" aria-hidden />
-                        <span>{t}</span>
+                        <span>{typeof item === "string" ? item : item.name ?? item.label}</span>
                     </li>
                 ))}
             </ul>
 
             <Link className="rs-cta" href={href}>
-                {hotel.cta.label}
+                {t("rooms.explore")}
                 <FiChevronRight />
             </Link>
         </article>
     );
 };
 
-const HomesCard = ({ homes }) => (
-    <article className="rs-card rs-card--wide" aria-labelledby="homes-title">
-        {homes.image && (
-            <>
-                <img
-                    className="rs-card__media"
-                    src={homes.image}
-                    alt=""
-                    aria-hidden="true"
-                />
-                <span className="rs-card__shade" aria-hidden="true" />
-            </>
-        )}
-        <div className="rs-card__head">
-            <div className="rs-card__meta">
-                <FiHome className="rs-icon" aria-hidden />
-                <span>Werrapark Resort</span>
-            </div>
-            <h3 id="homes-title" className="rs-card__title">
-                {homes.title}
-            </h3>
-        </div>
-
-        <ul className="rs-list">
-            {homes.items.map((t, i) => (
-                <li key={i}>
-                    <FiCheck className="rs-icon" aria-hidden />
-                    <span>{t}</span>
-                </li>
-            ))}
-        </ul>
-
-        <a className="rs-cta" href={homes.cta.href}>
-            {homes.cta.label}
-            <FiChevronRight />
-        </a>
-    </article>
-);
-
-export default function RoomsShowcase({
-    data = DATA,
-    eyebrow = "Unterkünfte",
-}) {
+export default function RoomsShowcase() {
     const [mounted, setMounted] = React.useState(false);
     React.useEffect(() => setMounted(true), []);
 
     const { props } = usePage();
-    const locale = props?.locale ?? "de";
+    const apiRooms = props?.rooms;
+    const { t, locale } = useTranslation();
+
+    const hotels = React.useMemo(() => {
+        const fromApi = normalizeApiRooms(apiRooms);
+        return fromApi ?? buildFallbackHotels();
+    }, [apiRooms]);
 
     return (
         <section className="rs-wrap rs-with-bg" aria-labelledby="rooms-title">
@@ -186,11 +127,11 @@ export default function RoomsShowcase({
                         }}
                     >
                         <DotGrid
-                            dotSize={14}
-                            gap={36}
+                            dotSize={12}
+                            gap={80}
                             baseColor="#1f7008"
                             activeColor="#0E9B5B"
-                            proximity={160}
+                            proximity={150}
                             speedTrigger={110}
                             shockRadius={260}
                             shockStrength={5}
@@ -202,20 +143,17 @@ export default function RoomsShowcase({
                 </React.Suspense>
             )}
 
-            {/* ==== İçerik ==== */}
             <div className="rs-top">
-                <Eyebrow>{eyebrow}</Eyebrow>
-                <Title id="rooms-title">{data.title}</Title>
-                <p className="rs-intro">{data.intro}</p>
+                <Eyebrow>{t("rooms.eyebrow")}</Eyebrow>
+                <Title id="rooms-title">{t("rooms.title")}</Title>
+                <p className="rs-intro">{t("rooms.intro")}</p>
             </div>
 
             <div className="rs-grid">
-                {data.hotels.map((h) => (
+                {hotels.map((h) => (
                     <HotelCard key={h.id} hotel={h} locale={locale} />
                 ))}
             </div>
-
-            <HomesCard homes={data.homes} />
         </section>
     );
 }

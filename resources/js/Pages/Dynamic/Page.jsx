@@ -7,25 +7,17 @@ export default function DynamicPage({ currentRoute = "page" }) {
     const { props } = usePage();
     const page = props?.page ?? {};
 
-    const {
-        title = "Seite",
-        subtitle = "",
-        heroImage = null,
-        blocks = [],
-        content = "",
-    } = page;
+    const { title = "Seite", subtitle = "", blocks = [], content = "" } = page;
 
     const hasBlocks = Array.isArray(blocks) && blocks.length > 0;
 
-    // 🔥 HERO fallback görsel
-    const heroSrc = heroImage || "/images/template1.webp";
+    const heroSrc = page.heroImage || "/images/template1.webp";
 
     return (
         <AppLayout currentRoute={currentRoute}>
             <Head title={`${title} – Werrapark`} />
 
             <div className="dp-wrapper">
-                {/* HERO */}
                 <section className="dp-hero">
                     <div
                         className="dp-hero__bg"
@@ -43,10 +35,8 @@ export default function DynamicPage({ currentRoute = "page" }) {
                     </div>
                 </section>
 
-                {/* CONTENT */}
                 <section className="dp-content">
                     <div className="dp-container">
-                        {/* Eğer blocks yoksa content göster */}
                         {!hasBlocks && content && (
                             <div
                                 className="dp-card"
@@ -54,7 +44,6 @@ export default function DynamicPage({ currentRoute = "page" }) {
                             />
                         )}
 
-                        {/* Eğer hiçbir veri yoksa demo mesaj */}
                         {!hasBlocks && !content && (
                             <div className="dp-card dp-empty">
                                 <p>
@@ -65,7 +54,6 @@ export default function DynamicPage({ currentRoute = "page" }) {
                             </div>
                         )}
 
-                        {/* Blocks varsa render */}
                         {hasBlocks &&
                             blocks.map((b, i) => {
                                 if (b.type === "text") {

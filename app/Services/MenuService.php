@@ -10,7 +10,8 @@ class MenuService
 {
     public function getMenu(string $locale): array
     {
-        $base   = rtrim(config('omr.api_base'), '/');
+        $base   = rtrim(config('omr.base_url'), '/');
+        $endpoint = rtrim(config('omr.endpoint'), '/');
         $tenant = config('omr.main_tenant') ?: config('omr.tenant_id');
 
         if (!$tenant) {
@@ -21,32 +22,31 @@ class MenuService
         $locale = strtolower($locale);
         $cacheKey = "menu:{$tenant}:{$locale}";
 
-        return Cache::remember($cacheKey, now()->addHours(6), function () use ($base, $tenant, $locale) {
+        return Cache::remember($cacheKey, now()->addMinutes(30), function () use ($base, $endpoint, $tenant, $locale) {
             try {
+                $url = "{$base}{$endpoint}/menus";
+
                 $response = Http::timeout(10)
                     ->withHeaders(['X-Tenant-ID' => $tenant])
-                    ->get("{$base}/v1/menu", [
-                        'tenant' => $tenant,
-                        'locale' => $locale,
+                    ->get($url, [
+                        'lang' => $locale,
                     ]);
 
                 if (!$response->successful()) {
                     Log::warning('Menu API failed', [
                         'status' => $response->status(),
-                        'tenant' => $tenant,
-                        'locale' => $locale,
+                        'url' => $url,
                     ]);
                     return [];
                 }
 
-                $data = $response->json('data');
+                $json = $response->json();
+                $data = $json['data'] ?? $json;
                 return is_array($data) ? $data : [];
 
             } catch (\Throwable $e) {
                 Log::error('Error fetching menu', [
-                    'tenant' => $tenant,
-                    'locale' => $locale,
-                    'error'  => $e->getMessage(),
+                    'error' => $e->getMessage(),
                 ]);
                 return [];
             }

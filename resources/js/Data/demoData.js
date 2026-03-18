@@ -4,12 +4,11 @@ const demoTeam = [
     name: "Sezai Koc",
     title: "Leitender Direktor - Werrapark Resorts Hotel",
     email: "sezai.koc@werrapark.de",
+    phone: "036874 205706",
     avatar: "/images/Teams/sezaikoc.png",
-    handle: "sezai.koc",                 // e-postadan farklı görünmesini isterseniz
-    status: "online",                    // ProfileCard'da alt bilgi
-    contactText: "E-Mail",               // buton metni
-    accent: "#10b981",                   // kişisel accent (yeşil)
-    // İsterseniz kart özel gradyanları:
+    status: "online",
+    contactText: "E-Mail",
+    accent: "#10b981",
     behindGradient:
       "linear-gradient(135deg,#10b981 0%, #34d399 35%, #6ee7b7 70%, #ecfeff 100%)",
     innerGradient:
@@ -21,8 +20,8 @@ const demoTeam = [
     name: "Christian Steinitz",
     title: "Hotelleiter",
     email: "info@werrapark.de",
+    phone: "036874 205706",
     avatar: "/images/Teams/christian.png",
-    handle: "werrapark",                 // info@ yerine marka handle
     status: "online",
     contactText: "E-Mail",
     accent: "#22c55e",
@@ -32,8 +31,8 @@ const demoTeam = [
     title:
       "Verantwortlich für Buchungen\nWerrapark Resorts Sommerberg Hotel",
     email: "info@werrapark-sommerberg.de",
+    phone: "036870 256109",
     avatar: "/images/Teams/christiankoch.png",
-    handle: "werrapark-sommerberg",
     status: "online",
     contactText: "E-Mail",
     accent: "#16a34a",
@@ -43,11 +42,11 @@ const demoTeam = [
     title:
       "Verantwortlich für Buchungen\nWerrapark Resorts Heubacher Höhe Hotel",
     email: "empfang-heubach@werrapark.de",
+    phone: "036874 93706",
     avatar: "/images/Teams/claudia.png",
-    handle: "empfang-heubach",
     status: "online",
     contactText: "E-Mail",
-    accent: "#14b8a6",                  // biraz turkuaz
+    accent: "#14b8a6",
   },
 ];
 

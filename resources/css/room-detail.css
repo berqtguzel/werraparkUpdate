@@ -1,0 +1,469 @@
+.rux-wrap {
+    padding: clamp(28px, 4vw, 52px) 18px clamp(56px, 7vw, 94px);
+    background:
+        radial-gradient(
+            1000px 620px at -8% -14%,
+            rgba(35, 170, 118, 0.18),
+            transparent 56%
+        ),
+        radial-gradient(
+            1000px 680px at 108% -6%,
+            rgba(35, 170, 118, 0.12),
+            transparent 58%
+        ),
+        linear-gradient(180deg, #f7fcf9, #edf8f2 56%, #f8fcfa);
+    color: #16372a;
+}
+
+.rux-grid,
+.rux-bottom {
+    max-width: 1240px;
+    margin-inline: auto;
+}
+
+.rux-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.85fr);
+    gap: 14px;
+}
+
+.rux-stage-card {
+    border-radius: 24px;
+    border: 1px solid rgba(19, 124, 86, 0.18);
+    background: rgba(255, 255, 255, 0.76);
+    box-shadow: 0 24px 48px rgba(20, 87, 62, 0.14);
+    padding: 14px;
+}
+
+.rux-stage {
+    margin: 0;
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px;
+    aspect-ratio: 16/9;
+}
+
+.rux-stage img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.45s ease;
+}
+
+.rux-stage:hover img {
+    transform: scale(1.015);
+}
+
+.rux-overlay {
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(
+            180deg,
+            rgba(0, 0, 0, 0.04),
+            rgba(0, 0, 0, 0.3) 55%,
+            rgba(0, 0, 0, 0.55)
+        ),
+        radial-gradient(
+            60% 80% at 15% 0%,
+            rgba(35, 170, 118, 0.22),
+            transparent 65%
+        );
+}
+
+.rux-caption {
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    margin: 0;
+    border-radius: 12px;
+    padding: 10px 12px;
+    background: rgba(8, 27, 20, 0.62);
+    color: #eafff4;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    line-height: 1.6;
+}
+
+.rux-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 38px;
+    height: 38px;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    border-radius: 999px;
+    background: rgba(8, 27, 20, 0.48);
+    color: #ebfff6;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 3;
+}
+
+.rux-arrow--left {
+    left: 10px;
+}
+
+.rux-arrow--right {
+    right: 10px;
+}
+
+.rux-thumbs {
+    margin-top: 10px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.rux-thumb {
+    border: 1px solid rgba(19, 124, 86, 0.2);
+    border-radius: 11px;
+    background: transparent;
+    padding: 3px;
+    cursor: pointer;
+}
+
+.rux-thumb img {
+    width: 100%;
+    aspect-ratio: 16/10;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.rux-thumb.is-active {
+    border-color: #149a68;
+    box-shadow: 0 0 0 3px rgba(20, 154, 104, 0.2);
+}
+
+.rux-aside {
+    border-radius: 24px;
+    border: 1px solid rgba(19, 124, 86, 0.18);
+    background:
+        linear-gradient(
+            165deg,
+            rgba(255, 255, 255, 0.92),
+            rgba(242, 250, 246, 0.94)
+        );
+    box-shadow: 0 24px 48px rgba(20, 87, 62, 0.12);
+    padding: 18px;
+    display: grid;
+    grid-auto-rows: min-content;
+    gap: 10px;
+}
+
+.rux-eyebrow {
+    margin: 0;
+    font-size: 11px;
+    letter-spacing: 0.19em;
+    text-transform: uppercase;
+    color: #4d8e74;
+}
+
+.rux-title {
+    margin: 0;
+    font-size: clamp(30px, 4.2vw, 48px);
+    line-height: 0.98;
+}
+
+.rux-loc {
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: #1d6b4d;
+}
+
+.rux-intro {
+    margin: 2px 0 0;
+    color: #335f4b;
+    line-height: 1.72;
+}
+
+.rux-facts {
+    margin-top: 4px;
+    display: grid;
+    gap: 8px;
+}
+
+.rux-fact {
+    border-radius: 11px;
+    border: 1px solid rgba(19, 124, 86, 0.2);
+    background: #f2faf6;
+    padding: 9px 10px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.rux-fact span {
+    font-size: 12px;
+    color: #527e6c;
+}
+
+.rux-fact strong {
+    font-size: 13px;
+    color: #164735;
+}
+
+.rux-cta {
+    margin-top: 4px;
+    border-radius: 16px;
+    border: 1px solid rgba(19, 124, 86, 0.18);
+    background:
+        linear-gradient(
+            140deg,
+            rgba(22, 162, 109, 0.18),
+            rgba(255, 255, 255, 0.72)
+        );
+    padding: 12px;
+}
+
+.rux-kicker {
+    margin: 0;
+    font-size: 11px;
+    letter-spacing: 0.17em;
+    text-transform: uppercase;
+    color: #4d8e74;
+}
+
+.rux-cta h2 {
+    margin: 8px 0 4px;
+    font-size: 22px;
+    color: #133f2f;
+}
+
+.rux-cta p {
+    margin: 0;
+    line-height: 1.66;
+    color: #315c49;
+}
+
+.rux-actions {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.rux-btn {
+    min-height: 38px;
+    border-radius: 999px;
+    padding: 0 14px;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rux-btn--primary {
+    color: #f6fffb;
+    background: linear-gradient(135deg, #1ea672 0%, #2fbf90 100%);
+}
+
+.rux-btn--ghost {
+    color: #1d4f3b;
+    border: 1px solid rgba(20, 154, 104, 0.28);
+    background: #f4fbf7;
+}
+
+.rux-bottom {
+    margin-top: 14px;
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: 14px;
+}
+
+.rux-panel {
+    border-radius: 20px;
+    border: 1px solid rgba(19, 124, 86, 0.17);
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 16px 30px rgba(20, 87, 62, 0.08);
+    padding: 16px;
+}
+
+.rux-panel-head {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #138359;
+}
+
+.rux-panel-head h3 {
+    margin: 0;
+    font-size: 13px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+}
+
+.rux-list {
+    margin: 12px 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 10px;
+}
+
+.rux-list li {
+    display: grid;
+    grid-template-columns: 18px minmax(0, 1fr);
+    gap: 9px;
+    color: #2a5744;
+    line-height: 1.58;
+}
+
+.rux-panel--amenities {
+    background:
+        linear-gradient(
+            160deg,
+            rgba(255, 255, 255, 0.95),
+            rgba(244, 251, 247, 0.96)
+        );
+}
+
+.rux-chip-grid {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.rux-chip {
+    min-height: 30px;
+    padding: 0 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    border: 1px solid rgba(20, 154, 104, 0.22);
+    background: rgba(20, 154, 104, 0.11);
+    color: #194b38;
+    display: inline-flex;
+    align-items: center;
+}
+
+.rux-note {
+    margin-top: 12px;
+    display: grid;
+    grid-template-columns: 16px minmax(0, 1fr);
+    gap: 8px;
+    color: #4b7e68;
+    font-size: 13px;
+    line-height: 1.58;
+}
+
+.rux-note p {
+    margin: 0;
+}
+
+@media (max-width: 980px) {
+    .rux-grid,
+    .rux-bottom {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 680px) {
+    .rux-thumbs {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .rux-stage {
+        aspect-ratio: 4/3;
+    }
+}
+
+@media (max-width: 560px) {
+    .rux-actions {
+        flex-direction: column;
+    }
+
+    .rux-btn {
+        width: 100%;
+    }
+}
+
+.dark .rux-wrap,
+[data-theme="dark"] .rux-wrap {
+    background:
+        radial-gradient(
+            1000px 620px at -8% -14%,
+            rgba(35, 170, 118, 0.24),
+            transparent 56%
+        ),
+        radial-gradient(
+            1000px 680px at 108% -6%,
+            rgba(35, 170, 118, 0.18),
+            transparent 58%
+        ),
+        linear-gradient(180deg, #08110e, #0d1512 56%, #0b130f);
+    color: #d9f5e8;
+}
+
+.dark .rux-stage-card,
+.dark .rux-aside,
+.dark .rux-panel,
+[data-theme="dark"] .rux-stage-card,
+[data-theme="dark"] .rux-aside,
+[data-theme="dark"] .rux-panel {
+    background: rgba(13, 23, 19, 0.88);
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+}
+
+.dark .rux-loc,
+.dark .rux-panel-head,
+[data-theme="dark"] .rux-loc,
+[data-theme="dark"] .rux-panel-head {
+    color: #9ce8cc;
+}
+
+.dark .rux-intro,
+.dark .rux-cta p,
+.dark .rux-list li,
+.dark .rux-note,
+[data-theme="dark"] .rux-intro,
+[data-theme="dark"] .rux-cta p,
+[data-theme="dark"] .rux-list li,
+[data-theme="dark"] .rux-note {
+    color: #b5d9c9;
+}
+
+.dark .rux-fact,
+[data-theme="dark"] .rux-fact {
+    background: #182823;
+    border-color: rgba(255, 255, 255, 0.14);
+}
+
+.dark .rux-fact span,
+[data-theme="dark"] .rux-fact span {
+    color: #9ac7b4;
+}
+
+.dark .rux-fact strong,
+[data-theme="dark"] .rux-fact strong {
+    color: #d8f8ea;
+}
+
+.dark .rux-chip,
+[data-theme="dark"] .rux-chip {
+    color: #d8f8ea;
+    background: rgba(20, 154, 104, 0.22);
+}
+
+.dark .rux-thumb,
+[data-theme="dark"] .rux-thumb {
+    border-color: rgba(255, 255, 255, 0.14);
+}
+
+.dark .rux-btn--ghost,
+[data-theme="dark"] .rux-btn--ghost {
+    color: #d8f6e8;
+    background: #15261f;
+    border-color: rgba(255, 255, 255, 0.18);
+}

@@ -191,8 +191,54 @@ html[data-theme="dark"] .tt3-btn--ghost{ color: #fff; border-color: rgba(255,255
 }
 
 
+/* ---- Scroll-reveal animasyonları ---- */
+
+.tt3-hidden .tt3-head-text{
+  opacity: 0;
+  transform: translateY(32px);
+}
+.tt3-hidden .tt3-head-mosaic{
+  opacity: 0;
+  transform: translateY(40px) scale(.97);
+}
+
+.tt3-revealed .tt3-head-text{
+  animation: tt3-fade-up .7s cubic-bezier(.22,1,.36,1) forwards;
+}
+.tt3-revealed .tt3-head-mosaic{
+  animation: tt3-fade-up .8s cubic-bezier(.22,1,.36,1) .15s forwards;
+  opacity: 0;
+}
+
+.tt3-hidden .tt3-card-anim{
+  opacity: 0;
+  transform: translateY(48px) scale(.96);
+}
+
+.tt3-revealed .tt3-card-anim{
+  animation: tt3-card-in .65s cubic-bezier(.22,1,.36,1) forwards;
+  animation-delay: calc(var(--card-i, 0) * 0.1s + 0.05s);
+  opacity: 0;
+}
+
+@keyframes tt3-fade-up{
+  from{ opacity:0; transform: translateY(32px); }
+  to  { opacity:1; transform: translateY(0); }
+}
+
+@keyframes tt3-card-in{
+  from{ opacity:0; transform: translateY(48px) scale(.96); }
+  to  { opacity:1; transform: translateY(0) scale(1); }
+}
+
 @media (prefers-reduced-motion: reduce){
   .tt3-mosaic-item img, .tt3-card, .tt3-card-media img, .tt3-btn { transition:none !important; }
+  .tt3-hidden .tt3-head-text,
+  .tt3-hidden .tt3-head-mosaic,
+  .tt3-hidden .tt3-card-anim{ opacity:1; transform:none; }
+  .tt3-revealed .tt3-head-text,
+  .tt3-revealed .tt3-head-mosaic,
+  .tt3-revealed .tt3-card-anim{ animation:none; opacity:1; transform:none; }
 }
 
 .tt3-with-bends{

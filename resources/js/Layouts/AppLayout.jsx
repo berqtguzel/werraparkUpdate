@@ -1,11 +1,26 @@
 import React from "react";
 import Header from "@/Components/Header";
 import Footer from "@/Components/Footer";
+import CookieConsent from "@/Components/CookieConsent";
+import WhatsAppWidget from "@/Components/WhatsAppWidget";
 import { ThemeProvider } from "@/Context/ThemeContext";
 import TargetCursor from "@/Components/ReactBits/Animations/TargetCursor";
 import SplashCursor from "@/Components/ReactBits/Animations/SplashCursor";
+import { trackButton } from "@/utils/buttonTracking";
 
 export default function AppLayout({ children, currentRoute }) {
+    React.useEffect(() => {
+        const handler = (e) => {
+            const el = e.target.closest("[data-track]");
+            if (el && window.axios) {
+                const id = el.getAttribute("data-track-id") ?? el.getAttribute("data-track");
+                const label = el.getAttribute("data-track-label") ?? el.textContent?.trim?.()?.slice(0, 100);
+                if (id) trackButton({ button_id: id, button_label: label });
+            }
+        };
+        document.addEventListener("click", handler, true);
+        return () => document.removeEventListener("click", handler, true);
+    }, []);
     return (
         <ThemeProvider>
             <div
@@ -27,13 +42,15 @@ export default function AppLayout({ children, currentRoute }) {
                 <main
                     style={{
                         flex: 1,
-                        paddingTop: "150px", // büyütülen fixed header (topbar + nav) için boşluk
+                        paddingTop: "150px",
                     }}
                 >
                     {children}
                 </main>
 
                 <Footer />
+                <WhatsAppWidget />
+                <CookieConsent />
             </div>
         </ThemeProvider>
     );

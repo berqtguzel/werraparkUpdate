@@ -8,6 +8,13 @@ use Tightenco\Ziggy\Ziggy;
 
 use App\Services\GlobalWebsiteService;
 use App\Services\MenuService;
+use App\Services\ApiHealthService;
+use App\Services\WidgetService;
+use App\Services\SettingsService;
+use App\Services\StaffService;
+use App\Services\ReviewsService;
+use App\Services\ContactFormsService;
+use App\Services\SliderService;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -15,7 +22,14 @@ class HandleInertiaRequests extends Middleware
 
     public function __construct(
         private GlobalWebsiteService $globalWebsiteService,
-        private MenuService $menuService
+        private MenuService $menuService,
+        private ApiHealthService $apiHealthService,
+        private WidgetService $widgetService,
+        private SettingsService $settingsService,
+        private StaffService $staffService,
+        private ReviewsService $reviewsService,
+        private ContactFormsService $contactFormsService,
+        private SliderService $sliderService,
     ) {}
 
     public function version(Request $request): ?string
@@ -25,15 +39,41 @@ class HandleInertiaRequests extends Middleware
 
     public function share(Request $request): array
     {
-        $locale = app()->getLocale();
+        $locale = $request->route('locale') ?? 'de';
+        $health = $this->apiHealthService->check();
+        $apiUp = $health['success'] ?? false;
 
         return array_merge(parent::share($request), [
+            'flash' => [
+                'commandResult' => $request->session()->get('commandResult'),
+            ],
 
             'global' => [
-                'tenantId' => config('omr.tenant_id'),
-                'locale'   => $locale,
-                'websites' => $this->globalWebsiteService->getWebsites($locale),
-                'menu'     => $this->menuService->getMenu($locale),
+                'tenantId'  => config('omr.tenant_id'),
+                'locale'    => $locale,
+                'apiHealth' => $health,
+                'websites'  => $apiUp ? $this->globalWebsiteService->getWebsites($locale) : [],
+                'menu'      => $apiUp ? $this->menuService->getMenu($locale) : [],
+                'widgets'   => $apiUp ? $this->widgetService->getWidgets($locale) : [
+                    'ratings' => [],
+                    'whatsapp' => [],
+                    'serviceHighlights' => [],
+                ],
+                'settings'  => $apiUp ? $this->settingsService->getForFrontend($locale) : [
+                    'general'     => [],
+                    'contact'     => [],
+                    'social'      => [],
+                    'branding'    => [],
+                    'colors'      => [],
+                    'footer'      => [],
+                    'seo'         => [],
+                    'analytics'   => [],
+                    'custom_code' => [],
+                ],
+                'staff'    => $apiUp ? $this->staffService->getStaff($locale) : [],
+                'reviews'      => $apiUp ? $this->reviewsService->getReviews($locale) : [],
+                'contactForms' => $apiUp ? $this->contactFormsService->getContactForms($locale) : [],
+                'slider'      => $apiUp ? $this->sliderService->getSlider(config('omr.hero_slider_slug', 'hero'), $locale) : null,
             ],
 
             'ziggy' => fn () => array_merge(

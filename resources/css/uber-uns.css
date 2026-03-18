@@ -38,7 +38,7 @@ img{display:block;max-width:100%;height:auto}
 .dark .uu-hero__bg{ opacity:.12; filter:grayscale(.6) brightness(.9); }
 .uu-hero__pattern{
   position:absolute; inset:0; z-index:0; pointer-events:none;
-  background-image:url('/images/Logo/werrapark.png');
+  background-image:url('/images/Logo/werrapark-logo.png');
   background-size:220px auto; background-repeat:repeat; opacity:.06;
 }
 .dark .uu-hero__pattern{ opacity:.12; filter:invert(1) brightness(1.08); mix-blend-mode:screen; }

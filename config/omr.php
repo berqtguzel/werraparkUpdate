@@ -1,7 +1,19 @@
 <?php
 
 return [
-    'api_base'    => env('OMR_API_BASE'),
-    'tenant_id'   => env('OMR_TENANT_ID'),
+
+    'base_url' => env('OMR_API_BASE'),
+
+    'timeout' => env('OMR_API_TIMEOUT', 10),
+
+    'tenant_id' => env('OMR_TENANT_ID'),
+
+    'endpoint' => env('OMR_MENU_ENDPOINT', '/v1'),
+
+    'default_locale' => env('OMR_DEFAULT_LOCALE', 'de'),
+
     'main_tenant' => env('OMR_MAIN_TENANT'),
+
+    'hero_slider_slug' => env('OMR_HERO_SLIDER_SLUG', 'hero'),
+
 ];

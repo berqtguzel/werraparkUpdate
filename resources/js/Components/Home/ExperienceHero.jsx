@@ -2,6 +2,8 @@ import React from "react";
 import { FiMail, FiInstagram, FiFacebook, FiTwitter } from "react-icons/fi";
 import "../../../css/experience-hero.css";
 import CountUp from "../ReactBits/Texts/CountUp";
+import { usePage } from "@inertiajs/react";
+usePage;
 const ExperienceHero = ({
     eyebrow = "Werrapark",
     title = "Urlaub im finnischen Blockhaus",
@@ -15,6 +17,9 @@ const ExperienceHero = ({
     email = "info@werrapark.de",
     image = "/images/blockhaus.jpeg",
 }) => {
+    const { props } = usePage();
+    console.log("Tenant ID:", props);
+
     return (
         <section className="ex-wrap" aria-label="Über uns – Blockhaus Erlebnis">
             <div className="ex-pattern" aria-hidden="true" />

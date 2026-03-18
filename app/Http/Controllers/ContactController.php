@@ -10,10 +10,11 @@ use Inertia\Inertia;
 class ContactController extends Controller
 {
 
-    public function index()
+    public function index(string $locale = 'de')
     {
         return Inertia::render('Home/Kontakt', [
             'currentRoute' => 'kontakt',
+            'locale' => $locale,
         ]);
     }
 

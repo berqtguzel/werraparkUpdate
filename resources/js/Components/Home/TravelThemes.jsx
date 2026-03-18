@@ -3,12 +3,36 @@
 import React from "react";
 import { Link, usePage } from "@inertiajs/react";
 import "../../../css/travel-themes.css";
+import { useTranslation } from "@/i18n";
 
 const Particles = React.lazy(() =>
     import("../ReactBits/Backgrounds/Particles").then((m) => ({
         default: m.default || m,
     })),
 );
+
+function useReveal(threshold = 0.15) {
+    const ref = React.useRef(null);
+    const [visible, setVisible] = React.useState(false);
+
+    React.useEffect(() => {
+        const el = ref.current;
+        if (!el) return;
+        const io = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setVisible(true);
+                    io.disconnect();
+                }
+            },
+            { threshold },
+        );
+        io.observe(el);
+        return () => io.disconnect();
+    }, [threshold]);
+
+    return [ref, visible];
+}
 
 const THEMES = [
     {
@@ -59,21 +83,18 @@ const THEMES = [
 ];
 
 export default function TravelThemes({
-    eyebrow = "Facilities & Mehr",
-    title = "Urlaubsthemen",
-    description = `Sie möchten den Alltagsstress hinter sich lassen und im Thüringer Wald entspannen?
-Als Fan von frischer Luft und Bewegung schätzen Sie unberührte Natur und abwechslungsreiche
-Bewegungsmöglichkeiten? Suchen Sie Ihr Urlaubsthema – wir kümmern uns um den Rest.`,
-    ctaPrimary = { label: "Alle Urlaubsthemen", href: "#" },
-    ctaSecondary = { label: "Bestpreis Buchung", href: "/offers" },
     items = THEMES,
 }) {
     const [feature, ...rest] = items;
     const [mounted, setMounted] = React.useState(false);
     React.useEffect(() => setMounted(true), []);
 
+    const [headerRef, headerVisible] = useReveal(0.12);
+    const [gridRef, gridVisible] = useReveal(0.08);
+
     const { props } = usePage();
     const locale = props?.locale ?? "de";
+    const { t } = useTranslation();
 
     return (
         <section className="tt3-wrap tt3-with-bends" aria-label="Urlaubsthemen">
@@ -98,24 +119,27 @@ Bewegungsmöglichkeiten? Suchen Sie Ihr Urlaubsthema – wir kümmern uns um den
             )}
 
             {/* ÜST ŞERİT: solda metin, sağda mozaik vitrin */}
-            <div className="tt3-header">
+            <div
+                ref={headerRef}
+                className={`tt3-header ${headerVisible ? "tt3-revealed" : "tt3-hidden"}`}
+            >
                 <div className="tt3-head-text">
-                    <span className="tt3-eyebrow">{eyebrow}</span>
-                    <h2 className="tt3-title">{title}</h2>
-                    <p className="tt3-desc">{description}</p>
+                    <span className="tt3-eyebrow">{t("themes.eyebrow")}</span>
+                    <h2 className="tt3-title">{t("themes.title")}</h2>
+                    <p className="tt3-desc">{t("themes.description")}</p>
 
                     <div className="tt3-cta">
                         <a
                             className="tt3-btn tt3-btn--primary"
-                            href={ctaPrimary.href || `/${locale}/urlaubsthemen`}
+                            href={`/${locale}/urlaubsthemen`}
                         >
-                            {ctaPrimary.label}
+                            {t("themes.allThemes")}
                         </a>
                         <a
                             className="tt3-btn tt3-btn--ghost"
-                            href={ctaSecondary.href}
+                            href="/offers"
                         >
-                            {ctaSecondary.label}
+                            {t("themes.bestPrice")}
                         </a>
                     </div>
                 </div>
@@ -158,13 +182,22 @@ Bewegungsmöglichkeiten? Suchen Sie Ihr Urlaubsthema – wir kümmern uns um den
             </div>
 
             {/* ALT IZGARA */}
-            <div className="tt3-grid" role="list">
-                {items.map((t) => (
-                    <article key={t.id} className="tt3-card" role="listitem">
+            <div
+                ref={gridRef}
+                className={`tt3-grid ${gridVisible ? "tt3-revealed" : "tt3-hidden"}`}
+                role="list"
+            >
+                {items.map((theme, idx) => (
+                    <article
+                        key={theme.id}
+                        className="tt3-card tt3-card-anim"
+                        role="listitem"
+                        style={{ "--card-i": idx }}
+                    >
                         <div className="tt3-card-media">
                             <img
-                                src={t.image}
-                                alt={t.title}
+                                src={theme.image}
+                                alt={theme.title}
                                 loading="lazy"
                                 decoding="async"
                             />
@@ -175,22 +208,22 @@ Bewegungsmöglichkeiten? Suchen Sie Ihr Urlaubsthema – wir kümmern uns um den
                         </div>
 
                         <div className="tt3-card-body">
-                            <h3 className="tt3-card-title">{t.title}</h3>
-                            <p className="tt3-card-excerpt">{t.excerpt}</p>
+                            <h3 className="tt3-card-title">{theme.title}</h3>
+                            <p className="tt3-card-excerpt">{theme.excerpt}</p>
                             <div className="tt3-card-actions">
                                 <Link
                                     className="tt3-link"
-                                    href={`/${locale}/urlaubsthemen/${t.id}`}
-                                    aria-label={`${t.title} – mehr lesen`}
+                                    href={`/${locale}/urlaubsthemen/${theme.id}`}
+                                    aria-label={`${theme.title} – ${t("themes.readMore")}`}
                                 >
-                                    Mehr lesen
+                                    {t("themes.readMore")}
                                 </Link>
                                 <Link
                                     className="tt3-chip"
-                                    href={`/${locale}/urlaubsthemen/${t.id}`}
-                                    aria-label={`${t.title} – entdecken`}
+                                    href={`/${locale}/urlaubsthemen/${theme.id}`}
+                                    aria-label={`${theme.title} – ${t("themes.discover")}`}
                                 >
-                                    Entdecken
+                                    {t("themes.discover")}
                                 </Link>
                             </div>
                         </div>

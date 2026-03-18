@@ -11,9 +11,9 @@ import OffersGrid from "@/Components/Home/OffersGrid";
 import GiftVoucherPromo from "@/Components/Home/GiftVoucherPromo";
 import ExperienceHero from "@/Components/Home/ExperienceHero";
 import RoomsShowcase from "@/Components/Home/RoomsShowcase";
-import RoomsGallery from "@/Components/Home/RoomGallery";
 import TravelThemes from "@/Components/Home/TravelThemes";
 import HotelReviews from "@/Components/Home/HotelReviews";
+import MapSection from "@/Components/Home/MapSection";
 
 export default function HomeIndex({ currentRoute = "home" }) {
     return (
@@ -32,9 +32,9 @@ export default function HomeIndex({ currentRoute = "home" }) {
             <OffersGrid />
             <ExperienceHero />
             <RoomsShowcase />
-            <RoomsGallery />
             <TravelThemes />
             <HotelReviews />
+            <MapSection />
         </AppLayout>
     );
 }

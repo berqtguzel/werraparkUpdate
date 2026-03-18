@@ -10,7 +10,7 @@ class GlobalWebsiteService
 {
     public function getWebsites(string $locale): array
     {
-        $base   = rtrim(config('omr.api_base'), '/');
+        $base   = rtrim(config('omr.base_url'), '/');
         $tenant = config('omr.main_tenant') ?: config('omr.tenant_id');
 
         if (!$tenant) {

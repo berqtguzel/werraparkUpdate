@@ -9,7 +9,7 @@ class SliderController extends Controller
 {
     public function getSliders(string $locale, string $slug)
     {
-        $base       = rtrim(config('omr.api_base'), '/');
+        $base       = rtrim(config('omr.base_url'), '/');
         $tenant     = config('omr.tenant_id');
         $mainTenant = config('omr.main_tenant') ?: $tenant;
 

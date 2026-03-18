@@ -2,56 +2,77 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\ApiHealthService;
+use App\Services\PageService;
 use Inertia\Inertia;
 
 class PageController extends Controller
 {
+    public function __construct(
+        private PageService $pageService,
+        private ApiHealthService $apiHealth,
+    ) {}
+
     public function show(string $locale, string $slug)
     {
         $locale = strtolower($locale);
-        $slug   = strtolower($slug);
+        $slug = strtolower($slug);
 
-        // Demo içerikler (API yok)
+        $pageData = null;
+
+        if ($this->apiHealth->isAvailable()) {
+            $pageData = $this->pageService->getPage($slug, $locale);
+        }
+
+        if (!$pageData) {
+            $pageData = $this->getFallbackPage($slug, $locale);
+        }
+
+        return Inertia::render('Dynamic/Page', [
+            'page' => $pageData,
+            'locale' => $locale,
+        ]);
+    }
+
+    private function getFallbackPage(string $slug, string $locale): array
+    {
         $pages = [
             'historie' => [
-                'title'   => $locale === 'en' ? 'History' : 'Historie',
+                'title' => $locale === 'en' ? 'History' : ($locale === 'tr' ? 'Tarihçe' : 'Historie'),
                 'content' => $locale === 'en'
                     ? '<p>This is a demo page. Replace with real content later.</p>'
-                    : '<p>Bu bir demo sayfasıdır. Daha sonra gerçek içerikle değiştirilebilir.</p>',
+                    : ($locale === 'tr'
+                        ? '<p>Bu bir demo sayfasıdır. Daha sonra gerçek içerikle değiştirilebilir.</p>'
+                        : '<p>Bu bir demo sayfasıdır. Daha sonra gerçek içerikle değiştirilebilir.</p>'),
             ],
             'rooms' => [
-                'title'   => $locale === 'en' ? 'Rooms' : 'Zimmer',
+                'title' => $locale === 'en' ? 'Rooms' : ($locale === 'tr' ? 'Odalar' : 'Zimmer'),
                 'content' => $locale === 'en'
                     ? '<p>Demo rooms description.</p>'
                     : '<p>Demo oda açıklaması.</p>',
             ],
             'spa' => [
-                'title'   => 'Spa',
+                'title' => 'Spa',
                 'content' => $locale === 'en'
                     ? '<p>Demo spa content.</p>'
                     : '<p>Demo spa içeriği.</p>',
             ],
-            // İstersen diğer slug’ları da buraya ekleyebilirsin
         ];
 
-        // slug listede var ama içerik tanımlı değilse de demo üret
-        $pageData = $pages[$slug] ?? [
-            'title'   => ucfirst($slug),
+        $data = $pages[$slug] ?? [
+            'title' => ucfirst($slug),
             'content' => $locale === 'en'
                 ? '<p>Demo page. Content will be added.</p>'
                 : '<p>Demo sayfa. İçerik daha sonra eklenecek.</p>',
         ];
 
-        // Frontend'in bekleyeceği şekilde payload
-        $pageData = array_merge($pageData, [
-            'slug'    => $slug,
-            'locale'  => $locale,
-            'is_demo' => true,
-        ]);
-
-        return Inertia::render('Dynamic/Page', [
-            'page'   => $pageData,
+        return array_merge($data, [
+            'slug' => $slug,
             'locale' => $locale,
+            'subtitle' => '',
+            'heroImage' => null,
+            'blocks' => [],
+            'is_demo' => true,
         ]);
     }
 }

@@ -1,74 +1,34 @@
 import React from "react";
 import "../../../css/hotels.css";
+import { Link, usePage } from "@inertiajs/react";
 import { Mail, Phone, Star } from "lucide-react";
 import ElectricBorder from "../ReactBits/Animations/ElectricBorder";
-
-const PixelTrail = React.lazy(() =>
-    import("../ReactBits/Backgrounds/PixelTrail").then((m) => ({
-        default: m.default || m,
-    }))
-);
-
-const hotels = [
-    {
-        name: "Werrapark Resort Frankenblick Hotel",
-        image: "/images/template1.webp",
-        email: "info@werrapark-frankenblick.de",
-        phone: "036874 205706",
-        rating: 4,
-    },
-    {
-        name: "Werrapark Resort Heubacher Höhe Hotel",
-        image: "/images/template1.webp",
-        email: "info@werrapark-heubacher-höhe.de",
-        phone: "036874 93706",
-        rating: 3,
-    },
-    {
-        name: "Werrapark Resort Sportcenter",
-        image: "/images/template1.webp",
-        email: "info@werrapark-sportcenter.de",
-        phone: "036874 2280",
-        rating: 5,
-    },
-    {
-        name: "Werrapark Resort Sommerberg Hotel",
-        image: "/images/template1.webp",
-        email: "info@werrapark-sommerberg.de",
-        phone: "036870 256109",
-        rating: 3,
-    },
-    {
-        name: "Werrapark Resort Ferienhaus-Bungalows",
-        image: "/images/template1.webp",
-        email: "info@werrapark-ferienhaus.de",
-        phone: "036870 256109",
-        rating: 4,
-    },
-];
+import HOTELS from "@/Data/HotelsData";
+import { useTranslation } from "@/i18n";
 
 export default function Hotels() {
-    const [isClient, setIsClient] = React.useState(false);
-    React.useEffect(() => setIsClient(true), []);
+    const { props } = usePage();
+    const locale = props?.locale ?? "de";
+    const { t } = useTranslation();
 
     return (
         <section
             className="hotels-section relative overflow-hidden"
             aria-labelledby="hotels-heading"
         >
+            <div className="hotels-background"></div>
             <div className="hotels-container relative z-20">
                 <h2 id="hotels-heading" className="hotels-title">
-                    Unsere Hotels
+                    {t("hotels.title")}
                 </h2>
                 <p className="hotels-subtitle" role="doc-subtitle">
-                    Entdecken Sie unsere Häuser im Thüringer Wald – komfortabel,
-                    naturverbunden und mit herzlicher Gastfreundschaft.
+                    {t("hotels.subtitle")}
                 </p>
 
                 <div className="hotel-grid">
-                    {hotels.map((hotel, index) => (
+                    {HOTELS.map((hotel) => (
                         <ElectricBorder
-                            key={index}
+                            key={hotel.id}
                             color={"var(--hotel-green)"}
                             secondaryColor={"var(--hotel-green-light)"}
                             borderRadius={16}
@@ -93,6 +53,9 @@ export default function Hotels() {
 
                                 <div className="hotel-body">
                                     <h3>{hotel.name}</h3>
+                                    <p className="hotel-tagline">
+                                        {hotel.tagline}
+                                    </p>
 
                                     <div className="hotel-rating">
                                         {[...Array(5)].map((_, i) => (
@@ -114,6 +77,7 @@ export default function Hotels() {
                                             href={`mailto:${hotel.email}`}
                                             className="hotel-link"
                                             aria-label={`E-Mail senden an ${hotel.name}`}
+                                            onClick={(e) => e.stopPropagation()}
                                         >
                                             <Mail size={16} /> {hotel.email}
                                         </a>
@@ -121,10 +85,18 @@ export default function Hotels() {
                                             href={`tel:${hotel.phone}`}
                                             className="hotel-link"
                                             aria-label={`Telefonnummer von ${hotel.name} anrufen`}
+                                            onClick={(e) => e.stopPropagation()}
                                         >
                                             <Phone size={16} /> {hotel.phone}
                                         </a>
                                     </div>
+
+                                    <Link
+                                        className="hotel-detail-btn"
+                                        href={`/${locale}/hotels/${hotel.id}`}
+                                    >
+                                        {t("hotels.cta")}
+                                    </Link>
                                 </div>
                             </div>
                         </ElectricBorder>

@@ -4,17 +4,62 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\RoomPageController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ArtisanCommandController;
+use App\Http\Controllers\ButtonTrackingController;
+use App\Http\Controllers\SettingsController;
+use App\Services\SliderService;
 
-Route::get('/', fn () => Inertia::render('Home/Index', [
-    'currentRoute' => 'home',
-]))->name('home');
+Route::post('/api/button-tracking/track', [ButtonTrackingController::class, 'track'])
+    ->name('button-tracking.track');
+
+Route::get('/api/settings', [SettingsController::class, 'index'])->name('settings.index');
+Route::get('/api/settings/frontend', [SettingsController::class, 'frontend'])->name('settings.frontend');
+Route::get('/api/settings/{key}', [SettingsController::class, 'show'])->name('settings.show');
+Route::post('/api/settings/clear-cache', [SettingsController::class, 'clearCache'])->name('settings.clear-cache');
+
+Route::get('/api/slider/debug', function () {
+    $locale = request()->query('locale', 'de');
+    $slug = config('omr.hero_slider_slug', 'hero');
+    $slider = app(SliderService::class)->getSlider($slug, $locale);
+    return response()->json([
+        'config' => [
+            'base_url' => config('omr.base_url'),
+            'endpoint' => config('omr.endpoint'),
+            'tenant_set' => !empty(config('omr.tenant_id')) || !empty(config('omr.main_tenant')),
+            'hero_slider_slug' => $slug,
+        ],
+        'slider' => $slider,
+    ]);
+})->name('slider.debug');
+
+Route::get('/', [HomeController::class, 'index'])->name('home');
+
+Route::get('/{locale}/uber-uns', fn (string $locale) => Inertia::render('Home/UberUns', [
+    'currentRoute' => 'uberuns',
+    'locale' => $locale,
+]))->where('locale', 'de|en|tr')->name('uberuns.locale');
 
 Route::get('/uber-uns', fn () => Inertia::render('Home/UberUns', [
     'currentRoute' => 'uberuns',
+    'locale' => 'de',
 ]))->name('uberuns');
 
-Route::get('/kontakt', [ContactController::class, 'index'])->name('contact.index');
-Route::post('/kontakt', [ContactController::class, 'store'])->name('contact.store');
+Route::get('/{locale}', [HomeController::class, 'index'])
+    ->where('locale', 'de|en|tr')
+    ->name('home.locale');
+
+Route::get('/{locale}/kontakt', [ContactController::class, 'index'])->where('locale', 'de|en|tr')->name('contact.index');
+Route::post('/{locale}/kontakt', [ContactController::class, 'store'])->where('locale', 'de|en|tr')->name('contact.store');
+
+Route::get('/artisan', fn () => redirect('/de/artisan'))->name('artisan.redirect');
+Route::get('/{locale}/artisan', [ArtisanCommandController::class, 'index'])
+    ->where('locale', 'de|en|tr')
+    ->name('artisan.index');
+Route::post('/{locale}/artisan/run', [ArtisanCommandController::class, 'run'])
+    ->where('locale', 'de|en|tr')
+    ->name('artisan.run');
 
 // Spezifische Urlaubsthemen-Detailseiten (z.B. /de/urlaubsthemen/wellness)
 Route::get('/{locale}/urlaubsthemen/{theme}', function (string $locale, string $theme) {
@@ -23,7 +68,7 @@ Route::get('/{locale}/urlaubsthemen/{theme}', function (string $locale, string $
         'theme'  => $theme,
     ]);
 })->where([
-    'locale' => 'de|en',
+    'locale' => 'de|en|tr',
 ])->name('themes.show');
 
 // Fallback ohne Locale → nach /de/urlaubsthemen/{theme} umleiten
@@ -38,12 +83,23 @@ Route::get('/{locale}/hotels/{hotel}', function (string $locale, string $hotel) 
         'hotel'  => $hotel,
     ]);
 })->where([
-    'locale' => 'de|en',
+    'locale' => 'de|en|tr',
 ])->name('hotels.show');
 
 // Fallback ohne Locale → nach /de/hotels/{hotel} umleiten
 Route::get('/hotels/{hotel}', function (string $hotel) {
     return redirect("/de/hotels/{$hotel}");
+});
+
+Route::get('/{locale}/rooms/{room}', [RoomPageController::class, 'show'])
+    ->where([
+        'locale' => 'de|en|tr',
+    ])
+    ->name('rooms.show');
+
+// Fallback ohne Locale -> nach /de/rooms/{room} umleiten
+Route::get('/rooms/{room}', function (string $room) {
+    return redirect("/de/rooms/{$room}");
 });
 
 // Angebots-Detailseiten (z.B. /de/offers/ai-heubach)
@@ -53,7 +109,7 @@ Route::get('/{locale}/offers/{offer}', function (string $locale, string $offer) 
         'offer'  => $offer,
     ]);
 })->where([
-    'locale' => 'de|en',
+    'locale' => 'de|en|tr',
 ])->name('offers.show');
 
 // Fallback ohne Locale → nach /de/offers/{offer} umleiten
@@ -68,7 +124,7 @@ Route::get('/{locale}/gutschein', function (string $locale) {
         'currentRoute' => 'gutschein',
     ]);
 })->where([
-    'locale' => 'de|en',
+    'locale' => 'de|en|tr',
 ])->name('gutschein.index');
 
 Route::get('/gutschein', function () {
@@ -77,33 +133,17 @@ Route::get('/gutschein', function () {
 
 Route::controller(PageController::class)->group(function () {
 
-    $slugs = [
-        'rooms',
-        'dining',
-        'activities',
-        'spa',
-        'events',
-        'impressum',
-        'historie',
-        'gaeste-abc',
-        'urlaubsthemen',
-        'galerie',
-        'karriere',
-        'bewertungen',
-        'veranstaltung',
-        'gutscheinshop',
-    ];
-
-    // /de/historie gibi
+    // Panel'den gelen tüm sayfa slug'ları (about, historie, galerie vb.)
+    // /de/about, /de/historie gibi - API'den sayfa varsa göster, yoksa fallback
     Route::get('/{locale}/{slug}', 'show')
         ->where([
-            'locale' => 'de|en',
-            'slug'   => implode('|', $slugs),
+            'locale' => 'de|en|tr',
+            'slug'   => '[a-z0-9\-]+',
         ])
         ->name('page.show');
 
-    // /historie yazılırsa /de/historie'ye yönlendir
+    // Locale olmadan /about yazılırsa /de/about'a yönlendir
     Route::get('/{slug}', function ($slug) {
         return redirect("/de/{$slug}");
-    })->whereIn('slug', $slugs);
+    })->where('slug', '[a-z0-9\-]+');
 });

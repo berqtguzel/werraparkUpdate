@@ -3,7 +3,6 @@ import React, { useMemo, useState, useEffect, useCallback } from "react";
 import "../../../css/rooms-gallery.css";
 import Aurora from "../ReactBits/Backgrounds/Aurora";
 
-/** Örnek veri */
 const SAMPLE = [
     { src: "/images/rooms/room.png", title: "Standard Doppelzimmer" },
     { src: "/images/rooms/room.png", title: "Einzelzimmer – hell & ruhig" },
@@ -65,7 +64,6 @@ export default function RoomsGallery({
 
     return (
         <section className="rg-wrap" aria-labelledby="rg-title">
-            {/* AURORA BACKGROUND */}
             <div className="rg-aurora" aria-hidden="true">
                 <Aurora
                     colorStops={["#7AE2B3", "#9FE5C7", "#1A5D48"]}
@@ -84,7 +82,6 @@ export default function RoomsGallery({
                     <p className="rg-sub">{sub}</p>
                 </header>
 
-                {/* Responsive Masonry */}
                 <div className="rg-gallery" role="list">
                     {items.map((it, i) => (
                         <figure className="rg-item" key={it.id} role="listitem">
@@ -111,7 +108,6 @@ export default function RoomsGallery({
                 </div>
             </div>
 
-            {/* LIGHTBOX */}
             {open && (
                 <div className="rg-lightbox" role="dialog" aria-modal="true">
                     <button
