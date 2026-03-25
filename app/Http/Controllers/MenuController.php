@@ -9,30 +9,21 @@ class MenuController extends Controller
     public static function fetchMenuData(): array
     {
         $cacheKey = 'menu_data';
-        $cachedData = Cache::get($cacheKey);
         $mainTenant = env("OMR_MAIN_TENANT", null);
 
-        if ($cachedData) {
-            return $cachedData;
-        }
+        return Cache::remember($cacheKey, now()->addDays(7), function () use ($mainTenant) {
+            try {
+                $tenantParam = $mainTenant ? '?tenant=' . $mainTenant : '';
+                $response = Http::timeout(5)->get('https://omerdogan.de/api/v1/menus' . $tenantParam);
 
+                if ($response->successful()) {
+                    return $response->json();
+                }
+            } catch (\Exception $e) {
 
-        function getTenantParam($mainTenant) {
-            return $mainTenant ? '?tenant=' . $mainTenant : '';
-        }
-        try {
-            $response = Http::timeout(5)->get('https://omerdogan.de/api/v1/menus' . getTenantParam($mainTenant));
-
-            if ($response->successful()) {
-                $data = $response->json();
-                Cache::put($cacheKey, $data, now()->addHours(6));
-
-                return $data;
             }
-        } catch (\Exception $e) {
 
-        }
-
-        return [];
+            return [];
+        });
     }
 }

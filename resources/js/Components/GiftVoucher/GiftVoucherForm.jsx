@@ -13,7 +13,12 @@ export default function GiftVoucherForm({
     backHref,
     methodTitle,
     paymentPanel,
-    footerAction,
+    paymentMethod,
+    paymentReady = false,
+    submitLabel,
+    submitVariant = "",
+    companies = [],
+    defaultCompanyId = null,
 }) {
     const { t } = useTranslation();
     const presetAmounts = [100, 200, 300, 400, 500];
@@ -24,6 +29,12 @@ export default function GiftVoucherForm({
     const [recipientName, setRecipientName] = React.useState("");
     const [recipientEmail, setRecipientEmail] = React.useState("");
     const [message, setMessage] = React.useState("");
+    const [companyId, setCompanyId] = React.useState(
+        defaultCompanyId ?? companies[0]?.id ?? "",
+    );
+    const [submitting, setSubmitting] = React.useState(false);
+    const [submitError, setSubmitError] = React.useState("");
+    const [invoiceResult, setInvoiceResult] = React.useState(null);
 
     const parsedCustom = Number(customAmount);
     const customValue = Number.isFinite(parsedCustom)
@@ -37,6 +48,123 @@ export default function GiftVoucherForm({
         currency: "EUR",
         maximumFractionDigits: 0,
     });
+    const currentRecipientName = recipientName.trim();
+    const currentRecipientEmail = recipientEmail.trim();
+
+    React.useEffect(() => {
+        if (!companyId && companies[0]?.id) {
+            setCompanyId(defaultCompanyId ?? companies[0].id);
+        }
+    }, [companies, companyId, defaultCompanyId]);
+
+    const resolveErrorMessage = React.useCallback(
+        (payload) => {
+            if (!payload || typeof payload !== "object") {
+                return t("giftVoucher.submitError");
+            }
+
+            const fieldErrors = payload.errors;
+            if (fieldErrors && typeof fieldErrors === "object") {
+                const firstEntry = Object.values(fieldErrors).find(
+                    (entry) => Array.isArray(entry) && entry[0],
+                );
+                if (Array.isArray(firstEntry) && firstEntry[0]) {
+                    return String(firstEntry[0]);
+                }
+            }
+
+            if (payload.message) {
+                return String(payload.message);
+            }
+
+            return t("giftVoucher.submitError");
+        },
+        [t],
+    );
+
+    const handleSubmit = async () => {
+        if (!paymentReady || submitting) {
+            return;
+        }
+
+        const cleanName = recipientName.trim();
+        const cleanEmail = recipientEmail.trim();
+        const numericCompanyId = Number(companyId);
+
+        if (!cleanName) {
+            setSubmitError(t("giftVoucher.validationName"));
+            return;
+        }
+
+        if (!cleanEmail) {
+            setSubmitError(t("giftVoucher.validationEmail"));
+            return;
+        }
+
+        if (!Number.isFinite(numericCompanyId) || numericCompanyId <= 0) {
+            setSubmitError(t("giftVoucher.validationCompany"));
+            return;
+        }
+
+        setSubmitting(true);
+        setSubmitError("");
+        setInvoiceResult(null);
+
+        try {
+            const csrfToken =
+                document
+                    .querySelector('meta[name="csrf-token"]')
+                    ?.getAttribute("content") ?? "";
+
+            const response = await fetch("/api/billing/invoices", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                    "X-Requested-With": "XMLHttpRequest",
+                    "X-CSRF-TOKEN": csrfToken,
+                },
+                body: JSON.stringify({
+                    company_id: numericCompanyId,
+                    customer_name: cleanName,
+                    customer_email: cleanEmail,
+                    total_amount: total,
+                    amount,
+                    quantity,
+                    payment_method: paymentMethod,
+                    message: message.trim(),
+                    description: `Werrapark gift voucher - ${quantity} x ${amount} EUR - ${paymentMethod}`,
+                }),
+            });
+
+            const payload = await response.json().catch(() => ({}));
+
+            if (!response.ok) {
+                throw new Error(resolveErrorMessage(payload));
+            }
+
+            const invoice = payload.invoice ?? null;
+            const created = payload.data ?? null;
+
+            setInvoiceResult({
+                message:
+                    payload.message || t("giftVoucher.invoiceCreatedSuccess"),
+                created,
+                invoice,
+            });
+        } catch (error) {
+            setSubmitError(
+                error instanceof Error
+                    ? error.message
+                    : t("giftVoucher.submitError"),
+            );
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    const summaryInvoice = invoiceResult?.invoice ?? invoiceResult?.created ?? null;
+    const actionClassName = `gvf-pay-btn ${submitVariant}`.trim();
 
     return (
         <section className="gvf-page">
@@ -189,6 +317,26 @@ export default function GiftVoucherForm({
                         <p>{t("giftVoucher.summaryHint")}</p>
                     </div>
                     <div className="gvf-summary-grid">
+                        {companies.length > 1 ? (
+                            <label>
+                                {t("giftVoucher.companyLabel")}
+                                <select
+                                    value={companyId}
+                                    onChange={(e) =>
+                                        setCompanyId(e.target.value)
+                                    }
+                                >
+                                    {companies.map((company) => (
+                                        <option
+                                            key={company.id ?? company.name}
+                                            value={company.id ?? ""}
+                                        >
+                                            {company.name ?? "—"}
+                                        </option>
+                                    ))}
+                                </select>
+                            </label>
+                        ) : null}
                         <label>
                             {t("giftVoucher.quantity")}
                             <input
@@ -227,12 +375,88 @@ export default function GiftVoucherForm({
                             <span>{t("giftVoucher.total")}</span>
                             <strong>{money.format(total)}</strong>
                         </div>
-                        {footerAction ?? (
-                            <button type="button" className="gvf-pay-btn">
-                                {t("giftVoucher.payNow")}
-                            </button>
-                        )}
+                        <button
+                            type="button"
+                            className={actionClassName}
+                            disabled={!paymentReady || submitting}
+                            title={
+                                !paymentReady
+                                    ? t("giftVoucher.paymentUnavailable")
+                                    : ""
+                            }
+                            onClick={handleSubmit}
+                        >
+                            {submitting
+                                ? t("giftVoucher.processing")
+                                : submitLabel || t("giftVoucher.payNow")}
+                        </button>
                     </div>
+
+                    {submitError ? (
+                        <div className="gvf-submit-state gvf-submit-state--error">
+                            <strong>{t("giftVoucher.submitErrorTitle")}</strong>
+                            <p>{submitError}</p>
+                        </div>
+                    ) : null}
+
+                    {summaryInvoice ? (
+                        <div className="gvf-submit-state gvf-submit-state--success">
+                            <strong>
+                                {invoiceResult?.message ||
+                                    t("giftVoucher.invoiceCreatedSuccess")}
+                            </strong>
+                            <div className="gvf-invoice-result-grid">
+                                <div>
+                                    <span>{t("giftVoucher.resultInvoice")}</span>
+                                    <b>
+                                        {summaryInvoice.invoice_number ||
+                                            summaryInvoice.number ||
+                                            "—"}
+                                    </b>
+                                </div>
+                                <div>
+                                    <span>{t("giftVoucher.resultStatus")}</span>
+                                    <b>{summaryInvoice.status || "pending"}</b>
+                                </div>
+                                <div>
+                                    <span>{t("giftVoucher.resultMethod")}</span>
+                                    <b>
+                                        {summaryInvoice.payment_method ||
+                                            paymentMethod ||
+                                            "—"}
+                                    </b>
+                                </div>
+                                <div>
+                                    <span>{t("giftVoucher.resultTotal")}</span>
+                                    <b>
+                                        {money.format(
+                                            Number(
+                                                summaryInvoice.total_amount ??
+                                                    summaryInvoice.total ??
+                                                    total,
+                                            ) || total,
+                                        )}
+                                    </b>
+                                </div>
+                                <div>
+                                    <span>{t("giftVoucher.resultCustomer")}</span>
+                                    <b>
+                                        {summaryInvoice.customer_name ||
+                                            currentRecipientName ||
+                                            recipientName}
+                                    </b>
+                                </div>
+                                <div>
+                                    <span>{t("giftVoucher.resultEmail")}</span>
+                                    <b>
+                                        {summaryInvoice.customer_email ||
+                                            currentRecipientEmail ||
+                                            recipientEmail}
+                                    </b>
+                                </div>
+                            </div>
+                        </div>
+                    ) : null}
                 </section>
             </div>
         </section>

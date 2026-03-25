@@ -16,6 +16,22 @@ function flattenMenuItems(items) {
     return out;
 }
 
+function normalizeMenuLinks(items, locale) {
+    return flattenMenuItems(items)
+        .map((item) => ({
+            id: item.id ?? item.slug ?? item.name ?? item.url,
+            name: item.name ?? item.title ?? "",
+            url: ensureLocaleInUrl(
+                item.url?.startsWith("http") || item.url?.startsWith("/")
+                    ? item.url
+                    : `/${locale}/${item.slug ?? item.url ?? ""}`,
+                locale,
+            ),
+            key: item.slug ?? item.key ?? item.id ?? "",
+        }))
+        .filter((item) => item.name && item.url);
+}
+
 function useFooterData() {
     const { props } = usePage();
     const locale = props?.locale ?? "de";
@@ -85,21 +101,16 @@ function useFooterData() {
             null;
 
         const rawItems = footerMenu?.items ?? footerMenu?.children ?? [];
-        const flatItems = flattenMenuItems(rawItems);
+        const navItems = normalizeMenuLinks(rawItems, locale);
 
-        const navItems = flatItems
-            .map((item) => ({
-                id: item.id ?? item.slug ?? item.name ?? item.url,
-                name: item.name ?? item.title ?? "",
-                url: ensureLocaleInUrl(
-                    item.url?.startsWith("http") || item.url?.startsWith("/")
-                        ? item.url
-                        : `/${locale}/${item.slug ?? item.url ?? ""}`,
-                    locale,
-                ),
-                key: item.slug ?? item.key ?? item.id ?? "",
-            }))
-            .filter((item) => item.name && item.url);
+        const bottomMenu =
+            menu.find((m) => Number(m?.id) === 3) ??
+            menu.find((m) => ["bottom", "legal"].includes(m.location ?? m.type ?? m.slug)) ??
+            null;
+        const bottomItems = normalizeMenuLinks(
+            bottomMenu?.items ?? bottomMenu?.children ?? [],
+            locale,
+        );
 
         const legalLinksRaw =
             footerSettings.legal_links ?? footerSettings.legalLinks ?? [];
@@ -153,7 +164,7 @@ function useFooterData() {
             contactInfos: infos,
             social: socialList,
             navItems,
-            legalLinks,
+            legalLinks: bottomItems.length > 0 ? bottomItems : legalLinks,
             ctaTitle,
             ctaLabel,
             ctaHref,

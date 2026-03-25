@@ -23,6 +23,8 @@ export default function CheckoutStripe({
     currentRoute = "gutschein",
     locale = "de",
     paymentMethods = {},
+    companies = [],
+    defaultCompanyId = null,
 }) {
     const { t } = useTranslation();
     const stripe = paymentMethods.stripe ?? {};
@@ -66,27 +68,22 @@ export default function CheckoutStripe({
         </div>
     );
 
-    const footerAction = (
-        <button
-            type="button"
-            className="gvf-pay-btn"
-            disabled={!ready}
-            title={ready ? "" : t("giftVoucher.stripeUnavailableTitle")}
-        >
-            {ready
-                ? t("giftVoucher.payWithStripe")
-                : t("giftVoucher.stripeUnavailableTitle")}
-        </button>
-    );
-
     return (
         <AppLayout currentRoute={currentRoute}>
             <Head title={`${t("giftVoucher.pageTitle")} - Stripe`} />
             <GiftVoucherForm
                 locale={locale}
                 methodTitle="Stripe"
+                paymentMethod="stripe"
+                paymentReady={ready}
+                submitLabel={
+                    ready
+                        ? t("giftVoucher.payWithStripe")
+                        : t("giftVoucher.stripeUnavailableTitle")
+                }
                 paymentPanel={paymentPanel}
-                footerAction={footerAction}
+                companies={companies}
+                defaultCompanyId={defaultCompanyId}
             />
         </AppLayout>
     );

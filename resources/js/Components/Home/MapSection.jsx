@@ -116,7 +116,7 @@ export default function MapSection({
         <section className="mp-section" aria-label={t("map.openMap")}>
             <div className="mp-header">
                 <span className="eyebrow">Standort</span>
-                <h2 className="mp-title">{title}</h2>
+                <h1 className="mp-title">{title}</h1>
                 <p className="mp-subtitle">{subtitle}</p>
                 <a
                     className="mp-map-link"

@@ -9,13 +9,11 @@ use Illuminate\Support\Facades\Log;
 class PageService
 {
     private const CACHE_PREFIX = 'omr_page_';
-    private const CACHE_TTL = 600;
-
     public function getPage(string $slug, string $locale): ?array
     {
         $cacheKey = self::CACHE_PREFIX . "{$locale}_{$slug}";
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($slug, $locale) {
+        return Cache::remember($cacheKey, now()->addDays(7), function () use ($slug, $locale) {
             return $this->fetchPage($slug, $locale);
         });
     }
@@ -24,7 +22,7 @@ class PageService
     {
         $cacheKey = self::CACHE_PREFIX . "list_{$locale}";
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($locale) {
+        return Cache::remember($cacheKey, now()->addDays(7), function () use ($locale) {
             return $this->fetchPages($locale);
         });
     }

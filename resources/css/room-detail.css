@@ -187,6 +187,10 @@
     gap: 8px;
 }
 
+.rux-facts--grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .rux-fact {
     border-radius: 11px;
     border: 1px solid rgba(19, 124, 86, 0.2);
@@ -196,6 +200,12 @@
     align-items: baseline;
     justify-content: space-between;
     gap: 12px;
+}
+
+.rux-fact__label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .rux-fact span {
@@ -361,6 +371,10 @@
     margin: 0;
 }
 
+.rux-note--plain {
+    margin-top: 12px;
+}
+
 @media (max-width: 980px) {
     .rux-grid,
     .rux-bottom {
@@ -375,6 +389,10 @@
 
     .rux-stage {
         aspect-ratio: 4/3;
+    }
+
+    .rux-facts--grid {
+        grid-template-columns: 1fr;
     }
 }
 

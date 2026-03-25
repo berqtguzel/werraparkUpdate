@@ -197,11 +197,6 @@ button,
     color: var(--site-link-color);
 }
 
-button:hover,
-.btn:hover {
-    background-color: var(--site-secondary-color);
-}
-
 footer {
     background-color: var(--site-footer-background-color);
 }
@@ -227,7 +222,6 @@ body {
     background: rgba(16, 185, 129, 0.18);
 }
 
-/* Global font inheritance for common patterns */
 input,
 textarea,
 select,

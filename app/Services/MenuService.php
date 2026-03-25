@@ -22,7 +22,7 @@ class MenuService
         $locale = strtolower($locale);
         $cacheKey = "menu:{$tenant}:{$locale}";
 
-        return Cache::remember($cacheKey, now()->addMinutes(30), function () use ($base, $endpoint, $tenant, $locale) {
+        return Cache::remember($cacheKey, now()->addDays(7), function () use ($base, $endpoint, $tenant, $locale) {
             try {
                 $url = "{$base}{$endpoint}/menus";
 

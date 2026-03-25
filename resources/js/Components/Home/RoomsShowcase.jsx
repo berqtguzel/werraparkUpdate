@@ -2,9 +2,14 @@
 
 import React from "react";
 import { Link, usePage } from "@inertiajs/react";
-import { FiCheck, FiMapPin, FiChevronRight } from "react-icons/fi";
+import {
+    FiCheck,
+    FiUsers,
+    FiCreditCard,
+    FiChevronRight,
+    FiLayers,
+} from "react-icons/fi";
 import "../../../css/rooms-showcase.css";
-import { ROOM_LIST } from "@/Data/RoomsData";
 import { useTranslation } from "@/i18n";
 
 const DotGrid = React.lazy(() =>
@@ -13,93 +18,115 @@ const DotGrid = React.lazy(() =>
     })),
 );
 
-function matchStaticSlug(apiRoom) {
-    if (apiRoom.slug && ROOM_LIST.some((r) => r.id === apiRoom.slug)) {
-        return apiRoom.slug;
-    }
-    const nameLC = (apiRoom.name ?? apiRoom.hotel_name ?? "").toLowerCase();
-    const match = ROOM_LIST.find(
-        (r) =>
-            nameLC.includes(r.id) ||
-            r.hotelName.toLowerCase().includes(nameLC.split(" ")[0]),
-    );
-    return match?.id ?? apiRoom.slug ?? String(apiRoom.id);
-}
-
-function normalizeApiRooms(apiRooms) {
-    if (!apiRooms?.length) return null;
-    return apiRooms.map((r) => {
-        const slug = matchStaticSlug(r);
-        return {
-            id: slug,
-            name: r.name ?? r.hotel_name ?? "",
-            location: r.location ?? "",
-            image: r.image ?? r.hero_image ?? "/images/template2.png",
-            items: r.room_types ?? r.categories ?? [],
-            cta: { slug },
-        };
-    });
-}
-
-function buildFallbackHotels() {
-    return ROOM_LIST.map((r) => ({
-        id: r.id,
-        name: r.hotelName,
-        location: r.location,
-        image: r.heroImage,
-        items: r.roomTypes,
-        cta: { slug: r.id },
-    }));
-}
-
-const Title = ({ children }) => <h2 className="rs-title">{children}</h2>;
+const Title = ({ children }) => <h1 className="rs-title">{children}</h1>;
 const Eyebrow = ({ children }) => <div className="eyebrow">{children}</div>;
 
 const HotelCard = ({ hotel, locale }) => {
     const { t } = useTranslation();
-    const href = `/${locale}/rooms/${hotel.cta?.slug ?? hotel.id}`;
+    const href = `/${locale}/rooms/${hotel.slug ?? hotel.id}`;
+    const boardSummary = (hotel.boardTypes || [])
+        .map((item) => item?.description ?? item?.name ?? item?.code)
+        .filter(Boolean)
+        .slice(0, 2);
+    const featureSummary = (hotel.features || [])
+        .map((item) => item?.name)
+        .filter(Boolean)
+        .slice(0, 3);
+    const roomFacts = [
+        hotel.capacity
+            ? {
+                  icon: <FiUsers className="rs-icon" aria-hidden />,
+                  label: t("rooms.capacityLabel"),
+                  value: t("rooms.capacityValue", { count: hotel.capacity }),
+              }
+            : null,
+        boardSummary.length
+            ? {
+                  icon: <FiLayers className="rs-icon" aria-hidden />,
+                  label: t("rooms.boardTypesLabel"),
+                  value: boardSummary.join(" · "),
+              }
+            : null,
+        hotel.price
+            ? {
+                  icon: <FiCreditCard className="rs-icon" aria-hidden />,
+                  label: t("rooms.priceLabel"),
+                  value: hotel.price,
+              }
+            : null,
+    ].filter(Boolean);
 
     return (
         <article className="rs-card" aria-labelledby={`h-${hotel.id}`}>
             {hotel.image && (
-                <>
+                <div className="rs-card__media-wrap">
                     <img
                         className="rs-card__media"
                         src={hotel.image}
-                        alt=""
-                        aria-hidden="true"
+                        alt={hotel.name}
                     />
-                    <span className="rs-card__shade" aria-hidden="true" />
-                </>
+                </div>
             )}
 
-            <div className="rs-card__head">
-                <div className="rs-card__meta">
-                    <FiMapPin className="rs-icon" aria-hidden />
-                    <span>{hotel.location}</span>
+            <div className="rs-card__body">
+                <div className="rs-card__head">
+                    <h3 id={`h-${hotel.id}`} className="rs-card__title">
+                        {hotel.name}
+                    </h3>
+                    {hotel.description ? (
+                        <p className="rs-card__desc">{hotel.description}</p>
+                    ) : null}
                 </div>
-                <h3 id={`h-${hotel.id}`} className="rs-card__title">
-                    {hotel.name}
-                </h3>
+
+                {roomFacts.length ? (
+                    <div className="rs-facts">
+                        {roomFacts.map((fact, i) => (
+                            <div className="rs-fact" key={i}>
+                                <span className="rs-fact__icon">
+                                    {fact.icon}
+                                </span>
+                                <div className="rs-fact__copy">
+                                    <span className="rs-fact__label">
+                                        {fact.label}
+                                    </span>
+                                    <strong>{fact.value}</strong>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ) : null}
+
+                {featureSummary.length ? (
+                    <div className="rs-tags">
+                        {featureSummary.map((item, i) => (
+                            <span className="rs-tag" key={i}>
+                                <FiCheck className="rs-icon" aria-hidden />
+                                {item}
+                            </span>
+                        ))}
+                    </div>
+                ) : null}
+
+                {hotel.items?.length ? (
+                    <ul className="rs-list">
+                        {hotel.items.slice(0, 4).map((item, i) => (
+                            <li key={i}>
+                                <FiCheck className="rs-icon" aria-hidden />
+                                <span>
+                                    {typeof item === "string"
+                                        ? item
+                                        : (item.name ?? item.label)}
+                                </span>
+                            </li>
+                        ))}
+                    </ul>
+                ) : null}
+
+                <Link className="rs-cta" href={href}>
+                    {t("rooms.explore")}
+                    <FiChevronRight />
+                </Link>
             </div>
-
-            <ul className="rs-list">
-                {(hotel.items || []).map((item, i) => (
-                    <li key={i}>
-                        <FiCheck className="rs-icon" aria-hidden />
-                        <span>
-                            {typeof item === "string"
-                                ? item
-                                : (item.name ?? item.label)}
-                        </span>
-                    </li>
-                ))}
-            </ul>
-
-            <Link className="rs-cta" href={href}>
-                {t("rooms.explore")}
-                <FiChevronRight />
-            </Link>
         </article>
     );
 };
@@ -109,13 +136,8 @@ export default function RoomsShowcase() {
     React.useEffect(() => setMounted(true), []);
 
     const { props } = usePage();
-    const apiRooms = props?.rooms;
+    const hotels = Array.isArray(props?.rooms) ? props.rooms : [];
     const { t, locale } = useTranslation();
-
-    const hotels = React.useMemo(() => {
-        const fromApi = normalizeApiRooms(apiRooms);
-        return fromApi ?? buildFallbackHotels();
-    }, [apiRooms]);
 
     return (
         <section className="rs-wrap rs-with-bg" aria-labelledby="rooms-title">
@@ -156,9 +178,26 @@ export default function RoomsShowcase() {
             </div>
 
             <div className="rs-grid">
-                {hotels.map((h) => (
-                    <HotelCard key={h.id} hotel={h} locale={locale} />
-                ))}
+                {hotels.length ? (
+                    hotels.map((h) => (
+                        <HotelCard
+                            key={h.id ?? h.slug}
+                            hotel={h}
+                            locale={locale}
+                        />
+                    ))
+                ) : (
+                    <article className="rs-card rs-card--empty">
+                        <div className="rs-card__head">
+                            <h3 className="rs-card__title">
+                                {t("rooms.emptyTitle")}
+                            </h3>
+                            <p className="rs-card__desc">
+                                {t("rooms.emptyText")}
+                            </p>
+                        </div>
+                    </article>
+                )}
             </div>
         </section>
     );

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\ApiHealthService;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Inertia\Inertia;
 
@@ -27,23 +28,103 @@ class HomeController extends Controller
 
     private function fetchRooms(string $locale): array
     {
-        try {
-            $url = config('omr.base_url') . config('omr.endpoint') . 'rooms';
+        $cacheKey = 'home_rooms:' . strtolower($locale);
 
-            $response = Http::timeout(config('omr.timeout'))
-                ->withHeaders([
-                    'X-Tenant-ID' => config('omr.tenant_id')
-                ])
-                ->get($url, [
-                    'lang' => $locale,
-                ]);
+        return Cache::remember($cacheKey, now()->addDays(7), function () use ($locale) {
+            try {
+                $url = config('omr.base_url') . config('omr.endpoint') . 'rooms';
 
-            if ($response->successful()) {
-                $json = $response->json();
-                return $json['data'] ?? [];
+                $response = Http::timeout(config('omr.timeout'))
+                    ->withHeaders([
+                        'X-Tenant-ID' => config('omr.tenant_id')
+                    ])
+                    ->get($url, [
+                        'lang' => $locale,
+                    ]);
+
+                if ($response->successful()) {
+                    $json = $response->json();
+                    $data = $json['data'] ?? [];
+
+                    return $this->normalizeRooms($data);
+                }
+            } catch (\Throwable $e) {
+                //
             }
-        } catch (\Throwable $e) {
-            //
+
+            return [];
+        });
+    }
+
+    private function normalizeRooms(array $rooms): array
+    {
+        $list = $this->unwrapRoomsPayload($rooms);
+
+        $normalized = array_map(function ($room) {
+            if (!is_array($room)) {
+                return null;
+            }
+
+            $features = collect($room['features'] ?? [])
+                ->filter(fn ($item) => is_array($item) && (($item['status'] ?? 'active') === 'active'))
+                ->map(fn ($item) => [
+                    'id' => $item['id'] ?? null,
+                    'name' => $item['name'] ?? null,
+                    'icon' => $item['icon'] ?? null,
+                ])
+                ->values()
+                ->all();
+
+            $boardTypes = collect($room['board_types'] ?? [])
+                ->filter(fn ($item) => is_array($item) && (($item['is_active'] ?? true) === true))
+                ->map(fn ($item) => [
+                    'id' => $item['id'] ?? null,
+                    'name' => $item['name'] ?? null,
+                    'code' => $item['code'] ?? null,
+                    'description' => $item['description'] ?? null,
+                    'price' => $item['price'] ?? null,
+                ])
+                ->values()
+                ->all();
+
+            $items = array_values(array_filter(array_merge(
+                array_map(fn ($item) => $item['name'] ?? null, $features),
+                array_map(fn ($item) => $item['description'] ?? $item['name'] ?? null, $boardTypes),
+            )));
+
+            return [
+                'id' => $room['id'] ?? null,
+                'slug' => $room['slug'] ?? (string) ($room['id'] ?? ''),
+                'name' => $room['name'] ?? '',
+                'description' => $room['description'] ?? '',
+                'capacity' => isset($room['capacity']) ? (int) $room['capacity'] : null,
+                'status' => $room['status'] ?? 'active',
+                'image' => $room['image'] ?? $room['hero_image'] ?? '/images/template2.png',
+                'price' => $room['price'] ?? null,
+                'order' => isset($room['order']) ? (int) $room['order'] : 9999,
+                'features' => $features,
+                'boardTypes' => $boardTypes,
+                'items' => $items,
+            ];
+        }, $list);
+
+        $normalized = array_values(array_filter($normalized, function ($room) {
+            return is_array($room) && (($room['status'] ?? 'active') === 'active');
+        }));
+
+        usort($normalized, fn ($a, $b) => ($a['order'] ?? 9999) <=> ($b['order'] ?? 9999));
+
+        return $normalized;
+    }
+
+    private function unwrapRoomsPayload(array $payload): array
+    {
+        if (array_is_list($payload)) {
+            return $payload;
+        }
+
+        if (isset($payload['data']) && is_array($payload['data']) && array_is_list($payload['data'])) {
+            return $payload['data'];
         }
 
         return [];

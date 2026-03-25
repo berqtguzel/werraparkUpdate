@@ -11,28 +11,20 @@ class GlobalWebsiteController extends Controller
     public static function fetchGlobalWebsites(): array
     {
         $cacheKey = 'global_websites_data';
-        $cachedData = Cache::get($cacheKey);
+        return Cache::remember($cacheKey, now()->addDays(7), function () {
+            try {
+                $response = Http::timeout(5)->get('https://omerdogan.de/api/');
 
-        if ($cachedData) {
-            return $cachedData;
-        }
-
-        try {
-            $response = Http::timeout(5)->get('https://omerdogan.de/api/');
-
-            if ($response->successful()) {
-                $data = $response->json();
-
-                Cache::put($cacheKey, $data, now()->addHours(6));
-
-                return $data;
-            } else {
-                Log::error('Failed to fetch global websites: ' . $response->status());
+                if ($response->successful()) {
+                    return $response->json();
+                } else {
+                    Log::error('Failed to fetch global websites: ' . $response->status());
+                }
+            } catch (\Exception $e) {
+                Log::error('Exception while fetching global websites: ' . $e->getMessage());
             }
-        } catch (\Exception $e) {
-            Log::error('Exception while fetching global websites: ' . $e->getMessage());
-        }
 
-        return [];
+            return [];
+        });
     }
 }

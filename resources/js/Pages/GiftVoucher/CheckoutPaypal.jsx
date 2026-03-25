@@ -23,6 +23,8 @@ export default function CheckoutPaypal({
     currentRoute = "gutschein",
     locale = "de",
     paymentMethods = {},
+    companies = [],
+    defaultCompanyId = null,
 }) {
     const { t } = useTranslation();
     const paypal = paymentMethods.paypal ?? {};
@@ -66,27 +68,23 @@ export default function CheckoutPaypal({
         </div>
     );
 
-    const footerAction = (
-        <button
-            type="button"
-            className="gvf-pay-btn gvf-pay-btn--paypal"
-            disabled={!ready}
-            title={ready ? "" : t("giftVoucher.paypalUnavailableTitle")}
-        >
-            {ready
-                ? t("giftVoucher.payWithPaypal")
-                : t("giftVoucher.paypalUnavailableTitle")}
-        </button>
-    );
-
     return (
         <AppLayout currentRoute={currentRoute}>
             <Head title={`${t("giftVoucher.pageTitle")} - PayPal`} />
             <GiftVoucherForm
                 locale={locale}
                 methodTitle="PayPal"
+                paymentMethod="paypal"
+                paymentReady={ready}
+                submitLabel={
+                    ready
+                        ? t("giftVoucher.payWithPaypal")
+                        : t("giftVoucher.paypalUnavailableTitle")
+                }
+                submitVariant="gvf-pay-btn--paypal"
                 paymentPanel={paymentPanel}
-                footerAction={footerAction}
+                companies={companies}
+                defaultCompanyId={defaultCompanyId}
             />
         </AppLayout>
     );

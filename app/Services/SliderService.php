@@ -10,8 +10,6 @@ class SliderService
 {
     private const CACHE_KEY_PREFIX = 'omr_slider_';
     private const CACHE_VERSION = 2;
-    private const CACHE_TTL = 600;
-
     private const FALLBACK_SLUGS = ['hero', 'experience', 'home', 'main', 'default'];
 
     public function getSlider(string $slug, string $locale): ?array
@@ -20,7 +18,7 @@ class SliderService
         $slug   = strtolower($slug);
         $cacheKey = self::CACHE_KEY_PREFIX . 'v' . self::CACHE_VERSION . ":{$locale}_{$slug}";
 
-        $result = Cache::remember($cacheKey, self::CACHE_TTL, function () use ($slug, $locale) {
+        $result = Cache::remember($cacheKey, now()->addDays(7), function () use ($slug, $locale) {
             $data = $this->fetch($slug, $locale);
             if ($data !== null) {
                 return $data;

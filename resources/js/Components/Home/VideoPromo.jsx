@@ -17,7 +17,7 @@ export default function VideoPromo({
             <div className="vp-shell">
                 <header className="vp-head">
                     <span className="eyebrow">Video</span>
-                    <h2 className="vp-title">{title}</h2>
+                    <h1 className="vp-title">{title}</h1>
                     <p className="vp-subtitle">{subtitle}</p>
                 </header>
 

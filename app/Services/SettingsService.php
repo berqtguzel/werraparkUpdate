@@ -9,8 +9,6 @@ use Illuminate\Support\Facades\Log;
 class SettingsService
 {
     private const CACHE_KEY_PREFIX = 'omr_settings_';
-    private const CACHE_TTL = 600;
-
     private const SETTINGS_KEYS = [
         'general',
         'contact',
@@ -33,7 +31,7 @@ class SettingsService
         $locale = $locale ?? config('omr.default_locale', 'de');
         $cacheKey = self::CACHE_KEY_PREFIX . 'all:' . $locale;
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($locale) {
+        return Cache::remember($cacheKey, now()->addDays(7), function () use ($locale) {
             $result = [];
 
             foreach (self::SETTINGS_KEYS as $key) {

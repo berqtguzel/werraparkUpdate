@@ -30,6 +30,8 @@ Route::post('/api/settings/clear-cache', [SettingsController::class, 'clearCache
 
 Route::get('/api/billing/companies', [GiftVoucherController::class, 'companiesJson'])->name('billing.companies');
 Route::get('/api/billing/invoices', [GiftVoucherController::class, 'invoicesJson'])->name('billing.invoices');
+Route::post('/api/billing/invoices', [GiftVoucherController::class, 'createInvoice'])->name('billing.invoices.create');
+Route::get('/api/billing/invoices/{invoice}', [GiftVoucherController::class, 'invoiceShow'])->name('billing.invoices.show');
 
 Route::get('/api/slider/debug', function () {
     $locale = request()->query('locale', 'de');

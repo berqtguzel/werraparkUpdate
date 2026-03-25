@@ -139,14 +139,14 @@ export default function Hero() {
             <div className="hero-content container">
                 <h1>{title}</h1>
                 <p>{subtitle}</p>
-                <div className="hero-ctas">
+                {/* <div className="hero-ctas">
                     <Link href="/offers" className="btn btn--primary">
                         Jetzt buchen
                     </Link>
                     <Link href="/rooms" className="btn btn--ghost">
                         Zimmer &amp; Suiten
                     </Link>
-                </div>
+                </div> */}
             </div>
         </section>
     );

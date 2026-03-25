@@ -29,7 +29,7 @@ class SliderController extends Controller
 
         $cacheKey = "slider_show:v" . self::CACHE_VERSION . ":{$mainTenant}:{$locale}:{$slug}";
 
-        $sliderData = Cache::remember($cacheKey, now()->addHours(1), function () use (
+        $sliderData = Cache::remember($cacheKey, now()->addDays(7), function () use (
             $base,
             $mainTenant,
             $locale,

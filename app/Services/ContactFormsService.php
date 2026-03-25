@@ -9,15 +9,13 @@ use Illuminate\Support\Facades\Log;
 class ContactFormsService
 {
     private const CACHE_KEY_PREFIX = 'omr_contact_forms_';
-    private const CACHE_TTL = 600;
-
     public function getContactForms(string $locale): array
     {
         $locale  = strtolower($locale);
         $tenant  = config('omr.main_tenant') ?: config('omr.tenant_id') ?: '';
         $cacheKey = self::CACHE_KEY_PREFIX . ($tenant ? "{$tenant}_{$locale}" : $locale);
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($locale) {
+        return Cache::remember($cacheKey, now()->addDays(7), function () use ($locale) {
             return $this->fetch($locale);
         });
     }

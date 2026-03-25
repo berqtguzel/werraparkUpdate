@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\ApiHealthService;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Inertia\Inertia;
 
@@ -18,24 +19,43 @@ class RoomPageController extends Controller
         $error = false;
 
         if ($this->apiHealth->isAvailable()) {
-            try {
-                $url = config('omr.base_url') . config('omr.endpoint') . 'rooms/' . $room;
+            $cacheKey = 'room_show:' . strtolower($locale) . ':' . strtolower($room);
 
-                $response = Http::timeout(config('omr.timeout'))
-                    ->withHeaders([
-                        'X-Tenant-ID' => config('omr.tenant_id')
-                    ])
-                    ->get($url, [
-                        'lang' => $locale,
-                    ]);
+            $cached = Cache::remember($cacheKey, now()->addDays(7), function () use ($locale, $room) {
+                try {
+                    $url = config('omr.base_url') . config('omr.endpoint') . 'rooms/' . $room;
 
-                if ($response->successful()) {
-                    $json = $response->json();
-                    $roomData = $json['data'] ?? null;
+                    $response = Http::timeout(config('omr.timeout'))
+                        ->withHeaders([
+                            'X-Tenant-ID' => config('omr.tenant_id')
+                        ])
+                        ->get($url, [
+                            'lang' => $locale,
+                        ]);
+
+                    if ($response->successful()) {
+                        $json = $response->json();
+
+                        return [
+                            'room' => $json['data'] ?? null,
+                            'error' => false,
+                        ];
+                    }
+                } catch (\Throwable $e) {
+                    return [
+                        'room' => null,
+                        'error' => true,
+                    ];
                 }
-            } catch (\Throwable $e) {
-                $error = true;
-            }
+
+                return [
+                    'room' => null,
+                    'error' => false,
+                ];
+            });
+
+            $roomData = $cached['room'] ?? null;
+            $error = (bool) ($cached['error'] ?? false);
         }
 
         return Inertia::render('Rooms/Show', [

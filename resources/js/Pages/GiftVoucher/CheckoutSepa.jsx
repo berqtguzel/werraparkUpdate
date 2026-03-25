@@ -9,6 +9,8 @@ export default function CheckoutSepa({
     currentRoute = "gutschein",
     locale = "de",
     paymentMethods = {},
+    companies = [],
+    defaultCompanyId = null,
 }) {
     const { t } = useTranslation();
     const sepa = paymentMethods.sepa ?? {};
@@ -57,27 +59,23 @@ export default function CheckoutSepa({
         </div>
     );
 
-    const footerAction = (
-        <button
-            type="button"
-            className="gvf-pay-btn gvf-pay-btn--sepa"
-            disabled={!ready}
-            title={ready ? "" : t("giftVoucher.sepaUnavailableTitle")}
-        >
-            {ready
-                ? t("giftVoucher.payWithSepa")
-                : t("giftVoucher.sepaUnavailableTitle")}
-        </button>
-    );
-
     return (
         <AppLayout currentRoute={currentRoute}>
             <Head title={`${t("giftVoucher.pageTitle")} - SEPA`} />
             <GiftVoucherForm
                 locale={locale}
                 methodTitle="SEPA"
+                paymentMethod="sepa"
+                paymentReady={ready}
+                submitLabel={
+                    ready
+                        ? t("giftVoucher.payWithSepa")
+                        : t("giftVoucher.sepaUnavailableTitle")
+                }
+                submitVariant="gvf-pay-btn--sepa"
                 paymentPanel={paymentPanel}
-                footerAction={footerAction}
+                companies={companies}
+                defaultCompanyId={defaultCompanyId}
             />
         </AppLayout>
     );

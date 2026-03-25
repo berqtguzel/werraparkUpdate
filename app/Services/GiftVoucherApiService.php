@@ -5,6 +5,7 @@ namespace App\Services;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class GiftVoucherApiService
 {
@@ -36,6 +37,45 @@ class GiftVoucherApiService
         return Cache::remember($key, self::CACHE_TTL, function () use ($query) {
             return $this->requestRemote('GET', '/v1/invoices', $query);
         });
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function getInvoiceRaw(string|int $invoice, array $query = []): array
+    {
+        return $this->requestRemote('GET', '/v1/invoices/' . urlencode((string) $invoice), $query);
+    }
+
+    /**
+     * @param  array<string, mixed>  $payload
+     * @return array<string, mixed>
+     */
+    public function createInvoice(array $payload): array
+    {
+        $companyId = $payload['company_id'] ?? $this->resolveCompanyId();
+
+        if (! $companyId) {
+            return [
+                '_error' => 'missing_company',
+                'message' => 'Billing şirketi bulunamadı.',
+                'data' => [],
+            ];
+        }
+
+        $totalAmount = (float) ($payload['total_amount'] ?? 0);
+        $customerName = trim((string) ($payload['customer_name'] ?? ''));
+        $customerEmail = trim((string) ($payload['customer_email'] ?? ''));
+
+        $body = array_filter([
+            'company_id' => (int) $companyId,
+            'invoice_number' => $payload['invoice_number'] ?? $this->generateInvoiceNumber(),
+            'customer_name' => $customerName,
+            'customer_email' => $customerEmail,
+            'total_amount' => $totalAmount,
+        ], fn ($value) => $value !== null && $value !== '');
+
+        return $this->requestRemote('POST', '/v1/invoices', [], $body);
     }
 
     /**
@@ -133,6 +173,21 @@ class GiftVoucherApiService
     }
 
     /**
+     * @return array<string, mixed>|null
+     */
+    public function getInvoicePublic(string|int $invoice, array $query = []): ?array
+    {
+        $raw = $this->getInvoiceRaw($invoice, $query);
+        $data = $raw['data'] ?? null;
+
+        if (! is_array($data)) {
+            return null;
+        }
+
+        return $this->sanitizeInvoiceDetail($data);
+    }
+
+    /**
      * @param  array<string, mixed>  $row
      * @return array<string, mixed>
      */
@@ -172,6 +227,61 @@ class GiftVoucherApiService
             'payment_method' => $payment['method'] ?? null,
             'remaining_amount' => $payment['remaining_amount'] ?? null,
         ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $row
+     * @return array<string, mixed>
+     */
+    private function sanitizeInvoiceDetail(array $row): array
+    {
+        $company = is_array($row['company'] ?? null) ? $row['company'] : [];
+        $customer = is_array($row['customer'] ?? null) ? $row['customer'] : [];
+        $pricing = is_array($row['pricing'] ?? null) ? $row['pricing'] : [];
+        $payment = is_array($row['payment'] ?? null) ? $row['payment'] : [];
+
+        return [
+            'id' => $row['id'] ?? null,
+            'company_id' => $row['company_id'] ?? null,
+            'company_name' => $company['name'] ?? null,
+            'invoice_number' => $row['invoice_number'] ?? null,
+            'invoice_date' => $row['invoice_date'] ?? null,
+            'due_date' => $row['due_date'] ?? null,
+            'description' => $row['description'] ?? null,
+            'customer_name' => $customer['name'] ?? null,
+            'customer_email' => $customer['email'] ?? null,
+            'customer_phone' => $customer['phone'] ?? null,
+            'customer_address' => $customer['address'] ?? null,
+            'subtotal' => $pricing['subtotal'] ?? null,
+            'tax_rate' => $pricing['tax_rate'] ?? null,
+            'tax_amount' => $pricing['tax_amount'] ?? null,
+            'discount' => $pricing['discount'] ?? null,
+            'total_amount' => $pricing['total_amount'] ?? null,
+            'status' => $payment['status'] ?? null,
+            'payment_method' => $payment['method'] ?? null,
+            'amount_paid' => $payment['amount_paid'] ?? null,
+            'remaining_amount' => $payment['remaining_amount'] ?? null,
+            'paid_at' => $payment['paid_at'] ?? null,
+            'created_at' => $row['created_at'] ?? null,
+        ];
+    }
+
+    public function resolveCompanyId(): ?int
+    {
+        $configured = config('billing.company_id');
+        if (is_numeric($configured)) {
+            return (int) $configured;
+        }
+
+        $companies = $this->getCompaniesPublic();
+        $first = $companies[0]['id'] ?? null;
+
+        return is_numeric($first) ? (int) $first : null;
+    }
+
+    private function generateInvoiceNumber(): string
+    {
+        return 'GV-' . now()->format('Ymd-His') . '-' . Str::upper(Str::random(4));
     }
 
     /**
@@ -413,7 +523,7 @@ class GiftVoucherApiService
      * @param  array<string, mixed>  $queryParams
      * @return array<string, mixed>
      */
-    private function requestRemote(string $method, string $path, array $queryParams = []): array
+    private function requestRemote(string $method, string $path, array $queryParams = [], array $payload = []): array
     {
         $base = rtrim((string) config('billing.base_url'), '/');
         if ($base === '') {
@@ -446,9 +556,14 @@ class GiftVoucherApiService
                 $req = $req->withHeaders([$headerName => (string) $tenant]);
             }
 
-            $response = strtoupper($method) === 'GET'
-                ? $req->get($url)
-                : $req->send(strtoupper($method), $url);
+            $verb = strtoupper($method);
+            $response = match ($verb) {
+                'POST' => $req->post($url, $payload),
+                'PUT' => $req->put($url, $payload),
+                'PATCH' => $req->patch($url, $payload),
+                'DELETE' => $req->delete($url, $payload),
+                default => $req->get($url),
+            };
 
             if (! $response->successful()) {
                 $body = $response->json();

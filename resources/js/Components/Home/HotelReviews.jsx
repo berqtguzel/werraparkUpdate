@@ -82,7 +82,7 @@ export default function HotelReviews() {
         <section className="hr-wrap" aria-label="Hotelbewertungen">
             <div className="hr-head">
                 <span className="eyebrow">Gastebewertungen</span>
-                <h2 className="hr-title">Was unsere Gaste uber uns sagen</h2>
+                <h1 className="hr-title">Was unsere Gaste uber uns sagen</h1>
                 <p className="hr-sub">
                     Echte Stimmen aus dem Werrapark Resort - transparent,
                     herzlich und direkt aus dem Aufenthalt.

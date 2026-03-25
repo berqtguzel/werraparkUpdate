@@ -9,14 +9,12 @@ use Illuminate\Support\Facades\Log;
 class StaffService
 {
     private const CACHE_KEY_PREFIX = 'omr_staff_';
-    private const CACHE_TTL = 600;
-
     public function getStaff(string $locale): array
     {
         $locale = strtolower($locale);
         $cacheKey = self::CACHE_KEY_PREFIX . $locale;
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($locale) {
+        return Cache::remember($cacheKey, now()->addDays(7), function () use ($locale) {
             return $this->fetch($locale);
         });
     }

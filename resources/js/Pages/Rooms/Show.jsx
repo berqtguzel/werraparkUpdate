@@ -5,88 +5,101 @@ import {
     CheckCircle2,
     ChevronLeft,
     ChevronRight,
+    CreditCard,
+    Eye,
+    Hash,
     MapPin,
+    Maximize,
     Sparkles,
+    Users,
 } from "lucide-react";
 import AppLayout from "@/Layouts/AppLayout";
-import ROOMS_DATA, { ROOM_LIST } from "@/Data/RoomsData";
 import { useTranslation } from "@/i18n";
 import "@/../css/room-detail.css";
 
-function normalizeRoom(apiRoom) {
-    if (!apiRoom || typeof apiRoom !== "object" || !apiRoom.id) return null;
-
-    const images = apiRoom.images?.length
-        ? apiRoom.images.map((img) => (typeof img === "string" ? img : img.url ?? img.path))
-        : [];
-    const heroImg = apiRoom.image || images[0] || "/images/template2.png";
-
-    const features = (apiRoom.features ?? []).map((f) =>
-        typeof f === "string" ? f : f.name ?? f.label ?? String(f),
+function pickTranslation(translations, locale) {
+    if (!Array.isArray(translations)) return null;
+    return (
+        translations.find(
+            (item) =>
+                String(item?.language_code ?? item?.locale ?? "").toLowerCase() ===
+                String(locale).toLowerCase(),
+        ) ?? translations[0] ?? null
     );
-
-    const boardTypes = (apiRoom.board_prices ?? apiRoom.board_types ?? []).map(
-        (b) => `${b.board_type_name ?? b.name} – ${b.price}€`,
-    );
-
-    const quickFacts = [
-        { label: "Typ", value: apiRoom.room_type ?? "" },
-        { label: "Kapazität", value: `${apiRoom.capacity ?? "–"} Pers.` },
-        { label: "Betten", value: String(apiRoom.beds ?? "–") },
-        { label: "Größe", value: apiRoom.size ? `${apiRoom.size} m²` : "–" },
-    ].filter((f) => f.value && f.value !== "–");
-
-    return {
-        id: apiRoom.slug ?? String(apiRoom.id),
-        hotelName: apiRoom.name ?? "",
-        location: apiRoom.view_type ?? "",
-        heroImage: heroImg,
-        gallery: images.length ? images : [heroImg],
-        intro: apiRoom.description ?? "",
-        atmosphere: "",
-        roomTypes: boardTypes.length ? boardTypes : [apiRoom.room_type].filter(Boolean),
-        amenities: features,
-        goodFor: apiRoom.view_type ? `${apiRoom.room_type}, ${apiRoom.view_type}` : apiRoom.room_type ?? "",
-        quickFacts,
-        roomPrices: apiRoom.room_prices ?? [],
-        translations: apiRoom.translations ?? [],
-        status: apiRoom.status ?? "",
-        roomNumber: apiRoom.room_number ?? "",
-    };
 }
 
-function resolveData(props) {
-    const { room: apiRoom, roomSlug } = props;
+function normalizeRoom(apiRoom, locale) {
+    if (!apiRoom || typeof apiRoom !== "object" || !apiRoom.id) return null;
 
-    const normalized = normalizeRoom(apiRoom);
-    if (normalized) return normalized;
+    const translation = pickTranslation(apiRoom.translations, locale);
+    const images = Array.isArray(apiRoom.images)
+        ? apiRoom.images
+              .map((img) => {
+                  if (typeof img === "string") {
+                      return { url: img, alt: "" };
+                  }
 
-    const slug = roomSlug ?? props.room;
+                  return {
+                      url: img?.url ?? img?.path ?? null,
+                      alt: img?.alt ?? "",
+                  };
+              })
+              .filter((img) => img.url)
+        : [];
+    const heroImg = apiRoom.image || images[0]?.url || "/images/template2.png";
+    const features = Array.isArray(apiRoom.features)
+        ? apiRoom.features
+              .filter((item) => (item?.status ?? "active") === "active")
+              .map((item) => ({
+                  id: item?.id ?? item?.name,
+                  name: item?.name ?? "",
+                  icon: item?.icon ?? null,
+              }))
+        : [];
+    const boardTypes = Array.isArray(apiRoom.board_types)
+        ? apiRoom.board_types
+              .filter((item) => item?.is_active !== false)
+              .map((item) => ({
+                  id: item?.id ?? item?.code ?? item?.name,
+                  name: item?.name ?? "",
+                  code: item?.code ?? "",
+                  description: item?.description ?? "",
+              }))
+        : [];
+    const roomPrices = Array.isArray(apiRoom.room_prices) ? apiRoom.room_prices : [];
 
-    if (typeof slug === "string" && ROOMS_DATA[slug]) return ROOMS_DATA[slug];
-
-    if (typeof slug === "string" && /^\d+$/.test(slug)) {
-        const idx = parseInt(slug, 10) - 1;
-        if (ROOM_LIST[idx]) return ROOM_LIST[idx];
-    }
-
-    if (typeof slug === "string") {
-        const lc = slug.toLowerCase();
-        const match = ROOM_LIST.find(
-            (r) => r.id.includes(lc) || r.hotelName.toLowerCase().includes(lc),
-        );
-        if (match) return match;
-    }
-
-    return ROOM_LIST[0] ?? null;
+    return {
+        id: apiRoom.id,
+        slug: apiRoom.slug ?? String(apiRoom.id),
+        name: translation?.name ?? apiRoom.name ?? "",
+        description: translation?.description ?? apiRoom.description ?? "",
+        roomType: apiRoom.room_type ?? "",
+        roomNumber: apiRoom.room_number ?? "",
+        capacity: apiRoom.capacity ?? null,
+        beds: apiRoom.beds ?? null,
+        size: apiRoom.size ?? null,
+        viewType: apiRoom.view_type ?? "",
+        status: apiRoom.status ?? "",
+        heroImage: heroImg,
+        gallery: images.length ? images : [{ url: heroImg, alt: "" }],
+        features,
+        boardTypes,
+        roomPrices,
+        languages: apiRoom._meta?.available_languages ?? [],
+    };
 }
 
 export default function RoomShow() {
     const { props } = usePage();
     const { t, locale } = useTranslation();
-    const data = resolveData(props);
+    const data = React.useMemo(
+        () => normalizeRoom(props?.room, locale),
+        [props?.room, locale],
+    );
 
-    const images = data?.gallery?.length ? data.gallery : data?.heroImage ? [data.heroImage] : ["/images/template2.png"];
+    const images = data?.gallery?.length
+        ? data.gallery
+        : [{ url: "/images/template2.png", alt: "" }];
     const [activeIndex, setActiveIndex] = React.useState(0);
     const [paused, setPaused] = React.useState(false);
     const activeImage = images[activeIndex] ?? images[0];
@@ -107,13 +120,69 @@ export default function RoomShow() {
         setActiveIndex((prev) => (prev - 1 + images.length) % images.length);
     const goNext = () => setActiveIndex((prev) => (prev + 1) % images.length);
 
+    const quickFacts = data
+        ? [
+              data.roomType
+                  ? {
+                        icon: <BedDouble size={16} />,
+                        label: t("roomDetail.roomTypeLabel"),
+                        value: data.roomType,
+                    }
+                  : null,
+              data.capacity
+                  ? {
+                        icon: <Users size={16} />,
+                        label: t("roomDetail.capacityLabel"),
+                        value: t("roomDetail.capacityValue", {
+                            count: data.capacity,
+                        }),
+                    }
+                  : null,
+              data.beds
+                  ? {
+                        icon: <BedDouble size={16} />,
+                        label: t("roomDetail.bedsLabel"),
+                        value: t("roomDetail.bedsValue", { count: data.beds }),
+                    }
+                  : null,
+              data.size
+                  ? {
+                        icon: <Maximize size={16} />,
+                        label: t("roomDetail.sizeLabel"),
+                        value: `${data.size} m²`,
+                    }
+                  : null,
+              data.viewType
+                  ? {
+                        icon: <Eye size={16} />,
+                        label: t("roomDetail.viewLabel"),
+                        value: data.viewType,
+                    }
+                  : null,
+              data.roomNumber
+                  ? {
+                        icon: <Hash size={16} />,
+                        label: t("roomDetail.roomNumberLabel"),
+                        value: data.roomNumber,
+                    }
+                  : null,
+          ].filter(Boolean)
+        : [];
+
     if (!data) {
         return (
             <AppLayout currentRoute="rooms">
                 <Head title="Room Not Found" />
-                <section className="rux-wrap" style={{ textAlign: "center", padding: "120px 20px" }}>
+                <section
+                    className="rux-wrap"
+                    style={{ textAlign: "center", padding: "120px 20px" }}
+                >
                     <h1>Room not found</h1>
-                    <a href={locale === "de" ? "/" : `/${locale}`} className="rux-btn rux-btn--ghost" style={{ marginTop: 20 }}>
+                    <a
+                        href={locale === "de" ? "/" : `/${locale}`}
+                        className="rux-btn rux-btn--ghost"
+                        style={{ marginTop: 20 }}
+                    >
                         {t("roomDetail.homeBtn")}
                     </a>
                 </section>
@@ -123,7 +192,7 @@ export default function RoomShow() {
 
     return (
         <AppLayout currentRoute="rooms">
-            <Head title={t("roomDetail.pageTitle", { name: data.hotelName })} />
+            <Head title={t("roomDetail.pageTitle", { name: data.name })} />
 
             <section className="rux-wrap" aria-labelledby="rux-title">
                 <div className="rux-grid">
@@ -133,13 +202,11 @@ export default function RoomShow() {
                             onMouseEnter={() => setPaused(true)}
                             onMouseLeave={() => setPaused(false)}
                         >
-                            <img src={activeImage} alt={data.hotelName} />
+                            <img
+                                src={activeImage.url}
+                                alt={activeImage.alt || data.name}
+                            />
                             <div className="rux-overlay" />
-                            {data.atmosphere && (
-                                <figcaption className="rux-caption">
-                                    {data.atmosphere}
-                                </figcaption>
-                            )}
 
                             {images.length > 1 && (
                                 <>
@@ -164,15 +231,21 @@ export default function RoomShow() {
                         </figure>
 
                         <div className="rux-thumbs">
-                            {images.map((src, index) => (
+                            {images.map((image, index) => (
                                 <button
-                                    key={`${src}-${index}`}
+                                    key={`${image.url}-${index}`}
                                     type="button"
                                     className={`rux-thumb ${index === activeIndex ? "is-active" : ""}`}
                                     onClick={() => setActiveIndex(index)}
-                                    aria-label={t("roomDetail.imageN", { n: index + 1 })}
+                                    aria-label={t("roomDetail.imageN", {
+                                        n: index + 1,
+                                    })}
                                 >
-                                    <img src={src} alt="" aria-hidden="true" />
+                                    <img
+                                        src={image.url}
+                                        alt={image.alt || ""}
+                                        aria-hidden="true"
+                                    />
                                 </button>
                             ))}
                         </div>
@@ -181,19 +254,26 @@ export default function RoomShow() {
                     <aside className="rux-aside">
                         <p className="rux-eyebrow">{t("roomDetail.eyebrow")}</p>
                         <h1 id="rux-title" className="rux-title">
-                            {data.hotelName}
+                            {data.name}
                         </h1>
-                        <p className="rux-loc">
-                            <MapPin size={15} />
-                            <span>{data.location}</span>
-                        </p>
-                        <p className="rux-intro">{data.intro}</p>
 
-                        {data.quickFacts?.length > 0 && (
-                            <div className="rux-facts">
-                                {data.quickFacts.map((fact, i) => (
+                        {data.viewType ? (
+                            <p className="rux-loc">
+                                <MapPin size={15} />
+                                <span>{data.viewType}</span>
+                            </p>
+                        ) : null}
+
+                        <p className="rux-intro">{data.description}</p>
+
+                        {quickFacts.length > 0 && (
+                            <div className="rux-facts rux-facts--grid">
+                                {quickFacts.map((fact, i) => (
                                     <article key={i} className="rux-fact">
-                                        <span>{fact.label}</span>
+                                        <div className="rux-fact__label">
+                                            {fact.icon}
+                                            <span>{fact.label}</span>
+                                        </div>
                                         <strong>{fact.value}</strong>
                                     </article>
                                 ))}
@@ -201,12 +281,14 @@ export default function RoomShow() {
                         )}
 
                         <article className="rux-cta">
-                            {data.goodFor && (
-                                <>
-                                    <p className="rux-kicker">{t("roomDetail.idealFor")}</p>
-                                    <h2>{data.goodFor}</h2>
-                                </>
-                            )}
+                            <p className="rux-kicker">
+                                {t("roomDetail.idealFor")}
+                            </p>
+                            <h2>
+                                {[data.roomType, data.viewType]
+                                    .filter(Boolean)
+                                    .join(" · ") || data.name}
+                            </h2>
                             <p>{t("roomDetail.bookingText")}</p>
                             <div className="rux-actions">
                                 <a
@@ -215,7 +297,10 @@ export default function RoomShow() {
                                 >
                                     {t("roomDetail.requestBtn")}
                                 </a>
-                                <a href={locale === "de" ? "/" : `/${locale}`} className="rux-btn rux-btn--ghost">
+                                <a
+                                    href={locale === "de" ? "/" : `/${locale}`}
+                                    className="rux-btn rux-btn--ghost"
+                                >
                                     {t("roomDetail.homeBtn")}
                                 </a>
                             </div>
@@ -224,38 +309,74 @@ export default function RoomShow() {
                 </div>
 
                 <div className="rux-bottom">
-                    {data.roomTypes?.length > 0 && (
+                    {data.boardTypes.length > 0 && (
                         <article className="rux-panel">
                             <div className="rux-panel-head">
                                 <BedDouble size={17} />
                                 <h3>{t("roomDetail.roomCategories")}</h3>
                             </div>
                             <ul className="rux-list">
-                                {data.roomTypes.map((item, i) => (
-                                    <li key={i}>
+                                {data.boardTypes.map((item) => (
+                                    <li key={item.id}>
                                         <CheckCircle2 size={16} />
-                                        <span>{typeof item === "string" ? item : item.name ?? item.label}</span>
+                                        <span>
+                                            {[item.name, item.code, item.description]
+                                                .filter(Boolean)
+                                                .join(" · ")}
+                                        </span>
                                     </li>
                                 ))}
                             </ul>
                         </article>
                     )}
 
-                    {data.amenities?.length > 0 && (
+                    {data.features.length > 0 && (
                         <article className="rux-panel rux-panel--amenities">
                             <div className="rux-panel-head">
                                 <Sparkles size={17} />
                                 <h3>{t("roomDetail.amenities")}</h3>
                             </div>
                             <div className="rux-chip-grid">
-                                {data.amenities.map((item, i) => (
-                                    <span className="rux-chip" key={i}>
-                                        {typeof item === "string" ? item : item.name ?? item.label}
+                                {data.features.map((item) => (
+                                    <span className="rux-chip" key={item.id}>
+                                        {item.name}
                                     </span>
                                 ))}
                             </div>
                         </article>
                     )}
+
+                    <article className="rux-panel">
+                        <div className="rux-panel-head">
+                            <CreditCard size={17} />
+                            <h3>{t("roomDetail.priceTitle")}</h3>
+                        </div>
+                        {data.roomPrices.length > 0 ? (
+                            <ul className="rux-list">
+                                {data.roomPrices.map((item, i) => (
+                                    <li key={item.id ?? i}>
+                                        <CheckCircle2 size={16} />
+                                        <span>
+                                            {[
+                                                item.name,
+                                                item.season,
+                                                item.price != null
+                                                    ? `${item.price} €`
+                                                    : null,
+                                            ]
+                                                .filter(Boolean)
+                                                .join(" · ")}
+                                        </span>
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <div className="rux-note rux-note--plain">
+                                <CheckCircle2 size={16} />
+                                <p>{t("roomDetail.priceFallback")}</p>
+                            </div>
+                        )}
+                    </article>
                 </div>
             </section>
         </AppLayout>

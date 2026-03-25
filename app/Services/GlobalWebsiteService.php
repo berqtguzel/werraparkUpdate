@@ -21,7 +21,7 @@ class GlobalWebsiteService
         $locale = strtolower($locale);
         $cacheKey = "global_websites:{$tenant}:{$locale}";
 
-        return Cache::remember($cacheKey, now()->addHours(6), function () use ($base, $tenant, $locale) {
+        return Cache::remember($cacheKey, now()->addDays(7), function () use ($base, $tenant, $locale) {
             try {
                 $response = Http::timeout(10)
                     ->withHeaders(['X-Tenant-ID' => $tenant])

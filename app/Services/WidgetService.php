@@ -9,13 +9,11 @@ use Illuminate\Support\Facades\Log;
 class WidgetService
 {
     private const CACHE_PREFIX = 'omr_widget_';
-    private const CACHE_TTL = 600;
-
     public function getWidgets(string $locale): array
     {
         $cacheKey = self::CACHE_PREFIX . $locale;
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($locale) {
+        return Cache::remember($cacheKey, now()->addDays(7), function () use ($locale) {
             return [
                 'ratings' => $this->fetchRatings($locale),
                 'whatsapp' => $this->fetchWhatsApp($locale),

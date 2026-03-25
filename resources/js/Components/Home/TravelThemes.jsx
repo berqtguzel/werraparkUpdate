@@ -123,7 +123,7 @@ export default function TravelThemes({ items = THEMES }) {
             >
                 <div className="tt3-head-text">
                     <span className="eyebrow">{t("themes.eyebrow")}</span>
-                    <h2 className="tt3-title">{t("themes.title")}</h2>
+                    <h1 className="tt3-title">{t("themes.title")}</h1>
                     <p className="tt3-desc">{t("themes.description")}</p>
 
                     <div className="tt3-cta">

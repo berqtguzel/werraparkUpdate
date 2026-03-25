@@ -123,7 +123,7 @@ export default function TeamGrid({ people }) {
             <div className="tg-shell">
                 <header className="tg-head">
                     <span className="eyebrow">werrapark</span>
-                    <h2 className="tg-heading">{t("team.heading")}</h2>
+                    <h3 className="tg-heading">{t("team.heading")}</h3>
                     <p className="tg-sub">{t("team.subtitle")}</p>
                 </header>
 
