@@ -38,12 +38,6 @@ export default function GiftVoucherPage({
                 bank_name: sepa.bank_name ?? null,
             },
         };
-
-        console.log("Gift voucher debug", {
-            billingApi,
-            companies,
-            paymentMethods: methodsDebug,
-        });
     }, [billingApi, companies, paypal, sepa, stripe]);
 
     const methods = [
@@ -111,21 +105,21 @@ export default function GiftVoucherPage({
                             <span className="gvf-intro-label">
                                 {t("giftVoucher.giftFor")}
                             </span>
-                            <h2>{t("giftVoucher.introTitle")}</h2>
+                            <h1>{t("giftVoucher.introTitle")}</h1>
                             <p>{t("giftVoucher.introText")}</p>
                         </div>
                         <div className="gvf-intro-card gvf-intro-card--highlight">
                             <span className="gvf-intro-label">
                                 {t("giftVoucher.brandLabel")}
                             </span>
-                            <h2>Werrapark</h2>
+                            <h1>Werrapark</h1>
                             <p>{t("giftVoucher.brandText")}</p>
                         </div>
                     </section>
 
                     <div className="gvf-method-header">
                         <div>
-                            <h2>{t("giftVoucher.methodsTitle")}</h2>
+                            <h1>{t("giftVoucher.methodsTitle")}</h1>
                             <p>{t("giftVoucher.methodsSubtitle")}</p>
                         </div>
                     </div>
@@ -159,7 +153,7 @@ export default function GiftVoucherPage({
                         ))}
                     </div>
 
-                    {companies.length > 0 ? (
+                    {/* {companies.length > 0 ? (
                         <section className="gvf-side-section">
                             <h2>{t("giftVoucher.companySectionTitle")}</h2>
                             <ul className="gvf-company-list">
@@ -173,7 +167,7 @@ export default function GiftVoucherPage({
                                 ))}
                             </ul>
                         </section>
-                    ) : null}
+                    ) : null} */}
 
                     <p className="gvf-invoice-hint">
                         {t("giftVoucher.invoiceHint")}

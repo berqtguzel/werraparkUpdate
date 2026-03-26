@@ -19,9 +19,7 @@ export default function GiftVoucherPromo() {
                     <span className="gvp-badge">
                         {t("giftVoucherPromo.badge")}
                     </span>
-                    <h2 className="gvp-title">
-                        {t("giftVoucherPromo.title")}
-                    </h2>
+                    <h1 className="gvp-title">{t("giftVoucherPromo.title")}</h1>
                     <p className="gvp-desc">
                         {t("giftVoucherPromo.description")}
                     </p>

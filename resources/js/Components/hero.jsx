@@ -26,8 +26,6 @@ export default function Hero() {
     const [activeIndex, setActiveIndex] = useState(0);
     const videoRefs = useRef({});
 
-    console.log("Slider data:", slider);
-
     const hasSlider = Array.isArray(slides) && slides.length > 0;
     const firstSlide = slides[0];
     const title =

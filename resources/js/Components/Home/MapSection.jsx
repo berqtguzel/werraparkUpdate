@@ -21,10 +21,6 @@ const GERMANY_CENTER = [51.1657, 10.4515];
 const DEFAULT_ZOOM = 6;
 
 const DEFAULTS = {
-    title: "Werrapark Resort – Mitten in Deutschland",
-    subtitle:
-        "Entdecken Sie uns im Herzen des Thüringer Waldes, umgeben von unberührter Natur.",
-    markerTitle: "Werrapark Resort",
     markerAddress: "R.-Breitscheid-Straße 41–45, 98574 Masserberg",
 };
 
@@ -51,9 +47,9 @@ function buildMapHref(mapUrl, markerPosition, markerAddress) {
 }
 
 export default function MapSection({
-    title = DEFAULTS.title,
-    subtitle = DEFAULTS.subtitle,
-    markerTitle = DEFAULTS.markerTitle,
+    title,
+    subtitle,
+    markerTitle,
     markerAddress: markerAddressProp,
 }) {
     const { t } = useTranslation();
@@ -83,8 +79,10 @@ export default function MapSection({
     }, [props?.global?.settings?.contact, markerTitle, markerAddressProp]);
 
     const markerPosition = contactData?.markerPosition ?? WERRAPARK_POSITION;
+    const titleResolved = title ?? t("map.title");
+    const subtitleResolved = subtitle ?? t("map.subtitle");
     const markerTitleResolved =
-        contactData?.markerTitle ?? markerTitle ?? DEFAULTS.markerTitle;
+        contactData?.markerTitle ?? markerTitle ?? t("map.markerTitle");
     const markerAddressResolved =
         contactData?.markerAddress ??
         markerAddressProp ??
@@ -115,9 +113,9 @@ export default function MapSection({
     return (
         <section className="mp-section" aria-label={t("map.openMap")}>
             <div className="mp-header">
-                <span className="eyebrow">Standort</span>
-                <h1 className="mp-title">{title}</h1>
-                <p className="mp-subtitle">{subtitle}</p>
+                <span className="eyebrow">{t("map.eyebrow")}</span>
+                <h1 className="mp-title">{titleResolved}</h1>
+                <p className="mp-subtitle">{subtitleResolved}</p>
                 <a
                     className="mp-map-link"
                     href={mapHref}

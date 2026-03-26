@@ -10,9 +10,6 @@ use App\Services\SettingsService;
 
 class SettingsController extends Controller
 {
-    /**
-     * Resim URL'indeki tenant ID'sini ana tenant ile değiştirir
-     */
     private static function replaceImageTenant(?string $imageUrl): ?string
     {
         if (!$imageUrl) {
@@ -36,9 +33,6 @@ class SettingsController extends Controller
         return $imageUrl;
     }
 
-    /**
-     * Logo URL'lerini recursive olarak değiştirir
-     */
     private static function replaceLogoImages($data)
     {
         if (is_array($data)) {
@@ -57,9 +51,6 @@ class SettingsController extends Controller
         return $data;
     }
 
-    /**
-     * Uzak API'den tüm settings bölümlerini çeker ve cache'ler.
-     */
     public static function getSettings(string $tenantId, string $locale): array
     {
         $locale = strtolower($locale);
@@ -134,9 +125,6 @@ class SettingsController extends Controller
         });
     }
 
-    /**
-     * Tüm settings'leri döndür
-     */
     public function index(Request $request): array
     {
         $locale = $request->query('locale') ?? $request->route('locale') ?? config('omr.default_locale', 'de');
@@ -147,9 +135,6 @@ class SettingsController extends Controller
         return self::getSettings($tenantId, $locale);
     }
 
-    /**
-     * Frontend için gerekli settings
-     */
     public function frontend(Request $request): array
     {
         $locale = $request->query('locale') ?? $request->route('locale') ?? config('omr.default_locale', 'de');
@@ -173,9 +158,6 @@ class SettingsController extends Controller
         ];
     }
 
-    /**
-     * Tek bir setting grubu
-     */
     public function show(Request $request, string $key): array
     {
         $locale = $request->query('locale') ?? $request->route('locale') ?? config('omr.default_locale', 'de');
@@ -190,9 +172,6 @@ class SettingsController extends Controller
         return $settings[$sectionKey] ?? [];
     }
 
-    /**
-     * Cache temizle
-     */
     public function clearCache(): array
     {
         $tenantId = config('omr.tenant_id') ?: config('omr.main_tenant') ?: '';

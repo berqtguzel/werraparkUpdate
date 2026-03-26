@@ -206,6 +206,7 @@
 .gcf-brand {
     position: absolute;
     top: 18px;
+    color: white;
     right: 18px;
     font-size: 17px;
     font-weight: 900;
@@ -854,7 +855,7 @@ html[data-theme="dark"] .gvf-invoice-result-grid b,
 }
 
 .gvf-intro-card--highlight {
-    background: linear-gradient(145deg, #0f172a, #1e3a8a 55%, #2a9765);
+    background: linear-gradient(145deg, #0f172a, #026e2b 55%, #2a9765);
     color: #eff6ff;
 }
 
@@ -862,7 +863,6 @@ html[data-theme="dark"] .gvf-invoice-result-grid b,
 .gvf-intro-card--highlight .gvf-intro-label {
     color: rgba(239, 246, 255, 0.88);
 }
-
 .gvf-intro-card h2 {
     margin: 0 0 8px;
     font-size: clamp(24px, 3vw, 32px);
@@ -871,7 +871,7 @@ html[data-theme="dark"] .gvf-invoice-result-grid b,
 
 .gvf-intro-card p {
     margin: 0;
-    color: #64748b;
+    color: white;
     line-height: 1.6;
 }
 

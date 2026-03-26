@@ -5,12 +5,16 @@ namespace App\Http\Controllers;
 use App\Services\GiftVoucherApiService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class GiftVoucherController extends Controller
 {
+    private const CACHE_PREFIX = 'gift_voucher_controller';
+    private const CACHE_VERSION_KEY = 'gift_voucher_controller_version';
+
     public function __construct(
         private GiftVoucherApiService $billing,
     ) {}
@@ -21,23 +25,27 @@ class GiftVoucherController extends Controller
     private function sharedPayload(string $locale): array
     {
         $locale = strtolower($locale);
-        $companiesRaw = $this->billing->getCompaniesRaw();
+        $cacheKey = self::CACHE_PREFIX . ':shared:' . $locale . ':v' . $this->cacheVersion();
 
-        return [
-            'locale' => $locale,
-            'currentRoute' => 'gutschein',
-            'companies' => $this->billing->getCompaniesPublic(),
-            'defaultCompanyId' => $this->billing->resolveCompanyId(),
-            'paymentMethods' => $this->billing->getPaymentMethodsPublic(),
-            'billingApi' => [
-                'ok' => empty($companiesRaw['_error']),
-                'message' => $companiesRaw['message'] ?? ($companiesRaw['_error'] ?? null),
-                'error' => $companiesRaw['_error'] ?? null,
-                'status' => $companiesRaw['status'] ?? null,
-                'requestUrl' => $companiesRaw['request_url'] ?? null,
-                'details' => $companiesRaw['response_body'] ?? null,
-            ],
-        ];
+        return Cache::remember($cacheKey, now()->addDays(7), function () use ($locale) {
+            $companiesRaw = $this->billing->getCompaniesRaw();
+
+            return [
+                'locale' => $locale,
+                'currentRoute' => 'gutschein',
+                'companies' => $this->billing->getCompaniesPublic(),
+                'defaultCompanyId' => $this->billing->resolveCompanyId(),
+                'paymentMethods' => $this->billing->getPaymentMethodsPublic(),
+                'billingApi' => [
+                    'ok' => empty($companiesRaw['_error']),
+                    'message' => $companiesRaw['message'] ?? ($companiesRaw['_error'] ?? null),
+                    'error' => $companiesRaw['_error'] ?? null,
+                    'status' => $companiesRaw['status'] ?? null,
+                    'requestUrl' => $companiesRaw['request_url'] ?? null,
+                    'details' => $companiesRaw['response_body'] ?? null,
+                ],
+            ];
+        });
     }
 
     public function index(string $locale): Response
@@ -74,10 +82,15 @@ class GiftVoucherController extends Controller
      */
     public function companiesJson(): JsonResponse
     {
-        return response()->json([
-            'data' => $this->billing->getCompaniesPublic(),
-            'payment_methods' => $this->billing->getPaymentMethodsPublic(),
-        ]);
+        $cacheKey = self::CACHE_PREFIX . ':companies:v' . $this->cacheVersion();
+        $data = Cache::remember($cacheKey, now()->addDays(7), function () {
+            return [
+                'data' => $this->billing->getCompaniesPublic(),
+                'payment_methods' => $this->billing->getPaymentMethodsPublic(),
+            ];
+        });
+
+        return response()->json($data);
     }
 
     /**
@@ -87,16 +100,30 @@ class GiftVoucherController extends Controller
     public function invoicesJson(Request $request): JsonResponse
     {
         $query = array_filter($request->query(), fn ($v) => $v !== null && $v !== '');
+        $cacheKey = self::CACHE_PREFIX . ':invoices:' . md5(json_encode([
+            'version' => $this->cacheVersion(),
+            'query' => $query,
+        ]));
+        $data = Cache::remember($cacheKey, now()->addDays(7), function () use ($query) {
+            return [
+                'data' => $this->billing->getInvoicesPublic($query),
+            ];
+        });
 
-        return response()->json([
-            'data' => $this->billing->getInvoicesPublic($query),
-        ]);
+        return response()->json($data);
     }
 
     public function invoiceShow(Request $request, string $invoice): JsonResponse
     {
         $query = array_filter($request->query(), fn ($v) => $v !== null && $v !== '');
-        $data = $this->billing->getInvoicePublic($invoice, $query);
+        $cacheKey = self::CACHE_PREFIX . ':invoice:' . md5(json_encode([
+            'version' => $this->cacheVersion(),
+            'invoice' => $invoice,
+            'query' => $query,
+        ]));
+        $data = Cache::remember($cacheKey, now()->addDays(7), function () use ($invoice, $query) {
+            return $this->billing->getInvoicePublic($invoice, $query);
+        });
 
         if (! $data) {
             return response()->json([
@@ -137,11 +164,26 @@ class GiftVoucherController extends Controller
         $invoiceData = is_array($result['data'] ?? null) ? $result['data'] : [];
         $invoiceRef = $invoiceData['id'] ?? $invoiceData['invoice_number'] ?? null;
         $invoice = $invoiceRef ? $this->billing->getInvoicePublic((string) $invoiceRef) : null;
+        $this->bumpCacheVersion();
 
         return response()->json([
             'message' => $result['message'] ?? 'Invoice created successfully',
             'data' => $invoiceData,
             'invoice' => $invoice,
         ], $status >= 200 && $status < 300 ? $status : 201);
+    }
+
+    private function cacheVersion(): int
+    {
+        return (int) Cache::get(self::CACHE_VERSION_KEY, 1);
+    }
+
+    private function bumpCacheVersion(): void
+    {
+        if (! Cache::has(self::CACHE_VERSION_KEY)) {
+            Cache::forever(self::CACHE_VERSION_KEY, 1);
+        }
+
+        Cache::increment(self::CACHE_VERSION_KEY);
     }
 }

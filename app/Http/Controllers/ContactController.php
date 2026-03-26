@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\ContactFormController;
 use App\Mail\ContactFormMail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
@@ -13,10 +14,17 @@ class ContactController extends Controller
 {
     public function index(string $locale = 'de')
     {
-        return Inertia::render('Home/Kontakt', [
-            'currentRoute' => 'kontakt',
-            'locale'       => $locale,
-        ]);
+        $locale = strtolower($locale);
+        $cacheKey = "contact_page:{$locale}";
+
+        $payload = Cache::remember($cacheKey, now()->addDays(7), function () use ($locale) {
+            return [
+                'currentRoute' => 'kontakt',
+                'locale'       => $locale,
+            ];
+        });
+
+        return Inertia::render('Home/Kontakt', $payload);
     }
 
     public function store(Request $request)

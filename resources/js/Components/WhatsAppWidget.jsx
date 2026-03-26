@@ -14,8 +14,6 @@ export default function WhatsAppWidget() {
           ? raw[0]
           : raw;
 
-    console.log("WA:", wa);
-
     if (!wa || wa.is_active !== true) return null;
 
     const phone = String(wa.phone_number || "").replace(/\D/g, "");

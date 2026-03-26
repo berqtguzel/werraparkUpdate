@@ -6,6 +6,7 @@ import { createRoot } from "react-dom/client";
 import { createInertiaApp } from "@inertiajs/react";
 import { ThemeProvider } from "./Context/ThemeContext";
 import { I18nProvider } from "./i18n";
+import PageTransitionLoader from "./Components/PageTransitionLoader";
 
 const appName =
     window.document.getElementsByTagName("title")[0]?.innerText || "Laravel";
@@ -34,11 +35,14 @@ createInertiaApp({
         root.render(
             <I18nProvider>
                 <ThemeProvider>
-                    <App {...props} />
+                    <>
+                        <PageTransitionLoader />
+                        <App {...props} />
+                    </>
                 </ThemeProvider>
             </I18nProvider>
         );
     },
 
-    progress: { color: "#4B5563" },
+    progress: false,
 });

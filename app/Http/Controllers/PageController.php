@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\ApiHealthService;
 use App\Services\PageService;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 
 class PageController extends Controller
@@ -17,16 +18,21 @@ class PageController extends Controller
     {
         $locale = strtolower($locale);
         $slug = strtolower($slug);
+        $cacheKey = "dynamic_page:{$locale}:{$slug}";
 
-        $pageData = null;
+        $pageData = Cache::remember($cacheKey, now()->addDays(7), function () use ($locale, $slug) {
+            $pageData = null;
 
-        if ($this->apiHealth->isAvailable()) {
-            $pageData = $this->pageService->getPage($slug, $locale);
-        }
+            if ($this->apiHealth->isAvailable()) {
+                $pageData = $this->pageService->getPage($slug, $locale);
+            }
 
-        if (!$pageData) {
-            $pageData = $this->getFallbackPage($slug, $locale);
-        }
+            if (!$pageData) {
+                $pageData = $this->getFallbackPage($slug, $locale);
+            }
+
+            return $pageData;
+        });
 
         return Inertia::render('Dynamic/Page', [
             'page' => $pageData,

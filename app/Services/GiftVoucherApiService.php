@@ -14,7 +14,7 @@ class GiftVoucherApiService
     private const CACHE_TTL = 300;
 
     /**
-     * Panel / uzak API’den ham companies yanıtı (cache’li).
+     *
      *
      * @return array<string, mixed>
      */
@@ -48,7 +48,7 @@ class GiftVoucherApiService
     }
 
     /**
-     * @param  array<string, mixed>  $payload
+     * @param  array<string, mixed>
      * @return array<string, mixed>
      */
     public function createInvoice(array $payload): array
@@ -79,7 +79,7 @@ class GiftVoucherApiService
     }
 
     /**
-     * Ön yüz için güvenli şirket özeti (gizli anahtarlar yok).
+     *
      *
      * @return list<array<string, mixed>>
      */
@@ -92,7 +92,7 @@ class GiftVoucherApiService
     }
 
     /**
-     * Stripe / PayPal / SEPA için birleştirilmiş, güvenli ödeme bayrakları ve public alanlar.
+
      *
      * @return array{stripe: array<string, mixed>, paypal: array<string, mixed>, sepa: array<string, mixed>}
      */
@@ -160,7 +160,7 @@ class GiftVoucherApiService
     }
 
     /**
-     * Fatura listesi (özet alanlar).
+     *
      *
      * @return list<array<string, mixed>>
      */
