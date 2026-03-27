@@ -66,6 +66,14 @@ class GiftVoucherApiService
         $totalAmount = (float) ($payload['total_amount'] ?? 0);
         $customerName = trim((string) ($payload['customer_name'] ?? ''));
         $customerEmail = trim((string) ($payload['customer_email'] ?? ''));
+        $message = trim((string) ($payload['message'] ?? ''));
+        $description = trim((string) ($payload['description'] ?? ''));
+
+        if ($message !== '') {
+            $description = $description !== ''
+                ? $description . ' | Personal message: ' . $message
+                : $message;
+        }
 
         $body = array_filter([
             'company_id' => (int) $companyId,
@@ -73,6 +81,8 @@ class GiftVoucherApiService
             'customer_name' => $customerName,
             'customer_email' => $customerEmail,
             'total_amount' => $totalAmount,
+            'message' => $message,
+            'description' => $description,
         ], fn ($value) => $value !== null && $value !== '');
 
         return $this->requestRemote('POST', '/v1/invoices', [], $body);
@@ -302,6 +312,7 @@ class GiftVoucherApiService
         }
 
         $hasPublic = $this->toBool($block['has_public'] ?? false);
+        $hasSecret = $this->toBool($block['has_secret'] ?? false);
         $connected = $block['connected_account_id'] ?? null;
         if (is_string($connected)) {
             $connected = trim($connected) !== '' ? $connected : null;
@@ -318,7 +329,7 @@ class GiftVoucherApiService
 
         $legacyOn = $this->toBool($block['enabled'] ?? $row['stripe_enabled'] ?? $row['stripe_active'] ?? false);
 
-        $enabled = $hasPublic || $connected !== null || $pk !== null || $legacyOn;
+        $enabled = $hasPublic || $hasSecret || $connected !== null || $pk !== null || $legacyOn;
 
         return [
             'enabled' => $enabled,
@@ -368,7 +379,7 @@ class GiftVoucherApiService
 
         $legacyOn = $this->toBool($block['enabled'] ?? $row['paypal_enabled'] ?? $row['paypal_active'] ?? false);
 
-        $enabled = ($hasClientId && $merchantId !== null) || ($clientId !== null) || $legacyOn;
+        $enabled = $hasClientId || $merchantId !== null || $clientId !== null || $legacyOn;
 
         return [
             'enabled' => $enabled,

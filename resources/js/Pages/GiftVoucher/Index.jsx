@@ -67,6 +67,12 @@ export default function GiftVoucherPage({
         },
     ];
 
+    console.log("GiftVoucherPage render", {
+        billingApi,
+        companies,
+        methods,
+    });
+
     return (
         <AppLayout currentRoute={currentRoute}>
             <Head title={t("giftVoucher.pageTitle")} />

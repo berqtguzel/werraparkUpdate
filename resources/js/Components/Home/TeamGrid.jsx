@@ -25,24 +25,25 @@ function TeamMedia({ src, name }) {
             />
             <span className="tg-media__overlay" aria-hidden="true" />
             <span className="tg-media__shine" aria-hidden="true" />
-            <span className="tg-media__name">{name}</span>
         </div>
     );
 }
-function CardInfo({ title, email, phone, website }) {
+function CardInfo({ name, title, email, phone, website }) {
     const { t } = useTranslation();
     return (
         <div className="tg-info">
-            {title && (
-                <div className="tg-info__title">
-                    {String(title).replace(/\n/g, " - ")}
-                </div>
-            )}
-
+            <div className="tg-info__body">
+                {name && <div className="tg-info__name">{name}</div>}
+                {title && (
+                    <div className="tg-info__title">
+                        {String(title).replace(/\n/g, " - ")}
+                    </div>
+                )}
+            </div>
             <div className="tg-contacts">
                 {phone && (
                     <a
-                        className="tg-chip tg-chip--link"
+                        className="tg-chip tg-chip--link tg-chip--phone"
                         href={`tel:${phone}`}
                         aria-label={t("team.call")}
                     >
@@ -53,7 +54,7 @@ function CardInfo({ title, email, phone, website }) {
 
                 {email && (
                     <a
-                        className="tg-chip tg-chip--link"
+                        className="tg-chip tg-chip--link tg-chip--email"
                         href={`mailto:${email}`}
                         aria-label={t("team.email")}
                     >
@@ -64,7 +65,7 @@ function CardInfo({ title, email, phone, website }) {
 
                 {website && (
                     <a
-                        className="tg-chip tg-chip--link"
+                        className="tg-chip tg-chip--link tg-chip--web"
                         href={website}
                         target="_blank"
                         rel="noreferrer"
@@ -122,7 +123,7 @@ export default function TeamGrid({ people }) {
 
             <div className="tg-shell">
                 <header className="tg-head">
-                    <span className="eyebrow">werrapark</span>
+                    <span className="tg-eyebrow">werrapark</span>
                     <h3 className="tg-heading">{t("team.heading")}</h3>
                     <p className="tg-sub">{t("team.subtitle")}</p>
                 </header>
@@ -140,6 +141,7 @@ export default function TeamGrid({ people }) {
                             >
                                 <TeamMedia src={src} name={p.name} />
                                 <CardInfo
+                                    name={p.name}
                                     title={p.title}
                                     email={p.email}
                                     phone={p.phone || p.tel || p.mobile}

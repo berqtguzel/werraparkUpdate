@@ -34,7 +34,6 @@ export default function GiftVoucherForm({
     );
     const [submitting, setSubmitting] = React.useState(false);
     const [submitError, setSubmitError] = React.useState("");
-    const [invoiceResult, setInvoiceResult] = React.useState(null);
 
     const parsedCustom = Number(customAmount);
     const customValue = Number.isFinite(parsedCustom)
@@ -48,8 +47,26 @@ export default function GiftVoucherForm({
         currency: "EUR",
         maximumFractionDigits: 0,
     });
-    const currentRecipientName = recipientName.trim();
-    const currentRecipientEmail = recipientEmail.trim();
+
+    const buildInvoiceHref = React.useCallback(
+        (payload) => {
+            const invoice = payload?.invoice ?? null;
+            const created = payload?.data ?? null;
+            const invoiceRef =
+                invoice?.id ??
+                created?.id ??
+                invoice?.invoice_number ??
+                created?.invoice_number ??
+                null;
+
+            if (!invoiceRef) {
+                return null;
+            }
+
+            return `/${locale}/gutschein/rechnung/${encodeURIComponent(String(invoiceRef))}`;
+        },
+        [locale],
+    );
 
     React.useEffect(() => {
         if (!companyId && companies[0]?.id) {
@@ -108,7 +125,6 @@ export default function GiftVoucherForm({
 
         setSubmitting(true);
         setSubmitError("");
-        setInvoiceResult(null);
 
         try {
             const csrfToken =
@@ -142,16 +158,14 @@ export default function GiftVoucherForm({
             if (!response.ok) {
                 throw new Error(resolveErrorMessage(payload));
             }
+            const invoiceHref = buildInvoiceHref(payload);
 
-            const invoice = payload.invoice ?? null;
-            const created = payload.data ?? null;
+            if (!invoiceHref) {
+                throw new Error(t("giftVoucher.invoiceRedirectError"));
+            }
 
-            setInvoiceResult({
-                message:
-                    payload.message || t("giftVoucher.invoiceCreatedSuccess"),
-                created,
-                invoice,
-            });
+            window.location.assign(invoiceHref);
+            return;
         } catch (error) {
             setSubmitError(
                 error instanceof Error
@@ -162,8 +176,6 @@ export default function GiftVoucherForm({
             setSubmitting(false);
         }
     };
-
-    const summaryInvoice = invoiceResult?.invoice ?? invoiceResult?.created ?? null;
     const actionClassName = `gvf-pay-btn ${submitVariant}`.trim();
 
     return (
@@ -399,64 +411,6 @@ export default function GiftVoucherForm({
                         </div>
                     ) : null}
 
-                    {summaryInvoice ? (
-                        <div className="gvf-submit-state gvf-submit-state--success">
-                            <strong>
-                                {invoiceResult?.message ||
-                                    t("giftVoucher.invoiceCreatedSuccess")}
-                            </strong>
-                            <div className="gvf-invoice-result-grid">
-                                <div>
-                                    <span>{t("giftVoucher.resultInvoice")}</span>
-                                    <b>
-                                        {summaryInvoice.invoice_number ||
-                                            summaryInvoice.number ||
-                                            "—"}
-                                    </b>
-                                </div>
-                                <div>
-                                    <span>{t("giftVoucher.resultStatus")}</span>
-                                    <b>{summaryInvoice.status || "pending"}</b>
-                                </div>
-                                <div>
-                                    <span>{t("giftVoucher.resultMethod")}</span>
-                                    <b>
-                                        {summaryInvoice.payment_method ||
-                                            paymentMethod ||
-                                            "—"}
-                                    </b>
-                                </div>
-                                <div>
-                                    <span>{t("giftVoucher.resultTotal")}</span>
-                                    <b>
-                                        {money.format(
-                                            Number(
-                                                summaryInvoice.total_amount ??
-                                                    summaryInvoice.total ??
-                                                    total,
-                                            ) || total,
-                                        )}
-                                    </b>
-                                </div>
-                                <div>
-                                    <span>{t("giftVoucher.resultCustomer")}</span>
-                                    <b>
-                                        {summaryInvoice.customer_name ||
-                                            currentRecipientName ||
-                                            recipientName}
-                                    </b>
-                                </div>
-                                <div>
-                                    <span>{t("giftVoucher.resultEmail")}</span>
-                                    <b>
-                                        {summaryInvoice.customer_email ||
-                                            currentRecipientEmail ||
-                                            recipientEmail}
-                                    </b>
-                                </div>
-                            </div>
-                        </div>
-                    ) : null}
                 </section>
             </div>
         </section>

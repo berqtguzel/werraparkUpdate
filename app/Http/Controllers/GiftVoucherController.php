@@ -12,8 +12,9 @@ use Inertia\Response;
 
 class GiftVoucherController extends Controller
 {
-    private const CACHE_PREFIX = 'gift_voucher_controller';
+    private const CACHE_PREFIX = 'gift_voucher_controller_v2';
     private const CACHE_VERSION_KEY = 'gift_voucher_controller_version';
+    private const CACHE_TTL = 300;
 
     public function __construct(
         private GiftVoucherApiService $billing,
@@ -27,7 +28,7 @@ class GiftVoucherController extends Controller
         $locale = strtolower($locale);
         $cacheKey = self::CACHE_PREFIX . ':shared:' . $locale . ':v' . $this->cacheVersion();
 
-        return Cache::remember($cacheKey, now()->addDays(7), function () use ($locale) {
+        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($locale) {
             $companiesRaw = $this->billing->getCompaniesRaw();
 
             return [
@@ -77,13 +78,24 @@ class GiftVoucherController extends Controller
         ));
     }
 
+    public function invoicePage(string $locale, string $invoice): Response
+    {
+        return Inertia::render('GiftVoucher/Invoice', array_merge(
+            $this->sharedPayload($locale),
+            [
+                'invoiceRef' => $invoice,
+                'invoice' => $this->billing->getInvoicePublic($invoice),
+            ]
+        ));
+    }
+
     /**
      * Uzak API: GET /v1/companies — güvenli özet + ödeme yöntemleri.
      */
     public function companiesJson(): JsonResponse
     {
         $cacheKey = self::CACHE_PREFIX . ':companies:v' . $this->cacheVersion();
-        $data = Cache::remember($cacheKey, now()->addDays(7), function () {
+        $data = Cache::remember($cacheKey, self::CACHE_TTL, function () {
             return [
                 'data' => $this->billing->getCompaniesPublic(),
                 'payment_methods' => $this->billing->getPaymentMethodsPublic(),
@@ -104,7 +116,7 @@ class GiftVoucherController extends Controller
             'version' => $this->cacheVersion(),
             'query' => $query,
         ]));
-        $data = Cache::remember($cacheKey, now()->addDays(7), function () use ($query) {
+        $data = Cache::remember($cacheKey, self::CACHE_TTL, function () use ($query) {
             return [
                 'data' => $this->billing->getInvoicesPublic($query),
             ];
@@ -121,7 +133,7 @@ class GiftVoucherController extends Controller
             'invoice' => $invoice,
             'query' => $query,
         ]));
-        $data = Cache::remember($cacheKey, now()->addDays(7), function () use ($invoice, $query) {
+        $data = Cache::remember($cacheKey, self::CACHE_TTL, function () use ($invoice, $query) {
             return $this->billing->getInvoicePublic($invoice, $query);
         });
 

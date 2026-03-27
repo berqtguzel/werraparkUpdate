@@ -148,6 +148,9 @@ Route::get('/{locale}/gutschein/paypal', [GiftVoucherController::class, 'paypal'
 Route::get('/{locale}/gutschein/sepa', [GiftVoucherController::class, 'sepa'])
     ->where('locale', 'de|en|tr')
     ->name('gutschein.sepa');
+Route::get('/{locale}/gutschein/rechnung/{invoice}', [GiftVoucherController::class, 'invoicePage'])
+    ->where('locale', 'de|en|tr')
+    ->name('gutschein.invoice');
 Route::get('/{locale}/gutschein', [GiftVoucherController::class, 'index'])
     ->where('locale', 'de|en|tr')
     ->name('gutschein.index');
