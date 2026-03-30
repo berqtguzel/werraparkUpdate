@@ -4,12 +4,15 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && vite build --ssr",
+    "build:csr": "vite build",
+    "build:ssr": "vite build --ssr",
+    "ssr:start": "php artisan inertia:start-ssr",
     "preview": "vite preview"
   },
   "dependencies": {
     "@headlessui/react": "1.7.18",
-    "@inertiajs/react": "1.2.0",
+    "@inertiajs/react": "^1.2.0",
     "@react-three/drei": "9.122.0",
     "@react-three/fiber": "8.15.16",
     "axios": "1.13.2",

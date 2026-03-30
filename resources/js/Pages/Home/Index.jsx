@@ -1,6 +1,6 @@
 import React from "react";
-import { Head } from "@inertiajs/react";
 import AppLayout from "@/Layouts/AppLayout";
+import SeoHead from "@/Components/SeoHead";
 import Hero from "@/Components/hero";
 import SplashCursor from "@/Components/SplashCursor";
 import Hotels from "@/Components/Home/Hotels";
@@ -18,7 +18,7 @@ import MapSection from "@/Components/Home/MapSection";
 export default function HomeIndex({ currentRoute = "home" }) {
     return (
         <AppLayout currentRoute={currentRoute}>
-            <Head title="Werrapark Hotel – Ihre Oase der Ruhe" />
+            <SeoHead />
             <Hero />
             <GiftVoucherPromo />
             <Hotels />

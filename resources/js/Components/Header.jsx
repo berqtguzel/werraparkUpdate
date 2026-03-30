@@ -74,7 +74,6 @@ export default function Header({ currentRoute }) {
     const branding = props?.global?.settings?.branding ?? {};
     const contact = props?.global?.settings?.contact ?? {};
 
-    console.log("Header props:", props);
     const logoLight =
         branding.logo_light ??
         branding.light_logo ??

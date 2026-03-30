@@ -1,6 +1,7 @@
 import React from "react";
-import { Head, usePage } from "@inertiajs/react";
+import { usePage } from "@inertiajs/react";
 import AppLayout from "@/Layouts/AppLayout";
+import SeoHead from "@/Components/SeoHead";
 import "../../../css/dynamic-page.css";
 
 export default function DynamicPage({ currentRoute = "page" }) {
@@ -15,7 +16,12 @@ export default function DynamicPage({ currentRoute = "page" }) {
 
     return (
         <AppLayout currentRoute={currentRoute}>
-            <Head title={`${title} – Werrapark`} />
+            <SeoHead
+                title={title}
+                description={subtitle}
+                image={heroSrc}
+                meta={page?.meta}
+            />
 
             <div className="dp-wrapper">
                 <section className="dp-hero">

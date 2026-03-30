@@ -2,10 +2,41 @@ import React, { useEffect, useState, Fragment } from "react";
 import { usePage, router } from "@inertiajs/react";
 import { Dialog, Transition } from "@headlessui/react";
 import "../../../css/contact.css";
-import { Mail, Phone, MapPin, CheckCircle } from "lucide-react";
+import { Mail, Phone, MapPin, CheckCircle, Globe } from "lucide-react";
 import { useTranslation } from "@/i18n";
+import demoTeam from "@/Data/demoData";
 
-function TeamCard({ photo, name, title, email, phone }) {
+const norm = (s = "") =>
+    String(s)
+        .normalize("NFD")
+        .replace(/\p{Diacritic}/gu, "")
+        .toLowerCase();
+
+const resolveMapEmbedUrl = (url, address) => {
+    const fallbackQuery = String(address || "").trim();
+
+    try {
+        if (url) {
+            const parsed = new URL(url);
+            const q =
+                parsed.searchParams.get("q") ||
+                parsed.searchParams.get("query") ||
+                parsed.searchParams.get("destination");
+
+            if (q) {
+                return `https://www.google.com/maps?q=${encodeURIComponent(q)}&z=15&output=embed`;
+            }
+        }
+    } catch {}
+
+    if (!fallbackQuery) return "";
+
+    return `https://www.google.com/maps?q=${encodeURIComponent(fallbackQuery)}&z=15&output=embed`;
+};
+
+function TeamCard({ photo, name, title, email, phone, website }) {
+    const { t } = useTranslation();
+
     return (
         <article className="ct-card">
             <div className="ct-card__header">
@@ -34,57 +65,22 @@ function TeamCard({ photo, name, title, email, phone }) {
                         <span>{phone}</span>
                     </a>
                 )}
+
+                {website && (
+                    <a
+                        className="ct-meta-row"
+                        href={website}
+                        target="_blank"
+                        rel="noreferrer"
+                    >
+                        <Globe size={16} />
+                        <span>{t("team.web")}</span>
+                    </a>
+                )}
             </div>
         </article>
     );
 }
-const FALLBACK_EXECUTIVES = [
-    {
-        photo: "/images/teams/sezaikoc.png",
-        name: "Sezai Koc",
-        title: "Generaldirektor des Werrapark Resorts Hotel",
-        email: "sezai.koc@werrapark.de",
-        phone: "0170 291 8717",
-    },
-    {
-        photo: "/images/teams/sezaikoc.png",
-        name: "Özgür Akkaynak",
-        title: "Operationsmanager des Werrapark Resorts Hotel",
-        email: "ozgur.akkaynak@werrapark.de",
-        phone: "0151 5909 8197",
-    },
-    {
-        photo: "/images/teams/sezaikoc.png",
-        name: "Christina Pahlahs",
-        title: "Leiterin der Personal- und Buchhaltungsabteilung des Werrapark Resorts Hotel",
-        email: "christina.pahlahs@werrapark.de",
-        phone: "03684 385 568",
-    },
-];
-
-const FALLBACK_RESERVATIONS = [
-    {
-        photo: "/images/teams/sezaikoc.png",
-        name: "Christian Steinitz",
-        title: "Hotelleiter",
-        email: "info@werrapark.de",
-        phone: "03684 93718",
-    },
-    {
-        photo: "/images/teams/sezaikoc.png",
-        name: "Christian Koch",
-        title: "Verantwortlich für Buchungen – Werrapark Resorts Sommerberg Hotel",
-        email: "info@werrapark-sommerberg.de",
-        phone: "036870 256109",
-    },
-    {
-        photo: "/images/teams/sezaikoc.png",
-        name: "Claudia Rosendahl",
-        title: "Verantwortlich für Buchungen – Werrapark Resort Heubacher Höhe Hotel",
-        email: "empfang-heubach@werrapark.de",
-        phone: "036874 93706",
-    },
-];
 
 const DEFAULT_FIELDS = [
     { name: "name", type: "text", required: true },
@@ -99,15 +95,24 @@ export default function ContactPage() {
     const [submitStatus, setSubmitStatus] = useState(null);
     const contactForms = props?.global?.contactForms ?? {};
     const settingsContact = props?.global?.settings?.contact ?? {};
+    const apiStaff = props?.global?.staff ?? [];
     const locale = props?.global?.locale ?? "de";
 
     useEffect(() => {
         if (props?.flash?.success) {
             setSubmitStatus({ type: "success", message: props.flash.success });
         }
-        const err = props?.errors?.error ?? (props?.errors && Object.values(props.errors).flat().filter(Boolean)[0]);
+        const err =
+            props?.errors?.error ??
+            (props?.errors &&
+                Object.values(props.errors).flat().filter(Boolean)[0]);
         if (err) {
-            const msg = typeof err === "string" ? err : Array.isArray(err) ? err[0] : err?.message ?? String(err);
+            const msg =
+                typeof err === "string"
+                    ? err
+                    : Array.isArray(err)
+                      ? err[0]
+                      : (err?.message ?? String(err));
             if (msg) setSubmitStatus({ type: "error", message: msg });
         }
     }, [props?.flash, props?.errors]);
@@ -120,29 +125,34 @@ export default function ContactPage() {
         return () => clearTimeout(t);
     }, [submitStatus?.type]);
 
-    const executives = (
-        contactForms.executives?.length
-            ? contactForms.executives
-            : FALLBACK_EXECUTIVES
-    ).map((p) => ({
-        photo: p.photo || "/images/teams/sezaikoc.png",
-        name: p.name,
-        title: p.title,
-        email: p.email,
-        phone: p.phone,
-    }));
+    const staffSource =
+        Array.isArray(apiStaff) && apiStaff.length ? apiStaff : demoTeam;
 
-    const reservations = (
-        contactForms.reservations?.length
-            ? contactForms.reservations
-            : FALLBACK_RESERVATIONS
-    ).map((p) => ({
-        photo: p.photo || "/images/teams/sezaikoc.png",
-        name: p.name,
-        title: p.title,
-        email: p.email,
-        phone: p.phone,
-    }));
+    let leadIdx = staffSource.findIndex((p) =>
+        norm(p.name || "").includes("sezai koc"),
+    );
+    if (leadIdx < 0) leadIdx = 0;
+
+    const orderedStaff = [
+        staffSource[leadIdx],
+        ...staffSource.filter((_, i) => i !== leadIdx),
+    ]
+        .filter(Boolean)
+        .map((p) => ({
+            photo:
+                p.photo ||
+                p.image ||
+                p.avatar ||
+                "/images/avatar-placeholder.png",
+            name: p.name,
+            title: p.title,
+            email: p.email,
+            phone: p.phone || p.tel || p.mobile,
+            website: p.website_link || p.website || p.url,
+        }));
+
+    const executives = orderedStaff.slice(0, 3);
+    const reservations = orderedStaff.slice(3);
 
     const addressStr =
         contactForms.contactInfo?.address ||
@@ -175,8 +185,14 @@ export default function ContactPage() {
             "info@werrapark.de",
         map: settingsContact.map || null,
     };
+    const mapEmbedUrl = resolveMapEmbedUrl(
+        contactInfo.map,
+        contactInfo.address,
+    );
 
-    const formFields = contactForms.formFields?.length ? contactForms.formFields : DEFAULT_FIELDS;
+    const formFields = contactForms.formFields?.length
+        ? contactForms.formFields
+        : DEFAULT_FIELDS;
     const formId = contactForms.forms?.[0]?.id ?? 1;
 
     const onSubmit = (e) => {
@@ -192,10 +208,21 @@ export default function ContactPage() {
         };
         setSubmitStatus(null);
         router.post(route("contact.store", { locale }), payload, {
-            onSuccess: () => setSubmitStatus({ type: "success", message: t("contact.success") }),
+            onSuccess: () =>
+                setSubmitStatus({
+                    type: "success",
+                    message: t("contact.success"),
+                }),
             onError: (errors) => {
-                const msg = errors?.error ?? Object.values(errors || {}).flat().filter(Boolean)[0];
-                setSubmitStatus({ type: "error", message: msg || t("contact.error") });
+                const msg =
+                    errors?.error ??
+                    Object.values(errors || {})
+                        .flat()
+                        .filter(Boolean)[0];
+                setSubmitStatus({
+                    type: "error",
+                    message: msg || t("contact.error"),
+                });
             },
         });
     };
@@ -209,27 +236,28 @@ export default function ContactPage() {
                 </header>
 
                 <section aria-labelledby="exec-title" className="ct-block">
-                    <h2 id="exec-title" className="ct-block__title">
+                    <h1 id="exec-title" className="ct-block__title">
                         {t("contact.executives")}
-                    </h2>
+                    </h1>
                     <div className="ct-grid">
                         {executives.map((p) => (
-                            <TeamCard key={p.email} {...p} />
+                            <TeamCard key={p.email || p.name} {...p} />
                         ))}
                     </div>
                 </section>
 
-                {/* Reservations team */}
-                <section aria-labelledby="res-title" className="ct-block">
-                    <h2 id="res-title" className="ct-block__title">
-                        {t("contact.reservations")}
-                    </h2>
-                    <div className="ct-grid">
-                        {reservations.map((p) => (
-                            <TeamCard key={p.email} {...p} />
-                        ))}
-                    </div>
-                </section>
+                {reservations.length > 0 ? (
+                    <section aria-labelledby="res-title" className="ct-block">
+                        <h1 id="res-title" className="ct-block__title">
+                            {t("contact.reservations")}
+                        </h1>
+                        <div className="ct-grid">
+                            {reservations.map((p) => (
+                                <TeamCard key={p.email || p.name} {...p} />
+                            ))}
+                        </div>
+                    </section>
+                ) : null}
 
                 {/* Contact panel + form */}
                 <section aria-labelledby="form-title" className="ct-panel">
@@ -260,23 +288,31 @@ export default function ContactPage() {
                             </li>
                         </ul>
 
-                        {contactInfo.map ? (
-                            <a
-                                href={contactInfo.map}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="ct-map-placeholder ct-map-placeholder--link"
+                        {mapEmbedUrl ? (
+                            <div
+                                className="ct-map-placeholder"
                                 aria-label={t("contact.mapLabel")}
                             >
                                 <div className="ct-map-inner">
-                                    <span className="ct-map-badge">
-                                        {t("contact.mapBadge")}
-                                    </span>
-                                    <p className="ct-map-text">
-                                        {t("contact.mapText")}
-                                    </p>
+                                    <iframe
+                                        src={mapEmbedUrl}
+                                        title={t("contact.mapLabel")}
+                                        className="ct-map-frame"
+                                        loading="lazy"
+                                        referrerPolicy="no-referrer-when-downgrade"
+                                    />
+                                    {contactInfo.map ? (
+                                        <a
+                                            href={contactInfo.map}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="ct-map-open"
+                                        >
+                                            {t("contact.mapBadge")}
+                                        </a>
+                                    ) : null}
                                 </div>
-                            </a>
+                            </div>
                         ) : (
                             <div
                                 className="ct-map-placeholder"
@@ -295,11 +331,18 @@ export default function ContactPage() {
                     </div>
 
                     {submitStatus?.type === "error" && (
-                        <div className="ct-form-status ct-form-status--error" role="alert">
+                        <div
+                            className="ct-form-status ct-form-status--error"
+                            role="alert"
+                        >
                             {submitStatus.message}
                         </div>
                     )}
-                    <Transition appear show={submitStatus?.type === "success"} as={Fragment}>
+                    <Transition
+                        appear
+                        show={submitStatus?.type === "success"}
+                        as={Fragment}
+                    >
                         <Dialog
                             as="div"
                             className="ct-modal"
@@ -317,7 +360,10 @@ export default function ContactPage() {
                                 leaveFrom="ct-modal__backdrop-leave-from"
                                 leaveTo="ct-modal__backdrop-leave-to"
                             >
-                                <div className="ct-modal__backdrop" aria-hidden="true" />
+                                <div
+                                    className="ct-modal__backdrop"
+                                    aria-hidden="true"
+                                />
                             </Transition.Child>
 
                             <div className="ct-modal__wrap">
@@ -333,7 +379,10 @@ export default function ContactPage() {
                                     >
                                         <Dialog.Panel className="ct-modal__panel">
                                             <div className="ct-modal__icon">
-                                                <CheckCircle size={56} strokeWidth={1.5} />
+                                                <CheckCircle
+                                                    size={56}
+                                                    strokeWidth={1.5}
+                                                />
                                             </div>
                                             <Dialog.Title className="ct-modal__title">
                                                 {t("contact.successTitle")}
@@ -360,13 +409,23 @@ export default function ContactPage() {
                     <form className="ct-form" onSubmit={onSubmit} noValidate>
                         {formFields.map((field) => {
                             const labelKey = `contact.${field.name}`;
-                            const labelText = t(labelKey) !== labelKey ? t(labelKey) : field.label ?? field.name;
+                            const labelText =
+                                t(labelKey) !== labelKey
+                                    ? t(labelKey)
+                                    : (field.label ?? field.name);
                             const placeholderKey = `contact.${field.name}Placeholder`;
-                            const placeholderText = t(placeholderKey) !== placeholderKey ? t(placeholderKey) : field.placeholder ?? "";
+                            const placeholderText =
+                                t(placeholderKey) !== placeholderKey
+                                    ? t(placeholderKey)
+                                    : (field.placeholder ?? "");
                             return (
                                 <div
                                     key={field.name}
-                                    className={field.type === "textarea" ? "ct-field ct-field--full" : "ct-field"}
+                                    className={
+                                        field.type === "textarea"
+                                            ? "ct-field ct-field--full"
+                                            : "ct-field"
+                                    }
                                 >
                                     <label htmlFor={field.name}>
                                         {labelText}
@@ -377,7 +436,10 @@ export default function ContactPage() {
                                             id={field.name}
                                             name={field.name}
                                             rows="6"
-                                            placeholder={placeholderText || t("contact.messagePlaceholder")}
+                                            placeholder={
+                                                placeholderText ||
+                                                t("contact.messagePlaceholder")
+                                            }
                                             required={field.required}
                                         />
                                     ) : (
@@ -385,7 +447,12 @@ export default function ContactPage() {
                                             id={field.name}
                                             name={field.name}
                                             type={field.type || "text"}
-                                            placeholder={placeholderText || (field.name === "phone" ? "+49 …" : "")}
+                                            placeholder={
+                                                placeholderText ||
+                                                (field.name === "phone"
+                                                    ? "+49 …"
+                                                    : "")
+                                            }
                                             required={field.required}
                                         />
                                     )}

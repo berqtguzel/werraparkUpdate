@@ -1,13 +1,18 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Header from "@/Components/Header";
 import Footer from "@/Components/Footer";
 import CookieConsent from "@/Components/CookieConsent";
 import WhatsAppWidget from "@/Components/WhatsAppWidget";
 import { ThemeProvider } from "@/Context/ThemeContext";
 import TargetCursor from "@/Components/ReactBits/Animations/TargetCursor";
-import SplashCursor from "@/Components/ReactBits/Animations/SplashCursor";
 
 export default function AppLayout({ children, currentRoute }) {
+    const [isClient, setIsClient] = useState(false);
+
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
+
     return (
         <ThemeProvider>
             <div
@@ -17,13 +22,15 @@ export default function AppLayout({ children, currentRoute }) {
                     flexDirection: "column",
                 }}
             >
-                <TargetCursor
-                    targetSelector="a, button, [role='button'], input, textarea, select, summary, .cursor-target"
-                    spinDuration={2.2}
-                    hoverDuration={0.22}
-                    parallaxOn
-                    hideDefaultCursor
-                />
+                {isClient ? (
+                    <TargetCursor
+                        targetSelector="a, button, [role='button'], input, textarea, select, summary, .cursor-target"
+                        spinDuration={2.2}
+                        hoverDuration={0.22}
+                        parallaxOn
+                        hideDefaultCursor
+                    />
+                ) : null}
                 <Header currentRoute={currentRoute} />
 
                 <main

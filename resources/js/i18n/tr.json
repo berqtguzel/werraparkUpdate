@@ -101,6 +101,7 @@
     "roomDetail.imageN": "Görsel {{n}}",
 
     "hotelDetail.eyebrow": "Otellerimiz",
+    "hotelDetail.descriptionTitle": "Otel Hakkında",
     "hotelDetail.roomHighlights": "Oda Özellikleri",
     "hotelDetail.amenities": "Donanım & Hizmetler",
     "hotelDetail.activities": "Aktiviteler",
@@ -108,6 +109,7 @@
     "hotelDetail.requestText": "Bu otelle ilgileniyor musunuz? Bize yazın, müsaitlik, oda tipleri ve teklifler hakkında size danışmanlık yapalım.",
     "hotelDetail.idealFor": "İdeal:",
     "hotelDetail.contactBtn": "İletişime Geç",
+    "hotelDetail.websiteBtn": "Web sitesini ziyaret et",
     "hotelDetail.homeBtn": "Ana Sayfaya Dön",
     "reviews.sectionAria": "Otel yorumlari",
     "reviews.eyebrow": "Misafir yorumlari",

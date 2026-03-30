@@ -1,7 +1,7 @@
 import React from "react";
-import { Head } from "@inertiajs/react";
 import AppLayout from "@/Layouts/AppLayout";
 import GiftVoucherForm from "@/Components/GiftVoucher/GiftVoucherForm";
+import SeoHead from "@/Components/SeoHead";
 import { useTranslation } from "@/i18n";
 import "@/../css/gift-voucher-page.css";
 
@@ -70,7 +70,10 @@ export default function CheckoutPaypal({
 
     return (
         <AppLayout currentRoute={currentRoute}>
-            <Head title={`${t("giftVoucher.pageTitle")} - PayPal`} />
+            <SeoHead
+                title={`${t("giftVoucher.pageTitle")} - PayPal`}
+                description={t("giftVoucher.heroSubtitle")}
+            />
             <GiftVoucherForm
                 locale={locale}
                 methodTitle="PayPal"

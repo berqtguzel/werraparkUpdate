@@ -1,5 +1,5 @@
 import React from "react";
-import { Head, usePage } from "@inertiajs/react";
+import { usePage } from "@inertiajs/react";
 import {
     BedDouble,
     CheckCircle2,
@@ -14,6 +14,7 @@ import {
     Users,
 } from "lucide-react";
 import AppLayout from "@/Layouts/AppLayout";
+import SeoHead from "@/Components/SeoHead";
 import { useTranslation } from "@/i18n";
 import "@/../css/room-detail.css";
 
@@ -172,7 +173,7 @@ export default function RoomShow() {
     if (!data) {
         return (
             <AppLayout currentRoute="rooms">
-                <Head title="Room Not Found" />
+                <SeoHead title="Room Not Found" noIndex />
                 <section
                     className="rux-wrap"
                     style={{ textAlign: "center", padding: "120px 20px" }}
@@ -192,7 +193,11 @@ export default function RoomShow() {
 
     return (
         <AppLayout currentRoute="rooms">
-            <Head title={t("roomDetail.pageTitle", { name: data.name })} />
+            <SeoHead
+                title={t("roomDetail.pageTitle", { name: data.name })}
+                description={data.description}
+                image={data.heroImage}
+            />
 
             <section className="rux-wrap" aria-labelledby="rux-title">
                 <div className="rux-grid">

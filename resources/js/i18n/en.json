@@ -101,6 +101,7 @@
     "roomDetail.imageN": "Image {{n}}",
 
     "hotelDetail.eyebrow": "Our Hotels",
+    "hotelDetail.descriptionTitle": "About the Hotel",
     "hotelDetail.roomHighlights": "Room Highlights",
     "hotelDetail.amenities": "Amenities & Services",
     "hotelDetail.activities": "Activities",
@@ -108,6 +109,7 @@
     "hotelDetail.requestText": "Interested in this hotel? Get in touch and we'll advise you on availability, room types and offers.",
     "hotelDetail.idealFor": "Ideal for:",
     "hotelDetail.contactBtn": "Contact Us",
+    "hotelDetail.websiteBtn": "Visit website",
     "hotelDetail.homeBtn": "Back to Home",
     "reviews.sectionAria": "Hotel reviews",
     "reviews.eyebrow": "Guest reviews",

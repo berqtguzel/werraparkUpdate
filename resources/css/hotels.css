@@ -66,6 +66,7 @@
     gap: clamp(14px, 2vw, 24px);
     grid-template-columns: repeat(5, minmax(0, 1fr)); /* desktop 5 */
     align-items: stretch;
+    grid-auto-rows: 1fr;
 }
 
 @media (max-width: 1400px) {
@@ -113,6 +114,7 @@
     display: flex;
     flex-direction: column;
     height: 100%;
+    min-height: 100%;
     will-change: transform;
 }
 .hotel-card--clickable {
@@ -146,16 +148,22 @@
     padding: 18px;
     display: grid;
     gap: 10px;
-    grid-auto-rows: max-content;
+    grid-template-rows: minmax(54px, auto) 22px minmax(92px, auto) auto;
+    flex: 1;
+    align-content: start;
 }
 .hotel-body h3 {
     font-family: var(--font-serif);
-    font-size: var(--text-lg);
+    font-size: 0.88rem;
     font-weight: var(--font-extrabold);
     line-height: var(--leading-snug);
     color: var(--hotel-text);
     text-align: center;
-    margin-bottom: 2px;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 .hotel-tagline {
     font-family: var(--font-sans);
@@ -180,33 +188,44 @@
 }
 
 .hotel-contact {
-    margin-top: auto;
     display: grid;
     gap: 8px;
+    align-content: start;
 }
 .hotel-link {
     display: inline-flex;
     align-items: center;
     gap: 8px;
+    min-height: 40px;
+    width: 100%;
+    padding: 0 12px;
+    border-radius: 12px;
+    border: 1px solid var(--hotel-card-border);
+    background: rgba(255, 255, 255, 0.44);
     font-family: var(--font-sans);
     font-size: var(--text-xs);
     color: var(--hotel-text);
     text-decoration: none;
     transition:
         color 0.2s ease,
-        transform 0.15s ease;
+        transform 0.15s ease,
+        background-color 0.2s ease,
+        border-color 0.2s ease;
     overflow-wrap: anywhere;
 }
 .hotel-link:hover {
     color: var(--hotel-green);
     transform: translateY(-1px);
+    background: rgba(255, 255, 255, 0.7);
+    border-color: rgba(31, 129, 85, 0.22);
 }
 
 .hotel-detail-btn {
-    margin-top: 8px;
+    margin-top: auto;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    width: 100%;
     font-family: var(--font-sans);
     font-size: var(--text-sm);
     font-weight: var(--font-bold);
@@ -249,6 +268,7 @@
 @media (max-width: 520px) {
     .hotel-body {
         padding: 16px;
+        grid-template-rows: minmax(48px, auto) 22px minmax(84px, auto) auto;
     }
 }
 

@@ -48,7 +48,9 @@ function CardInfo({ name, title, email, phone, website }) {
                         aria-label={t("team.call")}
                     >
                         <Phone size={14} strokeWidth={2} />
-                        <span>{phone}</span>
+                        <span className="tg-chip__text tg-chip__text--phone">
+                            {phone}
+                        </span>
                     </a>
                 )}
 
@@ -59,7 +61,7 @@ function CardInfo({ name, title, email, phone, website }) {
                         aria-label={t("team.email")}
                     >
                         <Mail size={14} strokeWidth={2} />
-                        <span>{t("team.email")}</span>
+                        <span className="tg-chip__text">{t("team.email")}</span>
                     </a>
                 )}
 
@@ -71,7 +73,7 @@ function CardInfo({ name, title, email, phone, website }) {
                         rel="noreferrer"
                     >
                         <Globe size={14} strokeWidth={2} />
-                        <span>{t("team.web")}</span>
+                        <span className="tg-chip__text">{t("team.web")}</span>
                     </a>
                 )}
             </div>

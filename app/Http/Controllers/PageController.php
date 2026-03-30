@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\ApiHealthService;
 use App\Services\PageService;
 use Illuminate\Support\Facades\Cache;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Inertia\Inertia;
 
 class PageController extends Controller
@@ -21,18 +22,16 @@ class PageController extends Controller
         $cacheKey = "dynamic_page:{$locale}:{$slug}";
 
         $pageData = Cache::remember($cacheKey, now()->addDays(7), function () use ($locale, $slug) {
-            $pageData = null;
-
             if ($this->apiHealth->isAvailable()) {
-                $pageData = $this->pageService->getPage($slug, $locale);
+                return $this->pageService->getPage($slug, $locale);
             }
 
-            if (!$pageData) {
-                $pageData = $this->getFallbackPage($slug, $locale);
-            }
-
-            return $pageData;
+            return $this->getFallbackPage($slug, $locale);
         });
+
+        if (! $pageData) {
+            throw new NotFoundHttpException();
+        }
 
         return Inertia::render('Dynamic/Page', [
             'page' => $pageData,
@@ -40,7 +39,7 @@ class PageController extends Controller
         ]);
     }
 
-    private function getFallbackPage(string $slug, string $locale): array
+    private function getFallbackPage(string $slug, string $locale): ?array
     {
         $pages = [
             'historie' => [
@@ -65,12 +64,11 @@ class PageController extends Controller
             ],
         ];
 
-        $data = $pages[$slug] ?? [
-            'title' => ucfirst($slug),
-            'content' => $locale === 'en'
-                ? '<p>Demo page. Content will be added.</p>'
-                : '<p>Demo sayfa. İçerik daha sonra eklenecek.</p>',
-        ];
+        $data = $pages[$slug] ?? null;
+
+        if (! $data) {
+            return null;
+        }
 
         return array_merge($data, [
             'slug' => $slug,

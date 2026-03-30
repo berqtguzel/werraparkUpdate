@@ -16,6 +16,7 @@ use App\Services\ReviewsService;
 use App\Services\ContactFormsService;
 use App\Services\SliderService;
 use App\Services\HotelService; // 1. Servisi buraya import ettik
+use App\Services\HolidayThemeService;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -32,6 +33,7 @@ class HandleInertiaRequests extends Middleware
         private ContactFormsService $contactFormsService,
         private SliderService $sliderService,
         private HotelService $hotelService, // 2. Constructor'a inject ettik
+        private HolidayThemeService $holidayThemeService,
     ) {}
 
     public function version(Request $request): ?string
@@ -44,6 +46,8 @@ class HandleInertiaRequests extends Middleware
         $locale = $request->route('locale') ?? 'de';
         $health = $this->apiHealthService->check();
         $apiUp = $health['success'] ?? false;
+        $holidayThemes = $apiUp ? $this->holidayThemeService->getThemes($locale) : [];
+        $themeGroups = $this->holidayThemeService->splitThemesByFile($holidayThemes);
 
         return array_merge(parent::share($request), [
             'flash' => [
@@ -59,6 +63,9 @@ class HandleInertiaRequests extends Middleware
                 'menu'      => $apiUp ? $this->menuService->getMenu($locale) : [],
                 // 3. Otelleri buraya ekledik
                 'hotels'    => $apiUp ? $this->hotelService->getHotels() : [],
+                'holidayThemes' => $holidayThemes,
+                'offerThemes' => $themeGroups['offers'],
+                'travelThemes' => $themeGroups['travelThemes'],
                 'widgets'   => $apiUp ? $this->widgetService->getWidgets($locale) : [
                     'ratings' => [],
                     'whatsapp' => [],

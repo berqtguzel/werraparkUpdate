@@ -1,34 +1,87 @@
 import React from "react";
-import { Head, usePage } from "@inertiajs/react";
+import { usePage } from "@inertiajs/react";
 import AppLayout from "@/Layouts/AppLayout";
-import OFFERS from "@/Data/OffersData";
+import SeoHead from "@/Components/SeoHead";
+import HOLIDAY_THEMES from "@/Data/holidayThemesData";
 import { useTranslation } from "@/i18n";
 import "@/../css/offer-detail.css";
 
-const OFFER_MAP = OFFERS.reduce((acc, o) => {
-    acc[o.id] = o;
-    return acc;
-}, {});
+const buildHighlights = (description = "", fallbackTitle = "") => {
+    const parts = String(description)
+        .split(/[\r\n]+|(?<=[.!?])\s+/)
+        .map((item) => item.trim())
+        .filter(Boolean);
+
+    if (parts.length) {
+        return parts.slice(0, 4);
+    }
+
+    if (fallbackTitle) {
+        return [fallbackTitle];
+    }
+
+    return ["Werrapark offer"];
+};
 
 export default function OfferShow({ offer: offerId }) {
     const { props } = usePage();
-    const locale = props?.locale ?? "de";
+    const locale = props?.locale ?? props?.global?.locale ?? "de";
     const { t } = useTranslation();
-    const base = OFFER_MAP[offerId] ?? OFFERS[0];
+    const offers = props?.global?.holidayThemes?.length
+        ? props.global.holidayThemes
+        : HOLIDAY_THEMES;
+    const base =
+        offers.find((item) => {
+            const slug = item.slug || item.id;
+            return (
+                String(item.id) === String(offerId) || slug === String(offerId)
+            );
+        }) ?? offers[0];
 
-    const title = base.subtitle
-        ? `${base.title} – ${base.subtitle}`
-        : base.title;
+    const title = base?.name || "";
+    const intro = base?.description || t("offerDetail.intro");
+    const highlights = buildHighlights(base?.description, base?.name);
+    const file = base?.file || null;
+    const pdfSectionTitle =
+        locale === "tr"
+            ? "PDF Dokumani"
+            : locale === "en"
+              ? "PDF Document"
+              : "PDF Dokument";
+    const pdfSectionText =
+        locale === "tr"
+            ? "Bu teklif ile ilgili PDF dosyasini dogrudan burada acabilir veya yeni sekmede goruntuleyebilirsiniz."
+            : locale === "en"
+              ? "Open the PDF related to this offer directly here or view it in a new tab."
+              : "Sie können das zu diesem Angebot gehörende PDF direkt hier öffnen oder in einem neuen Tab ansehen.";
+    const pdfOpenLabel =
+        locale === "tr"
+            ? "PDF ac"
+            : locale === "en"
+              ? "Open PDF"
+              : "PDF öffnen";
+    const pdfDownloadLabel =
+        locale === "tr"
+            ? "PDF indir"
+            : locale === "en"
+              ? "Download PDF"
+              : "PDF herunterladen";
+    const pdfButtonHint =
+        locale === "tr"
+            ? "Teklifi yeni sekmede tam ekran olarak goruntuleyin."
+            : locale === "en"
+              ? "View the offer as a full PDF in a new tab."
+              : "Angebot als PDF in einem neuen Tab ansehen.";
 
     return (
         <AppLayout currentRoute="offers">
-            <Head title={title} />
+            <SeoHead title={title} description={intro} image={base?.image} />
             <section className="of-wrap" aria-labelledby="offer-title">
                 <div className="of-hero">
                     <div className="of-hero-inner">
                         <img
                             src={base.image}
-                            alt={base.alt || base.title}
+                            alt={title}
                             className="of-hero-bg"
                             loading="lazy"
                             decoding="async"
@@ -37,14 +90,13 @@ export default function OfferShow({ offer: offerId }) {
                         <div className="of-hero-layout">
                             <div className="of-hero-copy">
                                 <p className="of-eyebrow">
-                                    {t("offerDetail.eyebrow")} • Werrapark Resort
+                                    {t("offerDetail.eyebrow")} • Werrapark
+                                    Resort
                                 </p>
                                 <h1 id="offer-title" className="of-title">
                                     {title}
                                 </h1>
-                                <p className="of-intro">
-                                    {t("offerDetail.intro")}
-                                </p>
+                                <p className="of-intro">{intro}</p>
                             </div>
 
                             <div className="of-hero-badge" aria-hidden="true">
@@ -63,15 +115,54 @@ export default function OfferShow({ offer: offerId }) {
                                 {t("offerDetail.servicesTitle")}
                             </h2>
                             <ul className="of-list">
-                                <li>{t("offerDetail.service1")}</li>
-                                <li>{t("offerDetail.service2")}</li>
-                                <li>{t("offerDetail.service3")}</li>
-                                <li>{t("offerDetail.service4")}</li>
+                                {highlights.map((item, index) => (
+                                    <li key={index}>{item}</li>
+                                ))}
                             </ul>
                         </div>
+                        {file ? (
+                            <div className="of-card of-card--pdf">
+                                <div className="of-pdf-head">
+                                    <div>
+                                        <h2 className="of-card-title">
+                                            {pdfSectionTitle}
+                                        </h2>
+                                        <p className="of-text">
+                                            {pdfSectionText}
+                                        </p>
+                                    </div>
+                                    <div className="of-pdf-actions">
+                                        <a
+                                            href={file}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="of-pdf-cta"
+                                        >
+                                            <span className="of-pdf-cta-copy">
+                                                <span className="of-pdf-cta-title">
+                                                    {pdfOpenLabel}
+                                                </span>
+                                                <span className="of-pdf-cta-text">
+                                                    {pdfButtonHint}
+                                                </span>
+                                            </span>
+                                            <span
+                                                className="of-pdf-cta-arrow"
+                                                aria-hidden="true"
+                                            >
+                                                PDF
+                                            </span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        ) : null}
                     </article>
 
-                    <aside className="of-aside" aria-label={t("offerDetail.priceTitle")}>
+                    <aside
+                        className="of-aside"
+                        aria-label={t("offerDetail.priceTitle")}
+                    >
                         <div className="of-aside-card">
                             <h2 className="of-aside-title">
                                 {t("offerDetail.priceTitle")}
@@ -86,12 +177,16 @@ export default function OfferShow({ offer: offerId }) {
                                 >
                                     {t("offerDetail.requestBtn")}
                                 </a>
-                                <a
-                                    href="/"
-                                    className="of-btn of-btn--ghost"
-                                >
-                                    {t("offerDetail.moreOffersBtn")}
-                                </a>
+                                {file ? (
+                                    <a
+                                        href={file}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="of-btn of-btn--ghost"
+                                    >
+                                        {t("offerDetail.moreOffersBtn")}
+                                    </a>
+                                ) : null}
                             </div>
                         </div>
                     </aside>

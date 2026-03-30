@@ -8,11 +8,8 @@ import { ThemeProvider } from "./Context/ThemeContext";
 import { I18nProvider } from "./i18n";
 import PageTransitionLoader from "./Components/PageTransitionLoader";
 
-const appName =
-    window.document.getElementsByTagName("title")[0]?.innerText || "Laravel";
-
 createInertiaApp({
-    title: (title) => `${title} - ${appName}`,
+    title: (title) => title || "Werrapark",
 
     resolve: (name) => {
         const pages = import.meta.glob("./Pages/**/*.{jsx,tsx}", {

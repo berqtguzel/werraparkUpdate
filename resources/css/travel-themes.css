@@ -49,7 +49,7 @@ body[data-theme="dark"] .tt3-wrap,
 }
 
 .tt3-header {
-    max-width: 1200px;
+    max-width: 1600px;
     margin: 0 auto;
     padding: 48px 20px 26px;
     display: grid;
@@ -64,10 +64,34 @@ body[data-theme="dark"] .tt3-wrap,
 }
 
 .tt3-head-text {
-    align-self: center;
+    align-self: stretch;
+    display: grid;
+    align-content: center;
+    gap: 10px;
+    min-height: 100%;
+    padding: 26px 24px;
+    border-radius: 22px;
+    background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.94),
+        rgba(255, 255, 255, 0.84)
+    );
+    border: 1px solid var(--tt3-border);
+    box-shadow: var(--tt3-shadow);
+}
+
+html[data-theme="dark"] .tt3-head-text,
+.dark .tt3-head-text {
+    background: radial-gradient(
+        circle at 0 0,
+        rgba(25, 191, 115, 0.15),
+        rgba(9, 17, 14, 0.95)
+    );
 }
 .tt3-eyebrow {
     display: inline-block;
+    justify-self: start;
+    width: fit-content;
     font-size: 12px;
     letter-spacing: 0.25em;
     text-transform: uppercase;
@@ -154,11 +178,8 @@ html[data-theme="dark"] .tt3-btn--ghost {
     border-radius: 20px;
     overflow: hidden;
     display: grid;
-    grid-template-areas:
-        "xl xl md1"
-        "xl xl tall";
-    grid-template-columns: 1fr 1fr 0.9fr;
-    grid-template-rows: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: minmax(180px, 1fr);
     gap: 10px;
     background: var(--tt3-surface);
     border: 1px solid var(--tt3-border);
@@ -171,6 +192,7 @@ html[data-theme="dark"] .tt3-btn--ghost {
     overflow: hidden;
     display: block;
     isolation: isolate;
+    min-height: 180px;
 }
 .tt3-mosaic-item img {
     position: absolute;
@@ -188,11 +210,9 @@ html[data-theme="dark"] .tt3-btn--ghost {
     transform: scale(1.06);
     filter: saturate(1) contrast(1);
 }
-.tt3-mosaic--xl {
-    grid-area: xl;
-}
+.tt3-mosaic--xl,
 .tt3-mosaic--tall {
-    grid-area: tall;
+    grid-area: auto;
 }
 
 .tt3-mosaic-overlay {
@@ -216,16 +236,19 @@ html[data-theme="dark"] .tt3-btn--ghost {
 .tt3-mosaic-overlay span {
     font-size: 13px;
     opacity: 0.95;
+    color: white;
 }
 
 .tt3-grid {
-    --col: 3;
-    max-width: 1200px;
+    --col: 4;
+    max-width: 1600px;
     margin: 18px auto 0;
     padding: 0 20px;
     display: grid;
     grid-template-columns: repeat(var(--col), minmax(0, 1fr));
     gap: 22px;
+    align-items: stretch;
+    padding-bottom: 1.5rem;
 }
 @media (max-width: 1100px) {
     .tt3-grid {
@@ -247,9 +270,9 @@ html[data-theme="dark"] .tt3-btn--ghost {
     position: relative;
     border-radius: 18px;
     overflow: hidden;
+    height: 100%;
     background: var(--tt3-surface);
     border: 1px solid var(--tt3-border);
-    margin-bottom: 10px;
     box-shadow: var(--tt3-shadow);
     display: grid;
     grid-template-rows: auto 1fr;
@@ -313,10 +336,12 @@ html[data-theme="dark"] .tt3-btn--ghost {
 }
 
 .tt3-card-body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: flex-start;
     padding: 16px 16px 14px;
-    display: grid;
     gap: 10px;
-    align-content: start;
 }
 .tt3-card-title {
     margin: 0;
@@ -325,40 +350,64 @@ html[data-theme="dark"] .tt3-btn--ghost {
     text-transform: uppercase;
     font-size: clamp(16px, 2vw, 18px);
     color: var(--tt3-text);
+    min-height: calc(2 * 1.35em);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 .tt3-card-excerpt {
     color: var(--tt3-muted);
     line-height: 1.6;
     margin: 0;
+    min-height: calc(3 * 1.6em);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .tt3-card-actions {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
-    align-items: center;
-    flex-wrap: wrap;
+    align-items: stretch;
+    margin-top: auto;
+    padding-top: 6px;
 }
 .tt3-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 38px;
     color: var(--tt3-text);
     text-decoration: none;
     font-weight: 800;
-    border-bottom: 1px dashed rgba(25, 191, 115, 0.5);
-    padding-bottom: 2px;
+    padding: 8px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--tt3-border);
+    background: rgba(255, 255, 255, 0.58);
     transition:
         color 0.18s ease,
-        border-color 0.18s ease;
+        border-color 0.18s ease,
+        background 0.18s ease,
+        transform 0.18s ease;
 }
 .tt3-link:hover {
     color: var(--brand-2);
-    border-color: rgba(25, 191, 115, 0.9);
+    border-color: rgba(25, 191, 115, 0.52);
+    background: rgba(25, 191, 115, 0.08);
+    transform: translateY(-1px);
 }
 
 .tt3-chip {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
+    min-height: 36px;
     padding: 8px 12px;
-    border-radius: 999px;
+    border-radius: 12px;
     text-decoration: none;
     color: var(--tt3-text);
     background: linear-gradient(
@@ -377,6 +426,28 @@ html[data-theme="dark"] .tt3-btn--ghost {
     transform: translateY(-1px);
     border-color: rgba(25, 191, 115, 0.55);
     box-shadow: 0 0 0 4px rgba(25, 191, 115, 0.28);
+}
+
+@media (max-width: 620px) {
+    .tt3-card-actions {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .tt3-link,
+    .tt3-chip {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .tt3-head-text {
+        padding: 22px 18px;
+    }
+
+    .tt3-head-mosaic {
+        grid-template-columns: minmax(0, 1fr);
+        grid-auto-rows: minmax(170px, 1fr);
+    }
 }
 
 /* ---- Scroll-reveal animasyonları ---- */

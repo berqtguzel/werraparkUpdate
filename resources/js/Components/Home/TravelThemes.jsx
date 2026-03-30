@@ -34,56 +34,7 @@ function useReveal(threshold = 0.15) {
     return [ref, visible];
 }
 
-const THEMES = [
-    {
-        id: "wellness",
-        title: "Erholungshotel",
-        excerpt:
-            "Natur, Ruhe und Genuss vereint – Auszeit mit kurzen Wegen zu Pool, Sauna und Kulinarik.",
-        image: "/images/template3.png",
-        href: "#",
-    },
-    {
-        id: "biker",
-        title: "Motorradtour",
-        excerpt:
-            "Kurvige Landstraßen, herrliche Aussichten – perfekte Routen im Thüringer Wald.",
-        image: "/images/template3.png",
-        href: "#",
-    },
-    {
-        id: "massage",
-        title: "Massage",
-        excerpt: "Klassische, Hot-Stone & Anwendungen für tiefes Wohlbefinden.",
-        image: "/images/template3.png",
-        href: "#",
-    },
-    {
-        id: "catering",
-        title: "Catering",
-        excerpt:
-            "Anlassbezogene, frische Menüs – maßgeschneidert für kleine & große Feiern.",
-        image: "/images/template3.png",
-        href: "#",
-    },
-    {
-        id: "wedding",
-        title: "Hochzeitssaal",
-        excerpt: "Elegantes Ambiente, flexible Bestuhlung & Rundum-Service.",
-        image: "/images/template3.png",
-        href: "#",
-    },
-    {
-        id: "camp",
-        title: "Fußballcamp",
-        excerpt: "Training, Spaß und Teamgefühl für fußballbegeisterte Kids.",
-        image: "/images/template3.png",
-        href: "#",
-    },
-];
-
-export default function TravelThemes({ items = THEMES }) {
-    const [feature, ...rest] = items;
+export default function TravelThemes({ items }) {
     const [mounted, setMounted] = React.useState(false);
     React.useEffect(() => setMounted(true), []);
 
@@ -91,7 +42,11 @@ export default function TravelThemes({ items = THEMES }) {
     const [gridRef, gridVisible] = useReveal(0.08);
 
     const { props } = usePage();
-    const locale = props?.locale ?? "de";
+    const locale = props?.global?.locale ?? props?.locale ?? "de";
+    const sourceItems = items?.length
+        ? items
+        : (props?.global?.travelThemes ?? []);
+    const [feature, ...rest] = sourceItems;
     const { t } = useTranslation();
 
     return (
@@ -116,24 +71,35 @@ export default function TravelThemes({ items = THEMES }) {
                 </React.Suspense>
             )}
 
-            {/* ÜST ŞERİT: solda metin, sağda mozaik vitrin */}
             <div
                 ref={headerRef}
                 className={`tt3-header ${headerVisible ? "tt3-revealed" : "tt3-hidden"}`}
             >
                 <div className="tt3-head-text">
-                    <span className="eyebrow">{t("themes.eyebrow")}</span>
+                    <span className="tt3-eyebrow">{t("themes.eyebrow")}</span>
                     <h1 className="tt3-title">{t("themes.title")}</h1>
                     <p className="tt3-desc">{t("themes.description")}</p>
 
                     <div className="tt3-cta">
                         <a
                             className="tt3-btn tt3-btn--primary"
-                            href={`/${locale}/urlaubsthemen`}
+                            href={
+                                feature
+                                    ? `/${locale}/urlaubsthemen/${feature.slug || feature.id}`
+                                    : "#"
+                            }
                         >
                             {t("themes.allThemes")}
                         </a>
-                        <a className="tt3-btn tt3-btn--ghost" href="/offers">
+                        <a
+                            className="tt3-btn tt3-btn--ghost"
+                            href={
+                                feature?.file ||
+                                (feature
+                                    ? `/${locale}/urlaubsthemen/${feature.slug || feature.id}`
+                                    : "#")
+                            }
+                        >
                             {t("themes.bestPrice")}
                         </a>
                     </div>
@@ -145,31 +111,31 @@ export default function TravelThemes({ items = THEMES }) {
                         className="tt3-mosaic-item tt3-mosaic--xl"
                         href={
                             feature
-                                ? `/${locale}/urlaubsthemen/${feature.id}`
-                                : `/${locale}/urlaubsthemen`
+                                ? `/${locale}/urlaubsthemen/${feature.slug || feature.id}`
+                                : "#"
                         }
                         tabIndex={-1}
                     >
                         <img src={feature?.image} alt="" />
                         <div className="tt3-mosaic-overlay">
-                            <strong>{feature?.title}</strong>
+                            <strong>{feature?.name}</strong>
                             <span>{feature?.excerpt}</span>
                         </div>
                     </Link>
 
                     {/* İki orta, bir dar görsel */}
-                    {rest.slice(0, 3).map((t, i) => (
+                    {rest.slice(0, 3).map((theme, i) => (
                         <Link
-                            key={t.id}
+                            key={theme.id}
                             className={`tt3-mosaic-item ${
                                 i === 2 ? "tt3-mosaic--tall" : ""
                             }`}
-                            href={`/${locale}/urlaubsthemen/${t.id}`}
+                            href={`/${locale}/urlaubsthemen/${theme.slug || theme.id}`}
                             tabIndex={-1}
                         >
-                            <img src={t.image} alt="" />
+                            <img src={theme.image} alt="" />
                             <div className="tt3-mosaic-overlay">
-                                <strong>{t.title}</strong>
+                                <strong>{theme.name}</strong>
                             </div>
                         </Link>
                     ))}
@@ -182,7 +148,7 @@ export default function TravelThemes({ items = THEMES }) {
                 className={`tt3-grid ${gridVisible ? "tt3-revealed" : "tt3-hidden"}`}
                 role="list"
             >
-                {items.map((theme, idx) => (
+                {sourceItems.map((theme, idx) => (
                     <article
                         key={theme.id}
                         className="tt3-card tt3-card-anim"
@@ -192,7 +158,7 @@ export default function TravelThemes({ items = THEMES }) {
                         <div className="tt3-card-media">
                             <img
                                 src={theme.image}
-                                alt={theme.title}
+                                alt={theme.name}
                                 loading="lazy"
                                 decoding="async"
                             />
@@ -203,20 +169,20 @@ export default function TravelThemes({ items = THEMES }) {
                         </div>
 
                         <div className="tt3-card-body">
-                            <h3 className="tt3-card-title">{theme.title}</h3>
+                            <h3 className="tt3-card-title">{theme.name}</h3>
                             <p className="tt3-card-excerpt">{theme.excerpt}</p>
                             <div className="tt3-card-actions">
                                 <Link
                                     className="tt3-link"
-                                    href={`/${locale}/urlaubsthemen/${theme.id}`}
-                                    aria-label={`${theme.title} – ${t("themes.readMore")}`}
+                                    href={`/${locale}/urlaubsthemen/${theme.slug || theme.id}`}
+                                    aria-label={`${theme.name} – ${t("themes.readMore")}`}
                                 >
                                     {t("themes.readMore")}
                                 </Link>
                                 <Link
                                     className="tt3-chip"
-                                    href={`/${locale}/urlaubsthemen/${theme.id}`}
-                                    aria-label={`${theme.title} – ${t("themes.discover")}`}
+                                    href={`/${locale}/urlaubsthemen/${theme.slug || theme.id}`}
+                                    aria-label={`${theme.name} – ${t("themes.discover")}`}
                                 >
                                     {t("themes.discover")}
                                 </Link>

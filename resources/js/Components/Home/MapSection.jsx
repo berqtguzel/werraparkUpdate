@@ -1,20 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { usePage } from "@inertiajs/react";
 import { useTranslation } from "@/i18n";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
 import "../../../css/map-section.css";
-
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-    iconRetinaUrl:
-        "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
-    iconUrl:
-        "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
-    shadowUrl:
-        "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
-});
 
 const WERRAPARK_POSITION = [50.5167, 10.7833];
 const GERMANY_CENTER = [51.1657, 10.4515];
@@ -55,6 +42,7 @@ export default function MapSection({
     const { t } = useTranslation();
     const { props } = usePage();
     const [isClient, setIsClient] = useState(false);
+    const [MapSectionClient, setMapSectionClient] = useState(null);
 
     const contactData = useMemo(() => {
         const contact = props?.global?.settings?.contact;
@@ -97,7 +85,23 @@ export default function MapSection({
         setIsClient(true);
     }, []);
 
-    if (!isClient) {
+    useEffect(() => {
+        if (!isClient) return;
+
+        let isMounted = true;
+
+        import("./MapSectionClient").then((module) => {
+            if (isMounted) {
+                setMapSectionClient(() => module.default);
+            }
+        });
+
+        return () => {
+            isMounted = false;
+        };
+    }, [isClient]);
+
+    if (!isClient || !MapSectionClient) {
         return (
             <section className="mp-section" aria-label={t("map.openMap")}>
                 <div className="mp-placeholder">
@@ -111,59 +115,16 @@ export default function MapSection({
     }
 
     return (
-        <section className="mp-section" aria-label={t("map.openMap")}>
-            <div className="mp-header">
-                <span className="eyebrow">{t("map.eyebrow")}</span>
-                <h1 className="mp-title">{titleResolved}</h1>
-                <p className="mp-subtitle">{subtitleResolved}</p>
-                <a
-                    className="mp-map-link"
-                    href={mapHref}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    {t("map.openMap")}
-                </a>
-            </div>
-
-            <div className="mp-map-wrap">
-                <MapContainer
-                    center={markerPosition}
-                    zoom={DEFAULT_ZOOM}
-                    className="mp-map"
-                    scrollWheelZoom={true}
-                    zoomControl={true}
-                >
-                    <TileLayer
-                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                        url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-                    />
-                    <Marker position={markerPosition}>
-                        <Popup>
-                            <strong>{markerTitleResolved}</strong>
-                            <br />
-                            {markerAddressResolved}
-                            {mapHref && (
-                                <>
-                                    <br />
-                                    <a
-                                        href={mapHref}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        style={{
-                                            marginTop: "8px",
-                                            display: "inline-block",
-                                            fontSize: "13px",
-                                        }}
-                                    >
-                                        {t("map.openMap")} →
-                                    </a>
-                                </>
-                            )}
-                        </Popup>
-                    </Marker>
-                </MapContainer>
-            </div>
-        </section>
+        <MapSectionClient
+            titleResolved={titleResolved}
+            subtitleResolved={subtitleResolved}
+            markerTitleResolved={markerTitleResolved}
+            markerAddressResolved={markerAddressResolved}
+            markerPosition={markerPosition}
+            mapHref={mapHref}
+            defaultZoom={DEFAULT_ZOOM}
+            openMapLabel={t("map.openMap")}
+            eyebrowLabel={t("map.eyebrow")}
+        />
     );
 }

@@ -1,7 +1,7 @@
 import React from "react";
-import { Head, usePage } from "@inertiajs/react";
 import AppLayout from "@/Layouts/AppLayout";
 import TeamGrid from "@/Components/Home/TeamGrid";
+import SeoHead from "@/Components/SeoHead";
 import { useTranslation } from "@/i18n";
 import "../../../css/uber-uns.css";
 
@@ -11,30 +11,12 @@ function pickText(value, fallback) {
     return s !== "" ? s : fallback;
 }
 
-function toAbsoluteUrl(href, origin) {
-    if (href == null || typeof href !== "string") return null;
-    const t = href.trim();
-    if (t === "") return null;
-    if (/^https?:\/\//i.test(t)) return t;
-    if (!origin) return t;
-    const base = origin.replace(/\/$/, "");
-    return `${base}${t.startsWith("/") ? "" : "/"}${t}`;
-}
-
 export default function UberUns({
     currentRoute = "uberuns",
     page: pageFromServer = null,
 }) {
     const { t, locale } = useTranslation();
     const page = pageFromServer;
-    const { props } = usePage();
-    let pageOrigin = null;
-    try {
-        const loc = props?.ziggy?.location;
-        if (loc) pageOrigin = new URL(loc).origin;
-    } catch {
-        pageOrigin = null;
-    }
 
     const DATA = {
         hero: {
@@ -102,105 +84,14 @@ export default function UberUns({
         },
     };
 
-    const meta = page?.meta ?? {};
-    const headTitle = pickText(
-        meta.title,
-        pickText(page?.title, t("about.pageTitle")),
-    );
-    const metaDesc = pickText(meta.description, pickText(page?.subtitle, ""));
-    const metaKeywords =
-        meta.keywords != null ? String(meta.keywords).trim() : "";
-    const ogTitle = pickText(meta.og_title, headTitle);
-    const ogDesc = pickText(meta.og_description, metaDesc);
-    const ogImageRaw = pickText(
-        meta.og_image,
-        pickText(meta.twitter_image, pickText(page?.heroImage, "")),
-    );
-    const ogImage = toAbsoluteUrl(ogImageRaw, pageOrigin);
-    const twTitle = pickText(meta.twitter_title, ogTitle);
-    const twDesc = pickText(meta.twitter_description, ogDesc);
-    const twImage = toAbsoluteUrl(
-        pickText(meta.twitter_image, ogImageRaw),
-        pageOrigin,
-    );
-    const canonical = meta.canonical_url
-        ? String(meta.canonical_url).trim()
-        : (props?.ziggy?.location ?? null);
-
     return (
         <AppLayout currentRoute={currentRoute}>
-            <Head title={headTitle}>
-                {metaDesc ? (
-                    <meta
-                        head-key="description"
-                        name="description"
-                        content={metaDesc}
-                    />
-                ) : null}
-                {metaKeywords ? (
-                    <meta
-                        head-key="keywords"
-                        name="keywords"
-                        content={metaKeywords}
-                    />
-                ) : null}
-                {canonical ? <link rel="canonical" href={canonical} /> : null}
-                <meta
-                    head-key="og:title"
-                    property="og:title"
-                    content={ogTitle}
-                />
-                {ogDesc ? (
-                    <meta
-                        head-key="og:description"
-                        property="og:description"
-                        content={ogDesc}
-                    />
-                ) : null}
-                {ogImage ? (
-                    <meta
-                        head-key="og:image"
-                        property="og:image"
-                        content={ogImage}
-                    />
-                ) : null}
-                <meta
-                    head-key="og:type"
-                    property="og:type"
-                    content={meta.og_type || "website"}
-                />
-                {props?.ziggy?.location ? (
-                    <meta
-                        head-key="og:url"
-                        property="og:url"
-                        content={props.ziggy.location}
-                    />
-                ) : null}
-                <meta
-                    head-key="twitter:card"
-                    name="twitter:card"
-                    content={meta.twitter_card || "summary_large_image"}
-                />
-                <meta
-                    head-key="twitter:title"
-                    name="twitter:title"
-                    content={twTitle}
-                />
-                {twDesc ? (
-                    <meta
-                        head-key="twitter:description"
-                        name="twitter:description"
-                        content={twDesc}
-                    />
-                ) : null}
-                {twImage ? (
-                    <meta
-                        head-key="twitter:image"
-                        name="twitter:image"
-                        content={twImage}
-                    />
-                ) : null}
-            </Head>
+            <SeoHead
+                title={pickText(page?.title, t("about.pageTitle"))}
+                description={pickText(page?.subtitle, "")}
+                image={pickText(page?.heroImage, "")}
+                meta={page?.meta}
+            />
             <main className="uu">
                 <section className="uu-hero uu-meshbg">
                     <div className="uu-hero__pattern" aria-hidden="true" />

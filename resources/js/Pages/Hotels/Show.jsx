@@ -1,30 +1,42 @@
 import React from "react";
-import { Head, usePage } from "@inertiajs/react";
+import { usePage } from "@inertiajs/react";
 import {
-    CheckCircle2,
     MapPin,
     Mail,
     Phone,
     Star,
     Sparkles,
-    Compass,
+    AlignLeft,
+    Globe,
 } from "lucide-react";
 import AppLayout from "@/Layouts/AppLayout";
+import SeoHead from "@/Components/SeoHead";
 import { useTranslation } from "@/i18n";
 import "@/../css/hotel-detail.css";
 
-export default function HotelShow({ hotel: hotelId }) {
+const slugifyHotel = (value = "") =>
+    String(value)
+        .normalize("NFD")
+        .replace(/\p{Diacritic}/gu, "")
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+
+export default function HotelShow({ hotel: hotelParam }) {
     const { props } = usePage();
     const { t } = useTranslation();
 
-    // 1. Global hotels listesinden tıklanan oteli ID ile buluyoruz
     const hotelList = props.global?.hotels || [];
     const locale = props.global?.locale ?? "de";
 
-    // URL'den gelen ID string olabilir, bu yüzden == kullanarak buluyoruz
-    const data = hotelList.find((h) => h.id == hotelId);
+    const data = hotelList.find((h) => {
+        const slug = h.slug || slugifyHotel(h.name);
+        return (
+            String(h.id) === String(hotelParam) || slug === String(hotelParam)
+        );
+    });
 
-    // Eğer otel bulunamazsa (veya sayfa yenilenirken henüz yüklenmediyse)
     if (!data) {
         return (
             <AppLayout currentRoute="rooms">
@@ -43,25 +55,29 @@ export default function HotelShow({ hotel: hotelId }) {
         );
     }
 
-    // API'den gelmeyen ancak tasarımda olan listeler için güvenli fallbackler (varsayılanlar)
-    const highlights = data.roomHighlights || [
-        t("hotelDetail.defaultHighlight") || "Modernes Design",
-    ];
     const amenities = data.services
-        ? data.services.split(",")
+        ? data.services
+              .split(",")
+              .map((item) => item.trim())
+              .filter(Boolean)
         : data.amenities || ["WiFi", "TV", "Spa"];
-    const activities = data.activities || [
-        t("hotelDetail.defaultActivity") || "Wandern & Natur",
-    ];
+    const descriptionParagraphs = String(data.description || "")
+        .split(/\r?\n/)
+        .map((item) => item.trim())
+        .filter(Boolean);
+    const websiteHref = data.website_link || data.website || data.url || null;
 
     return (
         <AppLayout currentRoute="rooms">
-            <Head title={data.name} />
+            <SeoHead
+                title={data.name}
+                description={descriptionParagraphs[0] || data.location || ""}
+                image={data.cover_image}
+            />
 
             <section className="hd-wrap" aria-labelledby="hotel-title">
                 <div className="hd-hero">
                     <div className="hd-hero-inner">
-                        {/* API'den gelen cover_image */}
                         <img
                             src={data.cover_image}
                             alt={data.name}
@@ -82,8 +98,6 @@ export default function HotelShow({ hotel: hotelId }) {
                                     <MapPin size={15} />
                                     {data.location}
                                 </p>
-                                {/* API'den gelen description'ı buraya basıyoruz */}
-                                <p className="hd-intro">{data.description}</p>
 
                                 <div className="hd-rating">
                                     {[...Array(5)].map((_, i) => (
@@ -112,20 +126,21 @@ export default function HotelShow({ hotel: hotelId }) {
 
                 <div className="hd-layout">
                     <article className="hd-main">
-                        <div className="hd-card">
-                            <h2 className="hd-card-title">
-                                {t("hotelDetail.roomHighlights")}
-                            </h2>
-                            <ul className="hd-list">
-                                {highlights.map((item, i) => (
-                                    <li key={i}>
-                                        <CheckCircle2 size={16} />
-                                        <span>{item}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-
+                        {descriptionParagraphs.length > 0 ? (
+                            <div className="hd-card hd-card--intro">
+                                <h2 className="hd-card-title">
+                                    <AlignLeft size={17} />
+                                    {t("hotelDetail.descriptionTitle")}
+                                </h2>
+                                <div className="hd-description">
+                                    {descriptionParagraphs.map(
+                                        (paragraph, i) => (
+                                            <p key={i}>{paragraph}</p>
+                                        ),
+                                    )}
+                                </div>
+                            </div>
+                        ) : null}
                         <div className="hd-card">
                             <h2 className="hd-card-title">
                                 <Sparkles size={17} />
@@ -134,25 +149,10 @@ export default function HotelShow({ hotel: hotelId }) {
                             <div className="hd-chip-grid">
                                 {amenities.map((item, i) => (
                                     <span className="hd-chip" key={i}>
-                                        {item.trim()}
+                                        {item}
                                     </span>
                                 ))}
                             </div>
-                        </div>
-
-                        <div className="hd-card">
-                            <h2 className="hd-card-title">
-                                <Compass size={17} />
-                                {t("hotelDetail.activities")}
-                            </h2>
-                            <ul className="hd-list">
-                                {activities.map((item, i) => (
-                                    <li key={i}>
-                                        <CheckCircle2 size={16} />
-                                        <span>{item}</span>
-                                    </li>
-                                ))}
-                            </ul>
                         </div>
                     </article>
 
@@ -183,14 +183,18 @@ export default function HotelShow({ hotel: hotelId }) {
                                 </a>
                             </div>
 
-                            <p className="hd-ideal-for">
-                                <strong>{t("hotelDetail.idealFor")}</strong>{" "}
-                                {data.idealFor ||
-                                    t("hotelDetail.defaultIdeal") ||
-                                    "Familien & Paare"}
-                            </p>
-
                             <div className="hd-actions">
+                                {websiteHref ? (
+                                    <a
+                                        href={websiteHref}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="hd-btn hd-btn--website"
+                                    >
+                                        <Globe size={16} />
+                                        {t("hotelDetail.websiteBtn")}
+                                    </a>
+                                ) : null}
                                 <a
                                     href={`/${locale}/kontakt`}
                                     className="hd-btn hd-btn--primary"

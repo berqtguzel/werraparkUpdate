@@ -1,6 +1,7 @@
 import React from "react";
-import { Head, Link } from "@inertiajs/react";
+import { Link } from "@inertiajs/react";
 import AppLayout from "@/Layouts/AppLayout";
+import SeoHead from "@/Components/SeoHead";
 import { useTranslation } from "@/i18n";
 import "@/../css/gift-voucher-page.css";
 
@@ -75,7 +76,10 @@ export default function GiftVoucherPage({
 
     return (
         <AppLayout currentRoute={currentRoute}>
-            <Head title={t("giftVoucher.pageTitle")} />
+            <SeoHead
+                title={t("giftVoucher.pageTitle")}
+                description={t("giftVoucher.heroSubtitle")}
+            />
             <section className="gvf-page">
                 <div className="gvf-box gvf-box--landing">
                     <header className="gvf-head gvf-head--landing">

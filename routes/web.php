@@ -7,14 +7,18 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ContactFormController;
 use App\Http\Controllers\RoomPageController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\ArtisanCommandController;
 use App\Http\Controllers\ButtonTrackingController;
 use App\Http\Controllers\GiftVoucherController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\HotelController;
+use App\Http\Controllers\ThemeController;
 use App\Services\SliderService;
 use App\Services\PageService;
 use App\Services\ApiHealthService;
+use App\Services\SettingsService;
+use App\Services\HolidayThemeService;
+use App\Services\HotelService;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,6 +30,16 @@ Route::get('/api/hotels', [HotelController::class, 'index'])->name('api.hotels')
 Route::post('/api/button-tracking/track', [ButtonTrackingController::class, 'track'])->name('button-tracking.track');
 Route::get('/track', [ButtonTrackingController::class, 'trackAndRedirect'])->name('button-tracking.redirect');
 Route::post('/api/contact/forms/{id}/submit', [ContactFormController::class, 'submit'])->name('contact.forms.submit');
+Route::get('/robots.txt', function (SettingsService $settingsService) {
+    $seo = $settingsService->get('seo', 'de');
+    $content = trim((string) ($seo['robots_txt'] ?? $seo['robotsTxt'] ?? ''));
+
+    if ($content === '') {
+        $content = "User-agent: *\nAllow: /";
+    }
+
+    return response($content, 200)->header('Content-Type', 'text/plain; charset=UTF-8');
+});
 
 Route::prefix('api/settings')->group(function () {
     Route::get('/', [SettingsController::class, 'index'])->name('settings.index');
@@ -64,7 +78,23 @@ Route::get('/{locale}/hotels', [HotelController::class, 'listPage'])
     ->where(['locale' => 'de|en|tr']) // Array yapıldı
     ->name('hotels.index');
 
-Route::get('/{locale}/hotels/{hotel}', function (string $locale, string $hotel) {
+Route::get('/{locale}/hotels/{hotel}', function (string $locale, string $hotel, HotelService $hotelService) {
+    $locale = strtolower($locale);
+    $hotels = $hotelService->getHotels();
+
+    $exists = collect($hotels)->contains(function ($item) use ($hotel) {
+        $slug = (string) ($item['slug'] ?? $item['id'] ?? '');
+        $nameSlug = \Illuminate\Support\Str::slug((string) ($item['name'] ?? ''));
+
+        return (string) ($item['id'] ?? '') === (string) $hotel
+            || $slug === (string) $hotel
+            || $nameSlug === (string) $hotel;
+    });
+
+    if (! $exists) {
+        throw new NotFoundHttpException();
+    }
+
     return Inertia::render('Hotels/Show', ['locale' => $locale, 'hotel' => $hotel]);
 })->where(['locale' => 'de|en|tr']) // Array yapıldı
   ->name('hotels.show');
@@ -77,14 +107,28 @@ Route::get('/{locale}/rooms/{room}', [RoomPageController::class, 'show'])
     ->name('rooms.show');
 
 // Offers
-Route::get('/{locale}/offers/{offer}', function (string $locale, string $offer) {
+Route::get('/{locale}/offers/{offer}', function (string $locale, string $offer, HolidayThemeService $holidayThemeService) {
+    $locale = strtolower($locale);
+    $offers = $holidayThemeService->getThemes($locale);
+
+    $exists = collect($offers)->contains(function ($item) use ($offer) {
+        $slug = (string) ($item['slug'] ?? $item['id'] ?? '');
+
+        return (string) ($item['id'] ?? '') === (string) $offer
+            || $slug === (string) $offer;
+    });
+
+    if (! $exists) {
+        throw new NotFoundHttpException();
+    }
+
     return Inertia::render('Offers/Show', ['locale' => $locale, 'offer' => $offer]);
 })->where(['locale' => 'de|en|tr'])->name('offers.show');
 
 // Themes
-Route::get('/{locale}/urlaubsthemen/{theme}', function (string $locale, string $theme) {
-    return Inertia::render('Themes/Show', ['locale' => $locale, 'theme' => $theme]);
-})->where(['locale' => 'de|en|tr'])->name('themes.show');
+Route::get('/{locale}/urlaubsthemen/{theme}', [ThemeController::class, 'show'])
+    ->where(['locale' => 'de|en|tr'])
+    ->name('themes.show');
 
 /*
 |--------------------------------------------------------------------------
@@ -106,9 +150,8 @@ Route::get('/{locale}/uber-uns', function (string $locale) {
     ]);
 })->where(['locale' => 'de|en|tr'])->name('uberuns.locale');
 
-// Kontakt & Artisan
+// Kontakt
 Route::get('/{locale}/kontakt', [ContactController::class, 'index'])->where(['locale' => 'de|en|tr'])->name('contact.index');
-Route::get('/{locale}/artisan', [ArtisanCommandController::class, 'index'])->where(['locale' => 'de|en|tr'])->name('artisan.index');
 
 // Gutschein - Hatalı olan kısım burasıydı, düzelttik:
 Route::prefix('/{locale}/gutschein')

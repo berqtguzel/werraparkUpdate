@@ -2,6 +2,9 @@ import { useEffect, useId, useLayoutEffect, useRef } from "react";
 
 import "../../../../css/ReactBits/Animations/ElectricBorder.css";
 
+const useIsomorphicLayoutEffect =
+    typeof window !== "undefined" ? useLayoutEffect : useEffect;
+
 const ElectricBorder = ({
     children,
     color = "#5227FF",
@@ -92,7 +95,7 @@ const ElectricBorder = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [speed, chaos]);
 
-    useLayoutEffect(() => {
+    useIsomorphicLayoutEffect(() => {
         if (!rootRef.current) return;
         const ro = new ResizeObserver(() => updateAnim());
         ro.observe(rootRef.current);

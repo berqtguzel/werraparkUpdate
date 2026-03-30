@@ -5,12 +5,22 @@ import { Mail, Phone, Star } from "lucide-react";
 import ElectricBorder from "../ReactBits/Animations/ElectricBorder";
 import { useTranslation } from "@/i18n";
 
+const slugifyHotel = (value = "") =>
+    String(value)
+        .normalize("NFD")
+        .replace(/\p{Diacritic}/gu, "")
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+
 export default function Hotels() {
     // 1. Global verileri Inertia props içinden çekiyoruz
     const { global } = usePage().props;
 
     // Verileri global nesnesinden ayıklıyoruz
     const hotelList = global?.hotels || [];
+    const orderedHotels = [...hotelList].reverse();
     const locale = global?.locale ?? "de";
     const { t } = useTranslation();
 
@@ -29,10 +39,14 @@ export default function Hotels() {
                 </p>
 
                 <div className="hotel-grid">
-                    {hotelList.length > 0 ? (
-                        hotelList.map((hotel) => (
+                    {orderedHotels.length > 0 ? (
+                        orderedHotels.map((hotel) => {
+                            const hotelSlug =
+                                hotel.slug || slugifyHotel(hotel.name) || hotel.id;
+
+                            return (
                             <ElectricBorder
-                                key={hotel.id}
+                                key={hotel.slug || hotel.id || hotel.name}
                                 color={"var(--hotel-green)"}
                                 secondaryColor={"var(--hotel-green-light)"}
                                 borderRadius={16}
@@ -103,14 +117,15 @@ export default function Hotels() {
 
                                         <Link
                                             className="hotel-detail-btn"
-                                            href={`/${locale}/hotels/${hotel.id}`}
+                                            href={`/${locale}/hotels/${hotelSlug}`}
                                         >
                                             {t("hotels.cta")}
                                         </Link>
                                     </div>
                                 </div>
                             </ElectricBorder>
-                        ))
+                            );
+                        })
                     ) : (
                         /* Veri yoksa veya yükleniyorsa gösterilecek alan */
                         <p className="no-hotels">

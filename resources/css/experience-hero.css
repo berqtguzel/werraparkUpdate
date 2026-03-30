@@ -67,7 +67,7 @@ html[data-theme="dark"] .ex-wrap .ex-link:hover {
 }
 
 .ex-container {
-    max-width: 1200px;
+    max-width: 1600px;
     margin: 0 auto;
     display: grid;
     grid-template-columns: 1.05fr 1fr;

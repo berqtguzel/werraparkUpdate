@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\ApiHealthService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Inertia\Inertia;
 
 class RoomPageController extends Controller
@@ -56,6 +57,10 @@ class RoomPageController extends Controller
 
             $roomData = $cached['room'] ?? null;
             $error = (bool) ($cached['error'] ?? false);
+        }
+
+        if (!$roomData && !$error) {
+            throw new NotFoundHttpException();
         }
 
         return Inertia::render('Rooms/Show', [
