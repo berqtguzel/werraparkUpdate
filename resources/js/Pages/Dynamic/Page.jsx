@@ -45,7 +45,7 @@ export default function DynamicPage({ currentRoute = "page" }) {
                     <div className="dp-container">
                         {!hasBlocks && content && (
                             <div
-                                className="dp-card"
+                                className="dp-card dp-richtext"
                                 dangerouslySetInnerHTML={{ __html: content }}
                             />
                         )}
@@ -68,12 +68,15 @@ export default function DynamicPage({ currentRoute = "page" }) {
                                             {b.heading && <h2>{b.heading}</h2>}
                                             {b.html ? (
                                                 <div
+                                                    className="dp-richtext"
                                                     dangerouslySetInnerHTML={{
                                                         __html: b.html,
                                                     }}
                                                 />
                                             ) : (
-                                                <p>{b.content}</p>
+                                                <div className="dp-richtext">
+                                                    {b.content}
+                                                </div>
                                             )}
                                         </div>
                                     );

@@ -25,6 +25,20 @@ const ExperienceHero = () => {
     const years = item?.years || 25;
     const email =
         settingsContact?.email || settingsContact?.reservation_email || "";
+    const badgeLabel =
+        locale === "tr"
+            ? "Deneyim"
+            : locale === "en"
+              ? "Experience"
+              : "Erfahrung";
+    const badgeCaption =
+        locale === "tr"
+            ? "Konaklama ve misafir deneyimi"
+            : locale === "en"
+              ? "Hospitality and guest experience"
+              : "Gastfreundschaft mit echter Erfahrung";
+    const badgeUnit =
+        locale === "tr" ? "Yil" : locale === "en" ? "Years" : "Jahre";
 
     const socialLinks = [
         { key: "facebook", url: settingsSocial?.facebook_url },
@@ -41,13 +55,20 @@ const ExperienceHero = () => {
                     {image && <img src={image} alt={title} loading="lazy" />}
 
                     <figcaption className="ex-badge">
-                        <span className="ex-badge-num">
-                            <CountUp
-                                from={0}
-                                to={Number(years)}
-                                duration={1.4}
-                            />
-                        </span>
+                        <span className="ex-badge-label">{badgeLabel}</span>
+                        <div className="ex-badge-main">
+                            <span className="ex-badge-num">
+                                <CountUp
+                                    className="ex-count-up"
+                                    from={0}
+                                    to={Number(years)}
+                                    duration={1.4}
+                                />
+                            </span>
+                            <span className="ex-badge-unit">{badgeUnit}</span>
+                        </div>
+                        <span className="ex-badge-divider" aria-hidden="true" />
+                        <span className="ex-badge-caption">{badgeCaption}</span>
                     </figcaption>
                 </figure>
 

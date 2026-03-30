@@ -86,9 +86,8 @@ export default function Header({ currentRoute }) {
         branding.logo ??
         DEFAULT_LOGO_DARK;
 
-    const contactEmail = contact.email ?? contact.mail ?? "info@werrapark.de";
-    const contactPhone =
-        contact.phone ?? contact.tel ?? contact.telephone ?? "+4936874205706";
+    const contactEmail = contact.email ?? contact.mail ?? "";
+    const contactPhone = contact.phone ?? contact.tel ?? contact.telephone ?? "";
 
     const [open, setOpen] = React.useState(false);
     const [mobileSub, setMobileSub] = React.useState(null);
@@ -98,43 +97,36 @@ export default function Header({ currentRoute }) {
         return () => (document.body.style.overflow = "");
     }, [open]);
 
-    const fallbackNav = [
-        {
-            name: "Home",
-            url: locale === "de" ? "/" : `/${locale}`,
-            key: "home",
-        },
-        { name: "Über uns", url: `/${locale}/uber-uns`, key: "uberuns" },
-        { name: "Galerie", url: `/${locale}/galerie`, key: "galerie" },
-        { name: "Karriere", url: `/${locale}/karriere`, key: "karriere" },
-    ];
-
     const navFromApi = React.useMemo(
         () => buildNavFromApi(apiMenu, locale),
         [apiMenu, locale],
     );
 
-    const desktopNav = navFromApi ?? fallbackNav;
-    const mobileNav = navFromApi ?? fallbackNav;
+    const desktopNav = navFromApi ?? [];
+    const mobileNav = navFromApi ?? [];
 
     return (
         <header className="wh-header">
             <div className="wh-topbar">
                 <div className="wh-container wh-topbar__inner">
                     <div className="wh-topbar__left">
-                        <a
-                            href={`mailto:${contactEmail}`}
-                            className="wh-toplink"
-                        >
-                            {contactEmail}
-                        </a>
+                        {contactEmail ? (
+                            <a
+                                href={`mailto:${contactEmail}`}
+                                className="wh-toplink"
+                            >
+                                {contactEmail}
+                            </a>
+                        ) : null}
 
-                        <a
-                            href={`tel:${contactPhone.replace(/\s/g, "")}`}
-                            className="wh-toplink"
-                        >
-                            {contactPhone}
-                        </a>
+                        {contactPhone ? (
+                            <a
+                                href={`tel:${contactPhone.replace(/\s/g, "")}`}
+                                className="wh-toplink"
+                            >
+                                {contactPhone}
+                            </a>
+                        ) : null}
                     </div>
                     <div className="wh-topbar__right">
                         <LanguageSwitcher locale={locale} />
@@ -358,19 +350,23 @@ export default function Header({ currentRoute }) {
                             </a>
 
                             <div className="wh-topbar__left">
-                                <a
-                                    href={`mailto:${contactEmail}`}
-                                    className="wh-toplink"
-                                >
-                                    {contactEmail}
-                                </a>
+                                {contactEmail ? (
+                                    <a
+                                        href={`mailto:${contactEmail}`}
+                                        className="wh-toplink"
+                                    >
+                                        {contactEmail}
+                                    </a>
+                                ) : null}
 
-                                <a
-                                    href={`tel:${contactPhone.replace(/\s/g, "")}`}
-                                    className="wh-toplink"
-                                >
-                                    {contactPhone}
-                                </a>
+                                {contactPhone ? (
+                                    <a
+                                        href={`tel:${contactPhone.replace(/\s/g, "")}`}
+                                        className="wh-toplink"
+                                    >
+                                        {contactPhone}
+                                    </a>
+                                ) : null}
                             </div>
                         </div>
                     </div>

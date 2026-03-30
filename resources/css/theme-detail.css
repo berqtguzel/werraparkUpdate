@@ -220,12 +220,61 @@ html[data-theme="dark"] .td-list,
 .td-text {
   margin: 4px 0 0;
   line-height: 1.7;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
   color: #3b5c4a;
+}
+
+.td-text > :first-child {
+  margin-top: 0;
+}
+
+.td-text > :last-child {
+  margin-bottom: 0;
+}
+
+.td-text p,
+.td-text ul,
+.td-text ol,
+.td-text blockquote {
+  margin: 0 0 1rem;
+}
+
+.td-text ul,
+.td-text ol {
+  padding-left: 1.25rem;
+}
+
+.td-text li + li {
+  margin-top: .4rem;
+}
+
+.td-text strong,
+.td-text b {
+  color: #163725;
+}
+
+.td-text a {
+  color: #0f8f5a;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 html[data-theme="dark"] .td-text,
 .dark .td-text {
   color: #c4f0d4;
+}
+
+html[data-theme="dark"] .td-text strong,
+html[data-theme="dark"] .td-text b,
+.dark .td-text strong,
+.dark .td-text b {
+  color: #ecfdf5;
+}
+
+html[data-theme="dark"] .td-text a,
+.dark .td-text a {
+  color: #86efac;
 }
 
 .td-aside {

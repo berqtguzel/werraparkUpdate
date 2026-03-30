@@ -1,22 +1,24 @@
 import React from "react";
 import "../../../css/video-promo.css";
+import { useTranslation } from "@/i18n";
 
 export default function VideoPromo({
-    title = "Schauen Sie sich unser Werbevideo an",
     poster = "/public/images/Thumbnail2.webp",
     videoId = "dQw4w9WgXcQ",
-    alt = "Werbevideo Vorschaubild",
-    subtitle = "Ein kurzer Einblick in Atmosphare, Natur und Erlebnisse im Werrapark Resort.",
 }) {
+    const { t, locale } = useTranslation();
     const [playing, setPlaying] = React.useState(false);
+    const title = t("videoPromo.title");
+    const subtitle = t("videoPromo.subtitle");
+    const alt = t("videoPromo.alt");
 
-    const src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&hl=de&playsinline=1`;
+    const src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&hl=${locale}&playsinline=1`;
 
     return (
         <section className="vp-section">
             <div className="vp-shell">
                 <header className="vp-head">
-                    <span className="eyebrow">Video</span>
+                    <span className="eyebrow">{t("videoPromo.eyebrow")}</span>
                     <h1 className="vp-title">{title}</h1>
                     <p className="vp-subtitle">{subtitle}</p>
                 </header>
@@ -38,7 +40,7 @@ export default function VideoPromo({
                                 className="vp-reset"
                                 onClick={() => setPlaying(false)}
                             >
-                                Vorschau
+                                {t("videoPromo.preview")}
                             </button>
                         </>
                     ) : (
@@ -46,7 +48,7 @@ export default function VideoPromo({
                             type="button"
                             className="vp-poster"
                             onClick={() => setPlaying(true)}
-                            aria-label="Video abspielen"
+                            aria-label={t("videoPromo.playAria")}
                         >
                             <img className="vp-img" src={poster} alt={alt} />
                             <span className="vp-vignette" aria-hidden="true" />
@@ -65,9 +67,9 @@ export default function VideoPromo({
                                 </svg>
                             </span>
                             <span className="vp-meta" aria-hidden="true">
-                                Werrapark Resort Film
+                                {t("videoPromo.meta")}
                             </span>
-                            <span className="vp-cta">Jetzt ansehen</span>
+                            <span className="vp-cta">{t("videoPromo.cta")}</span>
                         </button>
                     )}
                 </div>

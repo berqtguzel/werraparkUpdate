@@ -2,45 +2,40 @@ import React from "react";
 import { usePage } from "@inertiajs/react";
 import AppLayout from "@/Layouts/AppLayout";
 import SeoHead from "@/Components/SeoHead";
-import HOLIDAY_THEMES from "@/Data/holidayThemesData";
 import { useTranslation } from "@/i18n";
 import "@/../css/offer-detail.css";
 
-const buildHighlights = (description = "", fallbackTitle = "") => {
+const buildHighlights = (description = "") => {
     const parts = String(description)
         .split(/[\r\n]+|(?<=[.!?])\s+/)
         .map((item) => item.trim())
         .filter(Boolean);
 
-    if (parts.length) {
-        return parts.slice(0, 4);
-    }
-
-    if (fallbackTitle) {
-        return [fallbackTitle];
-    }
-
-    return ["Werrapark offer"];
+    return parts.slice(0, 4);
 };
 
 export default function OfferShow({ offer: offerId }) {
     const { props } = usePage();
     const locale = props?.locale ?? props?.global?.locale ?? "de";
     const { t } = useTranslation();
-    const offers = props?.global?.holidayThemes?.length
-        ? props.global.holidayThemes
-        : HOLIDAY_THEMES;
+    const offers = props?.global?.offerThemes?.length
+        ? props.global.offerThemes
+        : props?.global?.holidayThemes ?? [];
     const base =
         offers.find((item) => {
             const slug = item.slug || item.id;
             return (
                 String(item.id) === String(offerId) || slug === String(offerId)
             );
-        }) ?? offers[0];
+        }) ?? null;
+
+    if (!base) {
+        return null;
+    }
 
     const title = base?.name || "";
     const intro = base?.description || t("offerDetail.intro");
-    const highlights = buildHighlights(base?.description, base?.name);
+    const highlights = buildHighlights(base?.description);
     const file = base?.file || null;
     const pdfSectionTitle =
         locale === "tr"

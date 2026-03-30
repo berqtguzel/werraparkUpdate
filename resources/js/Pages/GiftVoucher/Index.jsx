@@ -68,12 +68,6 @@ export default function GiftVoucherPage({
         },
     ];
 
-    console.log("GiftVoucherPage render", {
-        billingApi,
-        companies,
-        methods,
-    });
-
     return (
         <AppLayout currentRoute={currentRoute}>
             <SeoHead

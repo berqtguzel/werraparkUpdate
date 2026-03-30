@@ -179,13 +179,6 @@ export default function TravelThemes({ items }) {
                                 >
                                     {t("themes.readMore")}
                                 </Link>
-                                <Link
-                                    className="tt3-chip"
-                                    href={`/${locale}/urlaubsthemen/${theme.slug || theme.id}`}
-                                    aria-label={`${theme.name} – ${t("themes.discover")}`}
-                                >
-                                    {t("themes.discover")}
-                                </Link>
                             </div>
                         </div>
 

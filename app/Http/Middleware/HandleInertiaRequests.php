@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Tightenco\Ziggy\Ziggy;
 
-use App\Services\GlobalWebsiteService;
 use App\Services\MenuService;
 use App\Services\ApiHealthService;
 use App\Services\WidgetService;
@@ -23,7 +22,6 @@ class HandleInertiaRequests extends Middleware
     protected $rootView = 'app';
 
     public function __construct(
-        private GlobalWebsiteService $globalWebsiteService,
         private MenuService $menuService,
         private ApiHealthService $apiHealthService,
         private WidgetService $widgetService,
@@ -56,12 +54,8 @@ class HandleInertiaRequests extends Middleware
             ],
 
             'global' => [
-                'tenantId'  => config('omr.tenant_id'),
                 'locale'    => $locale,
-                'apiHealth' => $health,
-                'websites'  => $apiUp ? $this->globalWebsiteService->getWebsites($locale) : [],
                 'menu'      => $apiUp ? $this->menuService->getMenu($locale) : [],
-                // 3. Otelleri buraya ekledik
                 'hotels'    => $apiUp ? $this->hotelService->getHotels() : [],
                 'holidayThemes' => $holidayThemes,
                 'offerThemes' => $themeGroups['offers'],

@@ -1,10 +1,9 @@
-import React, { useEffect, useState, Fragment } from "react";
+import React, { useEffect, useState, Fragment, useRef } from "react";
 import { usePage, router } from "@inertiajs/react";
 import { Dialog, Transition } from "@headlessui/react";
 import "../../../css/contact.css";
-import { Mail, Phone, MapPin, CheckCircle, Globe } from "lucide-react";
+import { Mail, Phone, MapPin, CheckCircle, Globe, AlertCircle } from "lucide-react";
 import { useTranslation } from "@/i18n";
-import demoTeam from "@/Data/demoData";
 
 const norm = (s = "") =>
     String(s)
@@ -32,6 +31,85 @@ const resolveMapEmbedUrl = (url, address) => {
     if (!fallbackQuery) return "";
 
     return `https://www.google.com/maps?q=${encodeURIComponent(fallbackQuery)}&z=15&output=embed`;
+};
+
+const sanitizePhoneInput = (value = "") =>
+    String(value).replace(/[^\d+\s\-()]/g, "");
+
+const sanitizeEmailInput = (value = "") => String(value).replace(/\s+/g, "");
+
+const getContactFieldLabel = (field, t) =>
+    ({
+        name: t("contact.name"),
+        phone: t("contact.phone"),
+        email: t("contact.email"),
+        message: t("contact.message"),
+    })[field] || field;
+
+const localizeContactError = (input, t) => {
+    if (!input) {
+        return {
+            title: t("contact.errorTitle"),
+            message: t("contact.error"),
+        };
+    }
+
+    if (typeof input === "object" && !Array.isArray(input)) {
+        const [field, rawValue] = Object.entries(input).find(([, value]) =>
+            Array.isArray(value) ? value.length > 0 : Boolean(value),
+        ) || [null, null];
+
+        const firstMessage = Array.isArray(rawValue) ? rawValue[0] : rawValue;
+
+        if (field && typeof firstMessage === "string") {
+            return localizeContactError({ field, message: firstMessage }, t);
+        }
+    }
+
+    if (typeof input === "object" && input.message) {
+        const rawMessage = String(input.message);
+        const fieldLabel = input.field
+            ? getContactFieldLabel(input.field, t)
+            : null;
+        const lower = rawMessage.toLowerCase();
+
+        if (lower.includes("required") || lower.includes("pflicht") || lower.includes("zorunlu")) {
+            return {
+                title: t("contact.errorTitle"),
+                message: fieldLabel
+                    ? t("contact.validationRequired", { field: fieldLabel })
+                    : t("contact.error"),
+            };
+        }
+
+        if (
+            lower.includes("valid email") ||
+            lower.includes("email address") ||
+            lower.includes("gueltige e-mail") ||
+            lower.includes("gültige e-mail") ||
+            lower.includes("gecerli e-posta") ||
+            lower.includes("geçerli e-posta")
+        ) {
+            return {
+                title: t("contact.errorTitle"),
+                message: t("contact.validationEmail"),
+            };
+        }
+
+        return {
+            title: t("contact.errorTitle"),
+            message: rawMessage,
+        };
+    }
+
+    if (typeof input === "string") {
+        return localizeContactError({ message: input }, t);
+    }
+
+    return {
+        title: t("contact.errorTitle"),
+        message: t("contact.error"),
+    };
 };
 
 function TeamCard({ photo, name, title, email, phone, website }) {
@@ -82,17 +160,12 @@ function TeamCard({ photo, name, title, email, phone, website }) {
     );
 }
 
-const DEFAULT_FIELDS = [
-    { name: "name", type: "text", required: true },
-    { name: "phone", type: "tel", required: false },
-    { name: "email", type: "email", required: true },
-    { name: "message", type: "textarea", required: true },
-];
-
 export default function ContactPage() {
     const { t } = useTranslation();
     const { props } = usePage();
+    const formRef = useRef(null);
     const [submitStatus, setSubmitStatus] = useState(null);
+    const [canSubmit, setCanSubmit] = useState(false);
     const contactForms = props?.global?.contactForms ?? {};
     const settingsContact = props?.global?.settings?.contact ?? {};
     const apiStaff = props?.global?.staff ?? [];
@@ -102,20 +175,11 @@ export default function ContactPage() {
         if (props?.flash?.success) {
             setSubmitStatus({ type: "success", message: props.flash.success });
         }
-        const err =
-            props?.errors?.error ??
-            (props?.errors &&
-                Object.values(props.errors).flat().filter(Boolean)[0]);
-        if (err) {
-            const msg =
-                typeof err === "string"
-                    ? err
-                    : Array.isArray(err)
-                      ? err[0]
-                      : (err?.message ?? String(err));
-            if (msg) setSubmitStatus({ type: "error", message: msg });
+        if (props?.errors && Object.keys(props.errors).length > 0) {
+            const localized = localizeContactError(props.errors, t);
+            setSubmitStatus({ type: "error", ...localized });
         }
-    }, [props?.flash, props?.errors]);
+    }, [props?.flash, props?.errors, t]);
 
     useEffect(() => {
         if (submitStatus?.type !== "success") return;
@@ -125,8 +189,7 @@ export default function ContactPage() {
         return () => clearTimeout(t);
     }, [submitStatus?.type]);
 
-    const staffSource =
-        Array.isArray(apiStaff) && apiStaff.length ? apiStaff : demoTeam;
+    const staffSource = Array.isArray(apiStaff) ? apiStaff : [];
 
     let leadIdx = staffSource.findIndex((p) =>
         norm(p.name || "").includes("sezai koc"),
@@ -168,7 +231,7 @@ export default function ContactPage() {
                   .filter(Boolean)
                   .join(", ")
             : null) ||
-        "Am Kirchberg 15, 98666 Masserberg-Schnett";
+        "";
 
     const contactInfo = {
         address: addressStr,
@@ -177,12 +240,12 @@ export default function ContactPage() {
             settingsContact.phone ||
             settingsContact.tel ||
             settingsContact.mobile ||
-            "+493684205706",
+            "",
         email:
             contactForms.contactInfo?.email ||
             settingsContact.email ||
             settingsContact.mail ||
-            "info@werrapark.de",
+            "",
         map: settingsContact.map || null,
     };
     const mapEmbedUrl = resolveMapEmbedUrl(
@@ -192,12 +255,31 @@ export default function ContactPage() {
 
     const formFields = contactForms.formFields?.length
         ? contactForms.formFields
-        : DEFAULT_FIELDS;
-    const formId = contactForms.forms?.[0]?.id ?? 1;
+        : [];
+    const formId = contactForms.forms?.[0]?.id ?? null;
+    const hasForm = Boolean(formId) && formFields.length > 0;
+
+    const updateFormValidity = () => {
+        const form = formRef.current;
+        setCanSubmit(Boolean(form && form.checkValidity()));
+    };
+
+    useEffect(() => {
+        if (!hasForm) {
+            setCanSubmit(false);
+            return;
+        }
+
+        updateFormValidity();
+    }, [hasForm, formFields]);
 
     const onSubmit = (e) => {
         e.preventDefault();
         const form = e.target;
+        if (!form.checkValidity()) {
+            updateFormValidity();
+            return;
+        }
         const formData = new FormData(form);
         const payload = {
             form_id: formId,
@@ -214,14 +296,10 @@ export default function ContactPage() {
                     message: t("contact.success"),
                 }),
             onError: (errors) => {
-                const msg =
-                    errors?.error ??
-                    Object.values(errors || {})
-                        .flat()
-                        .filter(Boolean)[0];
+                const localized = localizeContactError(errors, t);
                 setSubmitStatus({
                     type: "error",
-                    message: msg || t("contact.error"),
+                    ...localized,
                 });
             },
         });
@@ -266,26 +344,32 @@ export default function ContactPage() {
                             {t("contact.formTitle")}
                         </h2>
                         <ul className="ct-info">
-                            <li>
-                                <MapPin size={18} />
-                                <span>{contactInfo.address}</span>
-                            </li>
+                            {contactInfo.address ? (
+                                <li>
+                                    <MapPin size={18} />
+                                    <span>{contactInfo.address}</span>
+                                </li>
+                            ) : null}
 
-                            <li>
-                                <Phone size={18} />
-                                <a
-                                    href={`tel:${contactInfo.phone.replace(/\s/g, "")}`}
-                                >
-                                    {contactInfo.phone}
-                                </a>
-                            </li>
+                            {contactInfo.phone ? (
+                                <li>
+                                    <Phone size={18} />
+                                    <a
+                                        href={`tel:${contactInfo.phone.replace(/\s/g, "")}`}
+                                    >
+                                        {contactInfo.phone}
+                                    </a>
+                                </li>
+                            ) : null}
 
-                            <li>
-                                <Mail size={18} />
-                                <a href={`mailto:${contactInfo.email}`}>
-                                    {contactInfo.email}
-                                </a>
-                            </li>
+                            {contactInfo.email ? (
+                                <li>
+                                    <Mail size={18} />
+                                    <a href={`mailto:${contactInfo.email}`}>
+                                        {contactInfo.email}
+                                    </a>
+                                </li>
+                            ) : null}
                         </ul>
 
                         {mapEmbedUrl ? (
@@ -334,8 +418,19 @@ export default function ContactPage() {
                         <div
                             className="ct-form-status ct-form-status--error"
                             role="alert"
+                            aria-live="polite"
                         >
-                            {submitStatus.message}
+                            <div className="ct-form-status__icon" aria-hidden="true">
+                                <AlertCircle size={18} />
+                            </div>
+                            <div className="ct-form-status__body">
+                                <strong className="ct-form-status__title">
+                                    {submitStatus.title || t("contact.errorTitle")}
+                                </strong>
+                                <p className="ct-form-status__text">
+                                    {submitStatus.message}
+                                </p>
+                            </div>
                         </div>
                     )}
                     <Transition
@@ -406,66 +501,127 @@ export default function ContactPage() {
                             </div>
                         </Dialog>
                     </Transition>
-                    <form className="ct-form" onSubmit={onSubmit} noValidate>
-                        {formFields.map((field) => {
-                            const labelKey = `contact.${field.name}`;
-                            const labelText =
-                                t(labelKey) !== labelKey
-                                    ? t(labelKey)
-                                    : (field.label ?? field.name);
-                            const placeholderKey = `contact.${field.name}Placeholder`;
-                            const placeholderText =
-                                t(placeholderKey) !== placeholderKey
-                                    ? t(placeholderKey)
-                                    : (field.placeholder ?? "");
-                            return (
-                                <div
-                                    key={field.name}
-                                    className={
-                                        field.type === "textarea"
-                                            ? "ct-field ct-field--full"
-                                            : "ct-field"
-                                    }
-                                >
-                                    <label htmlFor={field.name}>
-                                        {labelText}
-                                        {field.required && " *"}
-                                    </label>
-                                    {field.type === "textarea" ? (
-                                        <textarea
-                                            id={field.name}
-                                            name={field.name}
-                                            rows="6"
-                                            placeholder={
-                                                placeholderText ||
-                                                t("contact.messagePlaceholder")
-                                            }
-                                            required={field.required}
-                                        />
-                                    ) : (
-                                        <input
-                                            id={field.name}
-                                            name={field.name}
-                                            type={field.type || "text"}
-                                            placeholder={
-                                                placeholderText ||
-                                                (field.name === "phone"
-                                                    ? "+49 …"
-                                                    : "")
-                                            }
-                                            required={field.required}
-                                        />
-                                    )}
-                                </div>
-                            );
-                        })}
+                    {hasForm ? (
+                        <form
+                            ref={formRef}
+                            className="ct-form"
+                            onSubmit={onSubmit}
+                            onInput={updateFormValidity}
+                            onChange={updateFormValidity}
+                            noValidate
+                        >
+                            {formFields.map((field) => {
+                                const labelKey = `contact.${field.name}`;
+                                const labelText =
+                                    t(labelKey) !== labelKey
+                                        ? t(labelKey)
+                                        : (field.label ?? field.name);
+                                const placeholderKey = `contact.${field.name}Placeholder`;
+                                const placeholderText =
+                                    t(placeholderKey) !== placeholderKey
+                                        ? t(placeholderKey)
+                                        : (field.placeholder ?? "");
+                                const isPhoneField =
+                                    field.name === "phone" ||
+                                    field.type === "tel";
+                                const isEmailField =
+                                    field.name === "email" ||
+                                    field.type === "email";
+                                return (
+                                    <div
+                                        key={field.name}
+                                        className={
+                                            field.type === "textarea"
+                                                ? "ct-field ct-field--full"
+                                                : "ct-field"
+                                        }
+                                    >
+                                        <label htmlFor={field.name}>
+                                            {labelText}
+                                            {field.required && " *"}
+                                        </label>
+                                        {field.type === "textarea" ? (
+                                            <textarea
+                                                id={field.name}
+                                                name={field.name}
+                                                rows="6"
+                                                placeholder={
+                                                    placeholderText ||
+                                                    t("contact.messagePlaceholder")
+                                                }
+                                                required={field.required}
+                                            />
+                                        ) : (
+                                            <input
+                                                id={field.name}
+                                                name={field.name}
+                                                type={field.type || "text"}
+                                                inputMode={
+                                                    isPhoneField
+                                                        ? "tel"
+                                                        : isEmailField
+                                                          ? "email"
+                                                          : undefined
+                                                }
+                                                autoComplete={
+                                                    isPhoneField
+                                                        ? "tel"
+                                                        : isEmailField
+                                                          ? "email"
+                                                          : undefined
+                                                }
+                                                pattern={
+                                                    isPhoneField
+                                                        ? "[0-9+()\\-\\s]*"
+                                                        : undefined
+                                                }
+                                                spellCheck={
+                                                    isEmailField ? false : undefined
+                                                }
+                                                placeholder={
+                                                    placeholderText ||
+                                                    (field.name === "phone"
+                                                        ? "+49 …"
+                                                        : "")
+                                                }
+                                                required={field.required}
+                                                onInput={(event) => {
+                                                    if (isPhoneField) {
+                                                        event.currentTarget.value =
+                                                            sanitizePhoneInput(
+                                                                event.currentTarget
+                                                                    .value,
+                                                            );
+                                                    }
 
-                        <div className="ct-actions">
-                            <button type="submit" className="ct-button">
-                                {t("contact.send")}
-                            </button>
-                        </div>
-                    </form>
+                                                    if (isEmailField) {
+                                                        event.currentTarget.value =
+                                                            sanitizeEmailInput(
+                                                                event.currentTarget
+                                                                    .value,
+                                                            );
+                                                    }
+
+                                                    updateFormValidity();
+                                                }}
+                                            />
+                                        )}
+                                    </div>
+                                );
+                            })}
+
+                            <div className="ct-actions">
+                                <button
+                                    type="submit"
+                                    className="ct-button"
+                                    disabled={!canSubmit}
+                                    aria-disabled={!canSubmit}
+                                >
+                                    {t("contact.send")}
+                                </button>
+                            </div>
+                        </form>
+                    ) : null}
                 </section>
             </div>
         </main>

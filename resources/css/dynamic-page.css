@@ -116,6 +116,49 @@
     color: #333;
 }
 
+.dp-richtext {
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+}
+
+.dp-richtext > :first-child {
+    margin-top: 0;
+}
+
+.dp-richtext > :last-child {
+    margin-bottom: 0;
+}
+
+.dp-richtext p,
+.dp-richtext ul,
+.dp-richtext ol,
+.dp-richtext blockquote {
+    margin: 0 0 1rem;
+}
+
+.dp-richtext ul,
+.dp-richtext ol {
+    padding-left: 1.25rem;
+}
+
+.dp-richtext li + li {
+    margin-top: 0.4rem;
+}
+
+.dp-richtext strong,
+.dp-richtext b,
+.dp-richtext h2,
+.dp-richtext h3,
+.dp-richtext h4 {
+    color: #163725;
+}
+
+.dp-richtext a {
+    color: #0f8f5a;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
 
 .dp-image img {
     width: 100%;

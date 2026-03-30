@@ -72,9 +72,7 @@ const OffersGrid = () => {
                                 />
                                 <div className="og-media-overlay" />
                                 {o.file && (
-                                    <span className="og-badge">
-                                        PDF
-                                    </span>
+                                    <span className="og-badge">PDF</span>
                                 )}
                             </Link>
                             <div className="og-card-body">
@@ -89,14 +87,6 @@ const OffersGrid = () => {
                                     >
                                         {t("offers.viewDetails")}
                                     </Link>
-                                    {o.file && (
-                                        <Link
-                                            className="og-btn og-btn--ghost"
-                                            href={`/${locale}/offers/${o.slug || o.id}`}
-                                        >
-                                            {t("themes.discover")}
-                                        </Link>
-                                    )}
                                 </div>
                             </div>
                         </article>

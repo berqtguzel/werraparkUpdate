@@ -182,50 +182,105 @@ html[data-theme="dark"] .ex-wrap .ex-link:hover {
     position: absolute;
     left: 24px;
     bottom: 24px;
-    min-width: 200px;
-    padding: 20px 24px;
+    display: grid;
+    gap: 12px;
+    min-width: 250px;
+    max-width: 290px;
+    padding: 18px 20px 20px;
     color: #fff;
     background:
+        linear-gradient(180deg, rgba(9, 44, 30, 0.94), rgba(7, 30, 22, 0.92)),
         radial-gradient(
-            200% 120% at 0% 0%,
-            rgba(255, 255, 255, 0.1),
-            transparent 45%
-        ),
-        var(--badge-bg);
-    border-radius: 14px;
+            120% 120% at 0% 0%,
+            rgba(31, 197, 120, 0.22),
+            transparent 58%
+        );
+    border-radius: 20px;
     box-shadow:
-        0 4px 0 rgba(0, 0, 0, 0.12),
-        0 20px 40px rgba(0, 0, 0, 0.25);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+        0 16px 34px rgba(0, 0, 0, 0.22),
+        0 2px 0 rgba(255, 255, 255, 0.04) inset;
+    border: 1px solid rgba(255, 255, 255, 0.12);
     overflow: hidden;
 }
-.ex-badge::after {
+.ex-badge::before {
     content: "";
     position: absolute;
-    inset: 0;
-    background:
-        linear-gradient(90deg, var(--badge-grid) 1px, transparent 1px) 0 0/20px
-            20px,
-        linear-gradient(0deg, var(--badge-grid) 1px, transparent 1px) 0 0/20px
-            20px;
+    inset: -20% auto auto 58%;
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    background: radial-gradient(
+        circle,
+        rgba(44, 220, 138, 0.34),
+        rgba(44, 220, 138, 0)
+    );
     pointer-events: none;
-    opacity: 0.8;
+    opacity: 0.9;
+}
+.ex-badge > * {
+    position: relative;
+    z-index: 1;
+}
+.ex-badge-label {
+    width: fit-content;
+    display: inline-flex;
+    align-items: center;
+    padding: 0;
+    border-radius: 0;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: rgba(218, 255, 235, 0.8);
+    background: transparent;
+    border: 0;
+}
+.ex-badge-main {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
 }
 .ex-badge-num {
     font-family: var(--font-sans);
-    font-size: clamp(3rem, 8vw, 5rem);
+    font-size: 2.2rem;
     font-weight: var(--font-extrabold);
-    letter-spacing: -0.03em;
-    line-height: 1;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
+    letter-spacing: -0.08em;
+    line-height: 0.78;
+    text-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+    display: inline-flex;
+    align-items: baseline;
 }
-.ex-count-up {
+.ex-badge-unit {
+    margin-bottom: 8px;
+    font-size: 0.98rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    line-height: 1;
+    color: rgba(228, 255, 238, 0.78);
+}
+.ex-badge-divider {
+    width: 56px;
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        rgba(70, 228, 149, 0.8),
+        rgba(255, 255, 255, 0.18)
+    );
+}
+.ex-badge-caption {
+    max-width: 18ch;
+    font-size: 0.86rem;
+    line-height: 1.45;
+    color: rgba(236, 255, 244, 0.84);
+}
+.ex-badge-num .ex-count-up {
     font-variant-numeric: tabular-nums;
     display: inline-block;
-    font-size: 32px;
+    font-size: inherit;
+    color: white;
+    font-weight: inherit;
+    line-height: inherit;
 }
 
 .ex-content {
@@ -357,9 +412,21 @@ html[data-theme="dark"] .ex-wrap .ex-link:hover {
     .ex-media .ex-badge {
         left: 16px;
         bottom: 16px;
-        padding: 20px 24px;
+        min-width: 214px;
+        max-width: 244px;
+        padding: 16px 17px 18px;
     }
     .ex-badge-num {
-        font-size: clamp(2.5rem, 10vw, 4rem);
+        font-size: clamp(4.4rem, 13vw, 6rem);
+    }
+    .ex-badge-unit {
+        margin-bottom: 6px;
+        font-size: 0.82rem;
+    }
+    .ex-badge-caption {
+        font-size: 0.76rem;
+    }
+    .ex-badge-divider {
+        width: 44px;
     }
 }

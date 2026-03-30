@@ -2,7 +2,6 @@ import React from "react";
 import { usePage } from "@inertiajs/react";
 import AppLayout from "@/Layouts/AppLayout";
 import "@/../css/theme-detail.css";
-import HOLIDAY_THEMES from "@/Data/holidayThemesData";
 import SeoHead from "@/Components/SeoHead";
 
 export default function ThemeShow({ theme }) {
@@ -12,18 +11,24 @@ export default function ThemeShow({ theme }) {
         ? props.themes
         : props?.global?.holidayThemes?.length
           ? props.global.holidayThemes
-          : HOLIDAY_THEMES;
+          : [];
 
     const data =
         themes.find((item) => {
             const slug = item.slug || item.id;
             return String(item.id) === String(theme) || slug === String(theme);
-        }) ?? themes[0];
+        }) ?? null;
 
-    const intro = data?.description || "";
-    const title = data?.name || "";
-    const image = data?.image || "/images/template3.png";
-    const file = data?.file || null;
+    if (!data) {
+        return null;
+    }
+
+    const intro = data.description || "";
+    const title = data.name || "";
+    const image = data.image || "";
+    const file = data.file || null;
+
+    console.log("ThemeShow render", { theme, data, props }); // Debug log
 
     return (
         <AppLayout currentRoute="urlaubsthemen">
@@ -46,17 +51,22 @@ export default function ThemeShow({ theme }) {
                                 </h1>
                             </div>
 
-                            <div className="td-hero-media" aria-hidden="true">
-                                <div className="td-hero-img-wrap">
-                                    <img
-                                        src={image}
-                                        alt=""
-                                        loading="lazy"
-                                        decoding="async"
-                                    />
-                                    <span className="td-hero-grad" />
+                            {image ? (
+                                <div
+                                    className="td-hero-media"
+                                    aria-hidden="true"
+                                >
+                                    <div className="td-hero-img-wrap">
+                                        <img
+                                            src={image}
+                                            alt=""
+                                            loading="lazy"
+                                            decoding="async"
+                                        />
+                                        <span className="td-hero-grad" />
+                                    </div>
                                 </div>
-                            </div>
+                            ) : null}
                         </div>
                     </div>
                 </div>
@@ -69,7 +79,10 @@ export default function ThemeShow({ theme }) {
                                     ? "Das erwartet Sie"
                                     : "What awaits you"}
                             </h2>
-                            <p className="td-text">{intro}</p>
+                            <div
+                                className="td-text"
+                                dangerouslySetInnerHTML={{ __html: intro }}
+                            />
                         </div>
                     </article>
 

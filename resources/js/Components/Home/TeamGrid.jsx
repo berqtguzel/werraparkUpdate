@@ -1,6 +1,5 @@
 import React from "react";
 import "../../../css/team-grid.css";
-import demoTeam from "@/Data/demoData";
 import { useTranslation } from "@/i18n";
 import { usePage } from "@inertiajs/react";
 import { Phone, Mail, Globe } from "lucide-react";
@@ -90,7 +89,7 @@ export default function TeamGrid({ people }) {
             ? people
             : Array.isArray(apiStaff) && apiStaff.length
               ? apiStaff
-              : demoTeam;
+              : [];
 
     let leadIdx = list.findIndex((p) =>
         norm(p.name || "").includes("sezai koc"),

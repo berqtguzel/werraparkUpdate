@@ -152,6 +152,7 @@ Route::get('/{locale}/uber-uns', function (string $locale) {
 
 // Kontakt
 Route::get('/{locale}/kontakt', [ContactController::class, 'index'])->where(['locale' => 'de|en|tr'])->name('contact.index');
+Route::post('/{locale}/kontakt', [ContactController::class, 'store'])->where(['locale' => 'de|en|tr'])->name('contact.store');
 
 // Gutschein - Hatalı olan kısım burasıydı, düzelttik:
 Route::prefix('/{locale}/gutschein')
