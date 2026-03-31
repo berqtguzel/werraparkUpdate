@@ -9,9 +9,10 @@ use Illuminate\Support\Facades\Log;
 class WidgetService
 {
     private const CACHE_PREFIX = 'omr_widget_';
+
     public function getWidgets(string $locale): array
     {
-        $cacheKey = self::CACHE_PREFIX . $locale;
+        $cacheKey = $this->cacheKey($locale);
 
         return Cache::remember($cacheKey, now()->addDays(7), function () use ($locale) {
             return [
@@ -20,6 +21,13 @@ class WidgetService
                 'serviceHighlights' => $this->fetchServiceHighlights($locale),
             ];
         });
+    }
+
+    public function clearCache(): void
+    {
+        foreach (['de', 'en', 'tr'] as $locale) {
+            Cache::forget($this->cacheKey($locale));
+        }
     }
 
     private function fetchRatings(string $locale): array
@@ -41,7 +49,7 @@ class WidgetService
     {
         $base = rtrim(config('omr.base_url'), '/');
         $endpoint = rtrim(config('omr.endpoint'), '/');
-        $tenant = config('omr.tenant_id');
+        $tenant = config('omr.main_tenant') ?: config('omr.tenant_id');
 
         if (!$tenant || !$base) {
             return [];
@@ -61,5 +69,12 @@ class WidgetService
         }
 
         return [];
+    }
+
+    private function cacheKey(string $locale): string
+    {
+        $tenant = config('omr.main_tenant') ?: config('omr.tenant_id') ?: 'default';
+
+        return self::CACHE_PREFIX . $tenant . ':' . strtolower($locale);
     }
 }

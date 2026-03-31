@@ -8,8 +8,8 @@ class MenuController extends Controller
 {
     public static function fetchMenuData(): array
     {
-        $cacheKey = 'menu_data';
         $mainTenant = env("OMR_MAIN_TENANT", null);
+        $cacheKey = 'menu_data:' . ($mainTenant ?: 'default');
 
         return Cache::remember($cacheKey, now()->addDays(7), function () use ($mainTenant) {
             try {

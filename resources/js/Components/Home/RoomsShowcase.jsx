@@ -12,17 +12,26 @@ import {
 import "../../../css/rooms-showcase.css";
 import { useTranslation } from "@/i18n";
 
-const DotGrid = React.lazy(() =>
-    import("../ReactBits/Backgrounds/DotGrid").then((m) => ({
-        default: m.default || m,
-    })),
-);
+function stripHtml(value = "") {
+    return String(value).replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+}
 
-const Title = ({ children }) => <h1 className="rs-title">{children}</h1>;
-const Eyebrow = ({ children }) => <div className="eyebrow">{children}</div>;
+function summarizeText(value = "", maxLength = 130) {
+    const text = stripHtml(value);
+    if (!text) return "";
+    if (text.length <= maxLength) return text;
+    return `${text.slice(0, maxLength).trim()}...`;
+}
 
-const HotelCard = ({ hotel, locale }) => {
-    const { t } = useTranslation();
+function normalizeList(items) {
+    return (Array.isArray(items) ? items : [])
+        .map((item) =>
+            typeof item === "string" ? item : item?.name ?? item?.label ?? null,
+        )
+        .filter(Boolean);
+}
+
+function RoomCard({ hotel, locale, t }) {
     const href = `/${locale}/rooms/${hotel.slug ?? hotel.id}`;
     const boardSummary = (hotel.boardTypes || [])
         .map((item) => item?.description ?? item?.name ?? item?.code)
@@ -32,24 +41,26 @@ const HotelCard = ({ hotel, locale }) => {
         .map((item) => item?.name)
         .filter(Boolean)
         .slice(0, 3);
-    const roomFacts = [
+    const detailList = normalizeList(hotel.items).slice(0, 3);
+    const cardSummary = summarizeText(hotel.description, 132);
+    const factItems = [
         hotel.capacity
             ? {
-                  icon: <FiUsers className="rs-icon" aria-hidden />,
+                  icon: <FiUsers aria-hidden />,
                   label: t("rooms.capacityLabel"),
                   value: t("rooms.capacityValue", { count: hotel.capacity }),
               }
             : null,
         boardSummary.length
             ? {
-                  icon: <FiLayers className="rs-icon" aria-hidden />,
+                  icon: <FiLayers aria-hidden />,
                   label: t("rooms.boardTypesLabel"),
                   value: boardSummary.join(" · "),
               }
             : null,
         hotel.price
             ? {
-                  icon: <FiCreditCard className="rs-icon" aria-hidden />,
+                  icon: <FiCreditCard aria-hidden />,
                   label: t("rooms.priceLabel"),
                   value: hotel.price,
               }
@@ -57,38 +68,34 @@ const HotelCard = ({ hotel, locale }) => {
     ].filter(Boolean);
 
     return (
-        <article className="rs-card" aria-labelledby={`h-${hotel.id}`}>
-            {hotel.image && (
-                <div className="rs-card__media-wrap">
+        <article className="rsm-card" aria-labelledby={`room-card-${hotel.id}`}>
+            <div className="rsm-media">
+                <div className="rsm-media__frame">
                     <img
-                        className="rs-card__media"
+                        className="rsm-media__image"
                         src={hotel.image}
                         alt={hotel.name}
+                        loading="lazy"
+                        decoding="async"
                     />
                 </div>
-            )}
+            </div>
 
-            <div className="rs-card__body">
-                <div className="rs-card__head">
-                    <h3 id={`h-${hotel.id}`} className="rs-card__title">
+            <div className="rsm-body">
+                <div className="rsm-header-block">
+                    <h3 id={`room-card-${hotel.id}`} className="rsm-title">
                         {hotel.name}
                     </h3>
-                    {hotel.description ? (
-                        <p className="rs-card__desc">{hotel.description}</p>
-                    ) : null}
+                    {cardSummary ? <p className="rsm-desc">{cardSummary}</p> : null}
                 </div>
 
-                {roomFacts.length ? (
-                    <div className="rs-facts">
-                        {roomFacts.map((fact, i) => (
-                            <div className="rs-fact" key={i}>
-                                <span className="rs-fact__icon">
-                                    {fact.icon}
-                                </span>
-                                <div className="rs-fact__copy">
-                                    <span className="rs-fact__label">
-                                        {fact.label}
-                                    </span>
+                {factItems.length ? (
+                    <div className="rsm-facts">
+                        {factItems.map((fact) => (
+                            <div className="rsm-fact" key={`${fact.label}-${fact.value}`}>
+                                <span className="rsm-fact__icon">{fact.icon}</span>
+                                <div className="rsm-fact__copy">
+                                    <span className="rsm-fact__label">{fact.label}</span>
                                     <strong>{fact.value}</strong>
                                 </div>
                             </div>
@@ -97,105 +104,66 @@ const HotelCard = ({ hotel, locale }) => {
                 ) : null}
 
                 {featureSummary.length ? (
-                    <div className="rs-tags">
-                        {featureSummary.map((item, i) => (
-                            <span className="rs-tag" key={i}>
-                                <FiCheck className="rs-icon" aria-hidden />
+                    <div className="rsm-chips">
+                        {featureSummary.map((item) => (
+                            <span className="rsm-chip" key={item}>
                                 {item}
                             </span>
                         ))}
                     </div>
                 ) : null}
 
-                {hotel.items?.length ? (
-                    <ul className="rs-list">
-                        {hotel.items.slice(0, 4).map((item, i) => (
-                            <li key={i}>
-                                <FiCheck className="rs-icon" aria-hidden />
-                                <span>
-                                    {typeof item === "string"
-                                        ? item
-                                        : (item.name ?? item.label)}
-                                </span>
+                {detailList.length ? (
+                    <ul className="rsm-points">
+                        {detailList.map((item) => (
+                            <li key={item}>
+                                <FiCheck aria-hidden />
+                                <span>{item}</span>
                             </li>
                         ))}
                     </ul>
                 ) : null}
 
-                <Link className="rs-cta" href={href}>
-                    {t("rooms.explore")}
-                    <FiChevronRight />
+                <Link className="rsm-cta" href={href}>
+                    <span>{t("rooms.explore")}</span>
+                    <FiChevronRight aria-hidden />
                 </Link>
             </div>
         </article>
     );
-};
+}
 
 export default function RoomsShowcase() {
-    const [mounted, setMounted] = React.useState(false);
-    React.useEffect(() => setMounted(true), []);
-
     const { props } = usePage();
     const hotels = Array.isArray(props?.rooms) ? props.rooms : [];
     const { t, locale } = useTranslation();
 
     return (
-        <section className="rs-wrap rs-with-bg" aria-labelledby="rooms-title">
-            {mounted && (
-                <React.Suspense fallback={null}>
-                    <div
-                        className="rs-dotgrid"
-                        aria-hidden="true"
-                        style={{
-                            position: "absolute",
-                            inset: 0,
-                            zIndex: 0,
-                            pointerEvents: "none",
-                            overflow: "hidden",
-                        }}
-                    >
-                        <DotGrid
-                            dotSize={12}
-                            gap={80}
-                            baseColor="#1f7008"
-                            activeColor="#0E9B5B"
-                            proximity={150}
-                            speedTrigger={110}
-                            shockRadius={260}
-                            shockStrength={5}
-                            maxSpeed={5200}
-                            resistance={820}
-                            returnDuration={1.3}
-                        />
-                    </div>
-                </React.Suspense>
-            )}
+        <section className="rsm-wrap" aria-labelledby="rooms-title">
+            <div className="rsm-shell">
+                <header className="rsm-header">
+                    <p className="rsm-eyebrow">{t("rooms.eyebrow")}</p>
+                    <h2 id="rooms-title" className="rsm-heading">
+                        {t("rooms.title")}
+                    </h2>
+                    <p className="rsm-intro">{t("rooms.intro")}</p>
+                </header>
 
-            <div className="rs-top">
-                <Eyebrow>{t("rooms.eyebrow")}</Eyebrow>
-                <Title id="rooms-title">{t("rooms.title")}</Title>
-                <p className="rs-intro">{t("rooms.intro")}</p>
-            </div>
-
-            <div className="rs-grid">
                 {hotels.length ? (
-                    hotels.map((h) => (
-                        <HotelCard
-                            key={h.id ?? h.slug}
-                            hotel={h}
-                            locale={locale}
-                        />
-                    ))
+                    <div className="rsm-grid">
+                        {hotels.map((hotel) => (
+                            <RoomCard
+                                key={hotel.id ?? hotel.slug}
+                                hotel={hotel}
+                                locale={locale}
+                                t={t}
+                            />
+                        ))}
+                    </div>
                 ) : (
-                    <article className="rs-card rs-card--empty">
-                        <div className="rs-card__head">
-                            <h3 className="rs-card__title">
-                                {t("rooms.emptyTitle")}
-                            </h3>
-                            <p className="rs-card__desc">
-                                {t("rooms.emptyText")}
-                            </p>
-                        </div>
+                    <article className="rsm-empty">
+                        <h3>{t("rooms.emptyTitle")}</h3>
+                        <p>{t("rooms.emptyText")}</p>
                     </article>
                 )}
             </div>

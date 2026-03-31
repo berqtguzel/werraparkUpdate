@@ -9,9 +9,10 @@ use Illuminate\Support\Facades\Log;
 class PageService
 {
     private const CACHE_PREFIX = 'omr_page_';
+
     public function getPage(string $slug, string $locale): ?array
     {
-        $cacheKey = self::CACHE_PREFIX . "{$locale}_{$slug}";
+        $cacheKey = $this->cacheKey($locale, $slug);
 
         return Cache::remember($cacheKey, now()->addDays(7), function () use ($slug, $locale) {
             return $this->fetchPage($slug, $locale);
@@ -20,7 +21,7 @@ class PageService
 
     public function getPages(string $locale): array
     {
-        $cacheKey = self::CACHE_PREFIX . "list_{$locale}";
+        $cacheKey = $this->listCacheKey($locale);
 
         return Cache::remember($cacheKey, now()->addDays(7), function () use ($locale) {
             return $this->fetchPages($locale);
@@ -167,11 +168,27 @@ class PageService
     public function clearCache(?string $slug = null): void
     {
         if ($slug) {
-            Cache::forget(self::CACHE_PREFIX . "de_{$slug}");
-            Cache::forget(self::CACHE_PREFIX . "en_{$slug}");
-            Cache::forget(self::CACHE_PREFIX . "tr_{$slug}");
+            foreach (['de', 'en', 'tr'] as $locale) {
+                Cache::forget($this->cacheKey($locale, $slug));
+            }
         } else {
-            Cache::flush();
+            foreach (['de', 'en', 'tr'] as $locale) {
+                Cache::forget($this->listCacheKey($locale));
+            }
         }
+    }
+
+    private function cacheKey(string $locale, string $slug): string
+    {
+        $tenant = config('omr.main_tenant') ?: config('omr.tenant_id') ?: 'default';
+
+        return self::CACHE_PREFIX . $tenant . ':' . strtolower($locale) . ':' . strtolower($slug);
+    }
+
+    private function listCacheKey(string $locale): string
+    {
+        $tenant = config('omr.main_tenant') ?: config('omr.tenant_id') ?: 'default';
+
+        return self::CACHE_PREFIX . $tenant . ':list:' . strtolower($locale);
     }
 }

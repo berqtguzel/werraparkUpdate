@@ -18,7 +18,9 @@ class RoomController extends Controller
             'search' => $request->search,
             'per_page' => $request->per_page ?? 10,
         ];
+        $tenant = config('omr.main_tenant') ?: config('omr.tenant_id') ?: 'default';
         $cacheKey = 'rooms_index:' . md5(json_encode([
+            'tenant' => $tenant,
             'locale' => $locale,
             'filters' => $filters,
         ]));

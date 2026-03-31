@@ -19,7 +19,8 @@ class PageController extends Controller
     {
         $locale = strtolower($locale);
         $slug = strtolower($slug);
-        $cacheKey = "dynamic_page:{$locale}:{$slug}";
+        $tenant = config('omr.main_tenant') ?: config('omr.tenant_id') ?: 'default';
+        $cacheKey = "dynamic_page:{$tenant}:{$locale}:{$slug}";
 
         $pageData = Cache::remember($cacheKey, now()->addDays(7), function () use ($locale, $slug) {
             if ($this->apiHealth->isAvailable()) {

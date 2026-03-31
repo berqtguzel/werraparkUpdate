@@ -3,6 +3,7 @@ import { createInertiaApp } from '@inertiajs/react';
 import createServer from '@inertiajs/react/server';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import route from '../../vendor/tightenco/ziggy/dist/index.m';
+import { I18nProvider } from './i18n';
 
 createServer((page) =>
     createInertiaApp({
@@ -17,7 +18,16 @@ createServer((page) =>
                     location: new URL(page.props.ziggy.location),
                 });
 
-            return <App {...props} />;
+            const initialLocale =
+                page?.props?.locale ??
+                page?.props?.global?.locale ??
+                'de';
+
+            return (
+                <I18nProvider initialLocale={initialLocale}>
+                    <App {...props} />
+                </I18nProvider>
+            );
         },
     })
 );

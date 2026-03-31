@@ -14,7 +14,7 @@ class ApiHealthService
 
     public function check(): array
     {
-        return Cache::remember(self::CACHE_KEY, self::CACHE_TTL_OK, function () {
+        return Cache::remember($this->cacheKey(), self::CACHE_TTL_OK, function () {
             return $this->ping();
         });
     }
@@ -26,11 +26,11 @@ class ApiHealthService
 
     public function forceCheck(): array
     {
-        Cache::forget(self::CACHE_KEY);
+        Cache::forget($this->cacheKey());
         $result = $this->ping();
 
         $ttl = $result['success'] ? self::CACHE_TTL_OK : self::CACHE_TTL_FAIL;
-        Cache::put(self::CACHE_KEY, $result, $ttl);
+        Cache::put($this->cacheKey(), $result, $ttl);
 
         return $result;
     }
@@ -79,5 +79,12 @@ class ApiHealthService
                 'checked_at' => now()->toIso8601String(),
             ];
         }
+    }
+
+    private function cacheKey(): string
+    {
+        $tenant = config('omr.main_tenant') ?: config('omr.tenant_id') ?: 'default';
+
+        return self::CACHE_KEY . ':' . $tenant;
     }
 }

@@ -11,10 +11,11 @@ class ContactFormController extends Controller
 {
     public static function getForms(string $locale = 'de')
     {
+        $locale = strtolower($locale);
         $apiBase = rtrim(config('omr.base_url') ?? env('OMR_API_BASE', 'https://omerdogan.de/api'), '/');
         $mainTenant = config('omr.main_tenant') ?: config('omr.tenant_id') ?: env('OMR_TENANT_ID', '');
 
-        $cacheKey = "contact_forms_" . ($mainTenant ?: 'default') . "_{$locale}";
+        $cacheKey = "contact_forms:" . ($mainTenant ?: 'default') . ":{$locale}";
 
         return Cache::remember($cacheKey, now()->addDays(7), function () use ($apiBase, $mainTenant, $locale) {
             try {

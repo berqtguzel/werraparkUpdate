@@ -14,7 +14,7 @@ class HolidayThemeService
     public function getThemes(string $locale): array
     {
         $locale = strtolower($locale);
-        $cacheKey = self::CACHE_KEY_PREFIX . $locale;
+        $cacheKey = $this->cacheKey($locale);
 
         return Cache::remember($cacheKey, now()->addDays(7), function () use ($locale) {
             return $this->fetch($locale);
@@ -24,7 +24,7 @@ class HolidayThemeService
     public function clearCache(): void
     {
         foreach (['de', 'en', 'tr'] as $locale) {
-            Cache::forget(self::CACHE_KEY_PREFIX . $locale);
+            Cache::forget($this->cacheKey($locale));
         }
     }
 
@@ -281,5 +281,12 @@ class HolidayThemeService
         $file = $theme['file'] ?? null;
 
         return is_string($file) && trim($file) !== '';
+    }
+
+    private function cacheKey(string $locale): string
+    {
+        $tenant = config('omr.main_tenant') ?: config('omr.tenant_id') ?: 'default';
+
+        return self::CACHE_KEY_PREFIX . $tenant . ':' . strtolower($locale);
     }
 }

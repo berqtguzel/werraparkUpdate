@@ -10,6 +10,8 @@ use App\Services\SettingsService;
 
 class SettingsController extends Controller
 {
+    private static array $requestCache = [];
+
     private static function replaceImageTenant(?string $imageUrl): ?string
     {
         if (!$imageUrl) {
@@ -57,7 +59,11 @@ class SettingsController extends Controller
         $mainTenant = config('omr.main_tenant') ?: env('OMR_MAIN_TENANT') ?: $tenantId;
         $cacheKey = "settings_{$tenantId}_{$locale}_{$mainTenant}";
 
-        return Cache::remember($cacheKey, now()->addDays(7), function () use ($tenantId, $locale, $mainTenant) {
+        if (isset(self::$requestCache[$cacheKey])) {
+            return self::$requestCache[$cacheKey];
+        }
+
+        $settings = Cache::remember($cacheKey, now()->addDays(7), function () use ($tenantId, $locale, $mainTenant) {
             $apiBase = rtrim(config('omr.base_url') ?? env('OMR_API_BASE') ?? env('VITE_REMOTE_API_BASE', 'https://omerdogan.de/api'), '/') . '/v1';
 
             $sections = [
@@ -109,7 +115,6 @@ class SettingsController extends Controller
                         $sectionData = array_merge($sectionData, $sectionData['attributes'] ?? []);
                     }
                     $settings[$section] = $sectionData;
-
                 } catch (\Throwable $e) {
                     Log::error('Settings API exception', [
                         'section' => $section,
@@ -123,6 +128,10 @@ class SettingsController extends Controller
 
             return $settings;
         });
+
+        self::$requestCache[$cacheKey] = $settings;
+
+        return $settings;
     }
 
     public function index(Request $request): array
@@ -176,6 +185,8 @@ class SettingsController extends Controller
     {
         $tenantId = config('omr.tenant_id') ?: config('omr.main_tenant') ?: '';
         $mainTenant = config('omr.main_tenant') ?: env('OMR_MAIN_TENANT') ?: $tenantId;
+
+        self::$requestCache = [];
 
         foreach (['de', 'en', 'tr'] as $locale) {
             if ($tenantId) {

@@ -8,18 +8,34 @@ const translations = { de, en, tr };
 
 const I18nContext = createContext({ t: (k) => k, locale: "de" });
 
+function normalizeLocale(value) {
+    const locale = String(value || "").toLowerCase();
+    return ["de", "en", "tr"].includes(locale) ? locale : "de";
+}
+
 function getLocaleFromUrl() {
     if (typeof window === "undefined") return "de";
     const match = window.location.pathname.match(/^\/(de|en|tr)(\/|$)/);
-    return match ? match[1] : "de";
+    return normalizeLocale(match ? match[1] : "de");
 }
 
-export function I18nProvider({ children }) {
-    const [locale, setLocale] = useState(getLocaleFromUrl);
+export function I18nProvider({ children, initialLocale = null }) {
+    const [locale, setLocale] = useState(() =>
+        normalizeLocale(initialLocale || getLocaleFromUrl()),
+    );
 
     useEffect(() => {
-        const off = router.on("navigate", () => {
-            setLocale(getLocaleFromUrl());
+        if (!initialLocale) return;
+        setLocale(normalizeLocale(initialLocale));
+    }, [initialLocale]);
+
+    useEffect(() => {
+        const off = router.on("navigate", (event) => {
+            const nextLocale =
+                event?.detail?.page?.props?.locale ??
+                event?.detail?.page?.props?.global?.locale ??
+                getLocaleFromUrl();
+            setLocale(normalizeLocale(nextLocale));
         });
         return off;
     }, []);

@@ -2,7 +2,6 @@ import React from "react";
 import AppLayout from "@/Layouts/AppLayout";
 import SeoHead from "@/Components/SeoHead";
 import Hero from "@/Components/hero";
-import SplashCursor from "@/Components/SplashCursor";
 import Hotels from "@/Components/Home/Hotels";
 
 import TeamGrid from "@/Components/Home/TeamGrid";

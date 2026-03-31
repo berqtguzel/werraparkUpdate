@@ -18,9 +18,7 @@ export default function OfferShow({ offer: offerId }) {
     const { props } = usePage();
     const locale = props?.locale ?? props?.global?.locale ?? "de";
     const { t } = useTranslation();
-    const offers = props?.global?.offerThemes?.length
-        ? props.global.offerThemes
-        : props?.global?.holidayThemes ?? [];
+    const offers = props?.global?.offerThemes ?? [];
     const base =
         offers.find((item) => {
             const slug = item.slug || item.id;

@@ -2,10 +2,10 @@
 
 namespace App\Providers;
 
+use App\Services\SettingsService;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
-use Illuminate\Support\Facades\Http;
 class AppServiceProvider extends ServiceProvider
 {
     private static function colorsToCssVars(array $colors): string
@@ -66,8 +66,7 @@ class AppServiceProvider extends ServiceProvider
         $tenantId = config('omr.tenant_id') ?: config('omr.main_tenant') ?: '';
         $siteColorsCss = '';
         if ($tenantId) {
-            $settings = \App\Http\Controllers\SettingsController::getSettings($tenantId, $locale);
-            $colors = $settings['colors'] ?? [];
+            $colors = app(SettingsService::class)->get('colors', $locale);
             $siteColorsCss = self::colorsToCssVars(is_array($colors) ? $colors : []);
         }
         View::share('siteColorsCss', $siteColorsCss);

@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Log;
 
 class DashboardService
 {
+    private const CACHE_VERSION_KEY = 'dashboard_cache_version';
+
     protected $apiUrl;
     protected $apiKey;
     protected $siteId;
@@ -35,7 +37,7 @@ class DashboardService
 
     protected function makeRequest($method, $endpoint, $data = null, $useCache = true)
     {
-        $cacheKey = $this->cachePrefix . md5($method . $endpoint . json_encode($data));
+        $cacheKey = $this->cachePrefix . ':v' . $this->cacheVersion() . ':' . md5($method . $endpoint . json_encode($data));
 
         if ($useCache && Cache::has($cacheKey)) {
             return Cache::get($cacheKey);
@@ -116,9 +118,15 @@ class DashboardService
 
     public function clearCache()
     {
-        $keys = Cache::get($this->cachePrefix . '*');
-        foreach ($keys as $key) {
-            Cache::forget($key);
+        Cache::forever(self::CACHE_VERSION_KEY, $this->cacheVersion() + 1);
+    }
+
+    private function cacheVersion(): int
+    {
+        if (!Cache::has(self::CACHE_VERSION_KEY)) {
+            Cache::forever(self::CACHE_VERSION_KEY, 1);
         }
+
+        return (int) Cache::get(self::CACHE_VERSION_KEY, 1);
     }
 }

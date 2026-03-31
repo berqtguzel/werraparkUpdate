@@ -9,10 +9,11 @@ use Illuminate\Support\Facades\Log;
 class ReviewsService
 {
     private const CACHE_KEY_PREFIX = 'omr_reviews_';
+
     public function getReviews(string $locale): array
     {
         $locale = strtolower($locale);
-        $cacheKey = self::CACHE_KEY_PREFIX . $locale;
+        $cacheKey = $this->cacheKey($locale);
 
         return Cache::remember($cacheKey, now()->addDays(7), function () use ($locale) {
             return $this->fetch($locale);
@@ -22,7 +23,7 @@ class ReviewsService
     public function clearCache(): void
     {
         foreach (['de', 'en', 'tr'] as $locale) {
-            Cache::forget(self::CACHE_KEY_PREFIX . $locale);
+            Cache::forget($this->cacheKey($locale));
         }
     }
 
@@ -107,7 +108,7 @@ class ReviewsService
             ];
         }
 
-        return $out;
+        return array_slice($out, 0, 12);
     }
 
     private function formatStayDate(string $date, string $locale): string
@@ -126,5 +127,12 @@ class ReviewsService
         } catch (\Throwable $e) {
             return $date;
         }
+    }
+
+    private function cacheKey(string $locale): string
+    {
+        $tenant = config('omr.main_tenant') ?: config('omr.tenant_id') ?: 'default';
+
+        return self::CACHE_KEY_PREFIX . $tenant . ':' . strtolower($locale);
     }
 }

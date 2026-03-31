@@ -9,11 +9,11 @@ use Illuminate\Support\Facades\Log;
 class ContactFormsService
 {
     private const CACHE_KEY_PREFIX = 'omr_contact_forms_';
+
     public function getContactForms(string $locale): array
     {
         $locale  = strtolower($locale);
-        $tenant  = config('omr.main_tenant') ?: config('omr.tenant_id') ?: '';
-        $cacheKey = self::CACHE_KEY_PREFIX . ($tenant ? "{$tenant}_{$locale}" : $locale);
+        $cacheKey = $this->cacheKey($locale);
 
         return Cache::remember($cacheKey, now()->addDays(7), function () use ($locale) {
             return $this->fetch($locale);
@@ -22,9 +22,8 @@ class ContactFormsService
 
     public function clearCache(): void
     {
-        $tenant = config('omr.main_tenant') ?: config('omr.tenant_id') ?: '';
         foreach (['de', 'en', 'tr'] as $locale) {
-            Cache::forget(self::CACHE_KEY_PREFIX . ($tenant ? "{$tenant}_{$locale}" : $locale));
+            Cache::forget($this->cacheKey($locale));
         }
     }
 
@@ -76,8 +75,6 @@ class ContactFormsService
     private function normalize(array $data, string $base): array
     {
         $out = [
-            'executives'   => [],
-            'reservations' => [],
             'contactInfo'  => [
                 'address' => '',
                 'phone'   => '',
@@ -108,15 +105,9 @@ class ContactFormsService
             $people = $attrs['people'] ?? $attrs['contacts'] ?? $attrs['items'] ?? [$form];
 
             if ($type === 'executives' || $type === 'executive') {
-                $out['executives'] = array_merge(
-                    $out['executives'],
-                    $this->normalizePeople($people, $base)
-                );
+                continue;
             } elseif ($type === 'reservations' || $type === 'reservation') {
-                $out['reservations'] = array_merge(
-                    $out['reservations'],
-                    $this->normalizePeople($people, $base)
-                );
+                continue;
             } elseif (isset($attrs['fields'])) {
                 $normalized = $this->normalizeFields($attrs['fields']);
                 $out['formFields'] = array_merge($out['formFields'], $normalized);
@@ -153,43 +144,6 @@ class ContactFormsService
             ];
         }
 
-        if (isset($data['executives']) && is_array($data['executives'])) {
-            $out['executives'] = $this->normalizePeople($data['executives'], $base);
-        }
-        if (isset($data['reservations']) && is_array($data['reservations'])) {
-            $out['reservations'] = $this->normalizePeople($data['reservations'], $base);
-        }
-
-        return $out;
-    }
-
-    private function normalizePeople(array $items, string $base): array
-    {
-        $out = [];
-
-        foreach ($items as $item) {
-            if (!is_array($item)) {
-                continue;
-            }
-            $attrs = $item['attributes'] ?? $item;
-            $img   = $attrs['image'] ?? $attrs['photo'] ?? $attrs['avatar'] ?? null;
-
-            if (is_array($img)) {
-                $img = $img['url'] ?? $img['data']['attributes']['url'] ?? null;
-            }
-            if ($img && !str_starts_with($img, 'http')) {
-                $img = $base . (str_starts_with($img, '/') ? '' : '/') . $img;
-            }
-
-            $out[] = [
-                'photo'  => $img ?: '/images/teams/sezaikoc.png',
-                'name'   => $attrs['name'] ?? $attrs['title'] ?? '',
-                'title'  => $attrs['title'] ?? $attrs['position'] ?? $attrs['role'] ?? '',
-                'email'  => $attrs['email'] ?? $attrs['mail'] ?? '',
-                'phone'  => $attrs['phone'] ?? $attrs['tel'] ?? $attrs['telephone'] ?? $attrs['mobile'] ?? '',
-            ];
-        }
-
         return $out;
     }
 
@@ -213,5 +167,12 @@ class ContactFormsService
         }
 
         return $out;
+    }
+
+    private function cacheKey(string $locale): string
+    {
+        $tenant = config('omr.main_tenant') ?: config('omr.tenant_id') ?: 'default';
+
+        return self::CACHE_KEY_PREFIX . $tenant . ':' . strtolower($locale);
     }
 }

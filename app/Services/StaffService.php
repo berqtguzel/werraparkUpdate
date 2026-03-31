@@ -9,10 +9,11 @@ use Illuminate\Support\Facades\Log;
 class StaffService
 {
     private const CACHE_KEY_PREFIX = 'omr_staff_';
+
     public function getStaff(string $locale): array
     {
         $locale = strtolower($locale);
-        $cacheKey = self::CACHE_KEY_PREFIX . $locale;
+        $cacheKey = $this->cacheKey($locale);
 
         return Cache::remember($cacheKey, now()->addDays(7), function () use ($locale) {
             return $this->fetch($locale);
@@ -22,7 +23,7 @@ class StaffService
     public function clearCache(): void
     {
         foreach (['de', 'en', 'tr'] as $locale) {
-            Cache::forget(self::CACHE_KEY_PREFIX . $locale);
+            Cache::forget($this->cacheKey($locale));
         }
     }
 
@@ -139,7 +140,6 @@ class StaffService
                 'website'  => $website,
                 'image'    => $img,
                 'avatar'   => $img,
-                'biography'=> $attrs['biography'] ?? '',
                 'order'    => $attrs['order'] ?? 999,
             ];
         }
@@ -147,5 +147,12 @@ class StaffService
         usort($out, fn ($a, $b) => ($a['order'] ?? 999) <=> ($b['order'] ?? 999));
 
         return $out;
+    }
+
+    private function cacheKey(string $locale): string
+    {
+        $tenant = config('omr.main_tenant') ?: config('omr.tenant_id') ?: 'default';
+
+        return self::CACHE_KEY_PREFIX . $tenant . ':' . strtolower($locale);
     }
 }

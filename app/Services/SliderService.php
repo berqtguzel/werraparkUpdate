@@ -16,7 +16,7 @@ class SliderService
     {
         $locale = strtolower($locale);
         $slug   = strtolower($slug);
-        $cacheKey = self::CACHE_KEY_PREFIX . 'v' . self::CACHE_VERSION . ":{$locale}_{$slug}";
+        $cacheKey = $this->cacheKey($locale, $slug);
 
         $result = Cache::remember($cacheKey, now()->addDays(7), function () use ($slug, $locale) {
             $data = $this->fetch($slug, $locale);
@@ -48,15 +48,14 @@ class SliderService
 
     public function clearCache(?string $slug = null): void
     {
-        $prefix = self::CACHE_KEY_PREFIX . 'v' . self::CACHE_VERSION . ':';
         if ($slug) {
             foreach (['de', 'en', 'tr'] as $locale) {
-                Cache::forget($prefix . "{$locale}_{$slug}");
+                Cache::forget($this->cacheKey($locale, strtolower($slug)));
             }
         } else {
             foreach (['de', 'en', 'tr'] as $locale) {
                 foreach (self::FALLBACK_SLUGS as $s) {
-                    Cache::forget($prefix . "{$locale}_{$s}");
+                    Cache::forget($this->cacheKey($locale, $s));
                 }
             }
         }
@@ -273,5 +272,12 @@ class SliderService
         }
 
         return $data;
+    }
+
+    private function cacheKey(string $locale, string $slug): string
+    {
+        $tenant = config('omr.main_tenant') ?: config('omr.tenant_id') ?: 'default';
+
+        return self::CACHE_KEY_PREFIX . 'v' . self::CACHE_VERSION . ":{$tenant}:" . strtolower($locale) . ':' . strtolower($slug);
     }
 }

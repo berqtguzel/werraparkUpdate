@@ -21,6 +21,8 @@ class HandleInertiaRequests extends Middleware
 {
     protected $rootView = 'app';
 
+    private const HOME_ROUTES = ['home', 'home.locale'];
+
     public function __construct(
         private MenuService $menuService,
         private ApiHealthService $apiHealthService,
@@ -42,10 +44,24 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         $locale = $request->route('locale') ?? 'de';
+        $routeName = $request->route()?->getName() ?? '';
         $health = $this->apiHealthService->check();
         $apiUp = $health['success'] ?? false;
-        $holidayThemes = $apiUp ? $this->holidayThemeService->getThemes($locale) : [];
-        $themeGroups = $this->holidayThemeService->splitThemesByFile($holidayThemes);
+        $isHomeRoute = in_array($routeName, self::HOME_ROUTES, true);
+        $needsHotels = $isHomeRoute || $routeName === 'hotels.show';
+        $needsThemes = $isHomeRoute || $routeName === 'offers.show';
+        $needsTravelThemes = $isHomeRoute;
+        $needsStaff = $isHomeRoute || $routeName === 'contact.index';
+        $needsReviews = $isHomeRoute;
+        $needsContactForms = $routeName === 'contact.index';
+        $needsSlider = $isHomeRoute;
+
+        $holidayThemes = ($apiUp && ($needsThemes || $needsTravelThemes))
+            ? $this->holidayThemeService->getThemes($locale)
+            : [];
+        $themeGroups = $holidayThemes !== []
+            ? $this->holidayThemeService->splitThemesByFile($holidayThemes)
+            : ['offers' => [], 'travelThemes' => []];
 
         return array_merge(parent::share($request), [
             'flash' => [
@@ -56,30 +72,17 @@ class HandleInertiaRequests extends Middleware
             'global' => [
                 'locale'    => $locale,
                 'menu'      => $apiUp ? $this->menuService->getMenu($locale) : [],
-                'hotels'    => $apiUp ? $this->hotelService->getHotels() : [],
-                'holidayThemes' => $holidayThemes,
+                'hotels'    => ($apiUp && $needsHotels) ? $this->hotelService->getHotels() : [],
                 'offerThemes' => $themeGroups['offers'],
                 'travelThemes' => $themeGroups['travelThemes'],
-                'widgets'   => $apiUp ? $this->widgetService->getWidgets($locale) : [
-                    'ratings' => [],
-                    'whatsapp' => [],
-                    'serviceHighlights' => [],
-                ],
-                'settings'  => $apiUp ? $this->settingsService->getForFrontend($locale) : [
-                    'general'     => [],
-                    'contact'     => [],
-                    'social'      => [],
-                    'branding'    => [],
-                    'colors'      => [],
-                    'footer'      => [],
-                    'seo'         => [],
-                    'analytics'   => [],
-                    'custom_code' => [],
-                ],
-                'staff'        => $apiUp ? $this->staffService->getStaff($locale) : [],
-                'reviews'      => $apiUp ? $this->reviewsService->getReviews($locale) : [],
-                'contactForms' => $apiUp ? $this->contactFormsService->getContactForms($locale) : [],
-                'slider'       => $apiUp ? $this->sliderService->getSlider(config('omr.hero_slider_slug', 'hero'), $locale) : null,
+                'widgets'   => $apiUp ? $this->widgetService->getWidgets($locale) : $this->emptyWidgets(),
+                'settings'  => $apiUp ? $this->settingsService->getForFrontend($locale) : $this->emptySettings(),
+                'staff'        => ($apiUp && $needsStaff) ? $this->staffService->getStaff($locale) : [],
+                'reviews'      => ($apiUp && $needsReviews) ? $this->reviewsService->getReviews($locale) : [],
+                'contactForms' => ($apiUp && $needsContactForms) ? $this->contactFormsService->getContactForms($locale) : $this->emptyContactForms(),
+                'slider'       => ($apiUp && $needsSlider)
+                    ? $this->sliderService->getSlider(config('omr.hero_slider_slug', 'hero'), $locale)
+                    : null,
             ],
 
             'ziggy' => fn() => array_merge(
@@ -87,5 +90,42 @@ class HandleInertiaRequests extends Middleware
                 ['location' => $request->url()]
             ),
         ]);
+    }
+
+    private function emptyWidgets(): array
+    {
+        return [
+            'ratings' => [],
+            'whatsapp' => [],
+            'serviceHighlights' => [],
+        ];
+    }
+
+    private function emptySettings(): array
+    {
+        return [
+            'general'     => [],
+            'contact'     => [],
+            'social'      => [],
+            'branding'    => [],
+            'colors'      => [],
+            'footer'      => [],
+            'seo'         => [],
+            'analytics'   => [],
+            'custom_code' => [],
+        ];
+    }
+
+    private function emptyContactForms(): array
+    {
+        return [
+            'contactInfo' => [
+                'address' => '',
+                'phone' => '',
+                'email' => '',
+            ],
+            'formFields' => [],
+            'forms' => [],
+        ];
     }
 }

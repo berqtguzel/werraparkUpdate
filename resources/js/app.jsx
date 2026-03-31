@@ -28,16 +28,20 @@ createInertiaApp({
     },
 
     setup({ el, App, props }) {
+        const initialLocale =
+            props?.initialPage?.props?.locale ??
+            props?.initialPage?.props?.global?.locale ??
+            "de";
         const root = createRoot(el);
         root.render(
-            <I18nProvider>
+            <I18nProvider initialLocale={initialLocale}>
                 <ThemeProvider>
                     <>
                         <PageTransitionLoader />
                         <App {...props} />
                     </>
                 </ThemeProvider>
-            </I18nProvider>
+            </I18nProvider>,
         );
     },
 

@@ -28,7 +28,8 @@ class HomeController extends Controller
 
     private function fetchRooms(string $locale): array
     {
-        $cacheKey = 'home_rooms:' . strtolower($locale);
+        $tenant = config('omr.main_tenant') ?: config('omr.tenant_id') ?: 'default';
+        $cacheKey = 'home_rooms:' . $tenant . ':' . strtolower($locale);
 
         return Cache::remember($cacheKey, now()->addDays(7), function () use ($locale) {
             try {

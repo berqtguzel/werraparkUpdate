@@ -7,11 +7,7 @@ import SeoHead from "@/Components/SeoHead";
 export default function ThemeShow({ theme }) {
     const { props } = usePage();
     const locale = props?.locale ?? props?.global?.locale ?? "de";
-    const themes = props?.themes?.length
-        ? props.themes
-        : props?.global?.holidayThemes?.length
-          ? props.global.holidayThemes
-          : [];
+    const themes = props?.themes?.length ? props.themes : [];
 
     const data =
         themes.find((item) => {
@@ -27,8 +23,6 @@ export default function ThemeShow({ theme }) {
     const title = data.name || "";
     const image = data.image || "";
     const file = data.file || null;
-
-    console.log("ThemeShow render", { theme, data, props }); // Debug log
 
     return (
         <AppLayout currentRoute="urlaubsthemen">

@@ -10,7 +10,8 @@ class GlobalWebsiteController extends Controller
 {
     public static function fetchGlobalWebsites(): array
     {
-        $cacheKey = 'global_websites_data';
+        $tenant = config('omr.main_tenant') ?: config('omr.tenant_id') ?: 'default';
+        $cacheKey = 'global_websites_data:' . $tenant;
         return Cache::remember($cacheKey, now()->addDays(7), function () {
             try {
                 $response = Http::timeout(5)->get('https://omerdogan.de/api/');

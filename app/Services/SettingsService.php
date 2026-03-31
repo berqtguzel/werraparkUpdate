@@ -29,7 +29,7 @@ class SettingsService
     public function getAll(?string $locale = null): array
     {
         $locale = $locale ?? config('omr.default_locale', 'de');
-        $cacheKey = self::CACHE_KEY_PREFIX . 'all:' . $locale;
+        $cacheKey = $this->cacheKey('all', $locale);
 
         return Cache::remember($cacheKey, now()->addDays(7), function () use ($locale) {
             $result = [];
@@ -49,15 +49,18 @@ class SettingsService
     {
         $locale = $locale ?? config('omr.default_locale', 'de');
         $tenantId = config('omr.tenant_id') ?: config('omr.main_tenant') ?: '';
+        $sectionKey = $key === 'custom_code' ? 'custom-code' : $key;
+        $cacheKey = $this->cacheKey($sectionKey, $locale);
 
         if (!$tenantId) {
             return [];
         }
 
-        $settings = \App\Http\Controllers\SettingsController::getSettings($tenantId, $locale);
-        $sectionKey = $key === 'custom_code' ? 'custom-code' : $key;
+        return Cache::remember($cacheKey, now()->addDays(7), function () use ($tenantId, $locale, $sectionKey) {
+            $settings = \App\Http\Controllers\SettingsController::getSettings($tenantId, $locale);
 
-        return $settings[$sectionKey] ?? [];
+            return $settings[$sectionKey] ?? [];
+        });
     }
 
     /**
@@ -67,6 +70,7 @@ class SettingsService
     {
         $locale = strtolower($locale);
         $tenantId = config('omr.tenant_id') ?: config('omr.main_tenant') ?: '';
+        $cacheKey = $this->cacheKey('frontend', $locale);
 
         if (!$tenantId) {
             return [
@@ -82,19 +86,21 @@ class SettingsService
             ];
         }
 
-        $settings = \App\Http\Controllers\SettingsController::getSettings($tenantId, $locale);
+        return Cache::remember($cacheKey, now()->addDays(7), function () use ($tenantId, $locale) {
+            $settings = \App\Http\Controllers\SettingsController::getSettings($tenantId, $locale);
 
-        return [
-            'general'     => $settings['general'] ?? [],
-            'contact'     => $this->normalizeContact($settings['contact'] ?? []),
-            'social'      => $settings['social'] ?? [],
-            'branding'    => $this->normalizeBranding($settings['branding'] ?? []),
-            'colors'      => $settings['colors'] ?? [],
-            'footer'      => $settings['footer'] ?? [],
-            'seo'         => $settings['seo'] ?? [],
-            'analytics'   => $settings['analytics'] ?? [],
-            'custom_code' => $settings['custom-code'] ?? [],
-        ];
+            return [
+                'general'     => $settings['general'] ?? [],
+                'contact'     => $this->normalizeContact($settings['contact'] ?? []),
+                'social'      => $settings['social'] ?? [],
+                'branding'    => $this->normalizeBranding($settings['branding'] ?? []),
+                'colors'      => $settings['colors'] ?? [],
+                'footer'      => $settings['footer'] ?? [],
+                'seo'         => $settings['seo'] ?? [],
+                'analytics'   => $settings['analytics'] ?? [],
+                'custom_code' => $settings['custom-code'] ?? [],
+            ];
+        });
     }
 
     /**
@@ -110,11 +116,19 @@ class SettingsService
                 Cache::forget("settings_{$tenantId}_{$locale}_{$mainTenant}");
             }
             foreach (self::SETTINGS_KEYS as $key) {
-                Cache::forget(self::CACHE_KEY_PREFIX . $key . ':' . $locale);
+                Cache::forget($this->cacheKey($key, $locale));
             }
-            Cache::forget(self::CACHE_KEY_PREFIX . 'all:' . $locale);
-            Cache::forget(self::CACHE_KEY_PREFIX . 'frontend:' . $locale);
+            Cache::forget($this->cacheKey('all', $locale));
+            Cache::forget($this->cacheKey('frontend', $locale));
         }
+    }
+
+    private function cacheKey(string $suffix, string $locale): string
+    {
+        $tenantId = config('omr.tenant_id') ?: config('omr.main_tenant') ?: 'default';
+        $mainTenant = config('omr.main_tenant') ?: env('OMR_MAIN_TENANT') ?: $tenantId;
+
+        return self::CACHE_KEY_PREFIX . "{$tenantId}:{$mainTenant}:" . strtolower($locale) . ':' . $suffix;
     }
 
     /**
