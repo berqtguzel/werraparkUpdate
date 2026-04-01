@@ -5,11 +5,15 @@ namespace App\Services;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class ReviewsService
 {
     private const CACHE_KEY_PREFIX = 'omr_reviews_';
 
+    /**
+     * Önbellekten veya API'den yorumları getirir.
+     */
     public function getReviews(string $locale): array
     {
         $locale = strtolower($locale);
@@ -20,13 +24,56 @@ class ReviewsService
         });
     }
 
+    /**
+     * Yeni bir yorum oluşturur (POST).
+     */
+public function createReview(array $data): array
+{
+    $base = rtrim(config('omr.base_url'), '/');
+
+    $endpoint = rtrim(config('omr.endpoint'), '/');
+
+    $tenant = config('omr.main_tenant') ?: config('omr.tenant_id');
+
+    if (!$tenant || !$base) {
+        return ['error' => 'Config missing'];
+    }
+    $url = "{$base}{$endpoint}/reviews";
+
+    try {
+        $response = Http::timeout(10)
+            ->withHeaders([
+                'X-Tenant-ID' => $tenant,
+                'Accept'      => 'application/json',
+            ])
+            ->post($url, [
+                'author_name'  => $data['author_name'] ?? '',
+                'author_email' => $data['author_email'] ?? '',
+                'review_text'  => $data['content'] ?? '',
+                'rating'       => $data['rating'] ?? 5,
+                'stay_date'    => now()->format('Y-m-d'),
+            ]);
+
+        if (!$response->successful()) {
+            return [
+                'error'   => 'API_REJECTED',
+                'details' => $response->json()
+            ];
+        }
+
+        $this->clearCache();
+        return $response->json();
+
+    } catch (\Throwable $e) {
+        return ['error' => 'EXCEPTION', 'message' => $e->getMessage()];
+    }
+}
     public function clearCache(): void
     {
         foreach (['de', 'en', 'tr'] as $locale) {
             Cache::forget($this->cacheKey($locale));
         }
     }
-
     private function fetch(string $locale): array
     {
         $base     = rtrim(config('omr.base_url'), '/');
@@ -58,52 +105,51 @@ class ReviewsService
             if (is_array($data) && isset($data['items'])) {
                 $data = $data['items'];
             }
+
             if (!is_array($data)) {
                 return [];
             }
 
             return $this->normalizeReviews($data, $locale);
-        } catch (\Throwable $e) {
+
+        } catch (Throwable $e) {
             Log::debug('Reviews API error', ['error' => $e->getMessage()]);
             return [];
         }
     }
 
-    private function normalizeReviews(array $data, string $locale = 'de'): array
+    private function normalizeReviews(array $data, string $locale): array
     {
         $out = [];
 
         foreach ($data as $item) {
-            if (!is_array($item)) {
-                continue;
-            }
+            if (!is_array($item)) continue;
+
             $attrs = $item['attributes'] ?? $item;
 
-            $status = $attrs['status'] ?? null;
-            if ($status && $status !== 'approved') {
+
+            if (isset($attrs['status']) && $attrs['status'] !== 'approved') {
                 continue;
             }
 
             $ratingRaw = $attrs['rating'] ?? $attrs['stars'] ?? 5;
-            $rating = is_numeric($ratingRaw)
-                ? (float) $ratingRaw
-                : 5.0;
+            $rating = is_numeric($ratingRaw) ? (float)$ratingRaw : 5.0;
+
             if ($rating > 5) {
                 $rating = round($rating / 2, 1);
             }
             $rating = max(1, min(5, (int) round($rating)));
 
+
             $stayDate = $attrs['stay_date'] ?? $attrs['stay'] ?? $attrs['period'] ?? null;
-            $stayFormatted = $stayDate
-                ? $this->formatStayDate($stayDate, $locale)
-                : '';
+            $stayFormatted = $stayDate ? $this->formatStayDate($stayDate, $locale) : '';
 
             $out[] = [
                 'id'       => $attrs['id'] ?? uniqid('r'),
-                'name'     => $attrs['author_name'] ?? $attrs['name'] ?? $attrs['author'] ?? $attrs['guest_name'] ?? '',
+                'name'     => $attrs['author_name'] ?? $attrs['name'] ?? 'Anonymous',
                 'location' => $attrs['location'] ?? $attrs['city'] ?? '',
                 'rating'   => $rating,
-                'text'     => $attrs['content'] ?? $attrs['text'] ?? $attrs['review'] ?? $attrs['comment'] ?? '',
+                'text'     => $attrs['content'] ?? $attrs['comment'] ?? '',
                 'stay'     => $stayFormatted,
             ];
         }
@@ -123,8 +169,9 @@ class ReviewsService
                 \IntlDateFormatter::GREGORIAN,
                 'MMMM yyyy'
             );
+
             return $formatter->format($dt);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return $date;
         }
     }
@@ -132,7 +179,6 @@ class ReviewsService
     private function cacheKey(string $locale): string
     {
         $tenant = config('omr.main_tenant') ?: config('omr.tenant_id') ?: 'default';
-
         return self::CACHE_KEY_PREFIX . $tenant . ':' . strtolower($locale);
     }
 }

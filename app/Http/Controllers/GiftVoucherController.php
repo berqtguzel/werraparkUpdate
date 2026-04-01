@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\GiftVoucherApiService;
+use App\Services\CouponService; // ✅ EKLENDİ
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -18,6 +19,7 @@ class GiftVoucherController extends Controller
 
     public function __construct(
         private GiftVoucherApiService $billing,
+        private CouponService $couponService, // ✅ EKLENDİ
     ) {}
 
     /**
@@ -37,6 +39,10 @@ class GiftVoucherController extends Controller
                 'companies' => $this->billing->getCompaniesPublic(),
                 'defaultCompanyId' => $this->billing->resolveCompanyId(),
                 'paymentMethods' => $this->billing->getPaymentMethodsPublic(),
+
+                // ✅ BURASI EKLENDİ
+                'coupons' => $this->couponService->getCoupons(),
+
                 'billingApi' => [
                     'ok' => empty($companiesRaw['_error']),
                     'message' => $companiesRaw['message'] ?? ($companiesRaw['_error'] ?? null),
@@ -89,9 +95,6 @@ class GiftVoucherController extends Controller
         ));
     }
 
-    /**
-     * Uzak API: GET /v1/companies — güvenli özet + ödeme yöntemleri.
-     */
     public function companiesJson(): JsonResponse
     {
         $cacheKey = self::CACHE_PREFIX . ':companies:v' . $this->cacheVersion();
@@ -105,10 +108,6 @@ class GiftVoucherController extends Controller
         return response()->json($data);
     }
 
-    /**
-     * Uzak API: GET /v1/invoices — sorgu parametreleri aynen iletilir.
-     * (Gutschein-UI listelemez; Rechnung nach erfolgreicher Zahlung / eigener Route.)
-     */
     public function invoicesJson(Request $request): JsonResponse
     {
         $query = array_filter($request->query(), fn ($v) => $v !== null && $v !== '');
@@ -116,6 +115,7 @@ class GiftVoucherController extends Controller
             'version' => $this->cacheVersion(),
             'query' => $query,
         ]));
+
         $data = Cache::remember($cacheKey, self::CACHE_TTL, function () use ($query) {
             return [
                 'data' => $this->billing->getInvoicesPublic($query),
@@ -133,6 +133,7 @@ class GiftVoucherController extends Controller
             'invoice' => $invoice,
             'query' => $query,
         ]));
+
         $data = Cache::remember($cacheKey, self::CACHE_TTL, function () use ($invoice, $query) {
             return $this->billing->getInvoicePublic($invoice, $query);
         });

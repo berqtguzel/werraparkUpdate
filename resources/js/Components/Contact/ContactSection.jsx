@@ -1,10 +1,16 @@
-import React, { useEffect, useState, Fragment, useRef } from "react";
+import React, { Fragment, useEffect, useRef, useState } from "react";
 import { usePage, router } from "@inertiajs/react";
 import { Dialog, Transition } from "@headlessui/react";
 import "../../../css/contact.css";
-import { Mail, Phone, MapPin, CheckCircle, Globe, AlertCircle } from "lucide-react";
+import {
+    Mail,
+    Phone,
+    MapPin,
+    CheckCircle,
+    Globe,
+    AlertCircle,
+} from "lucide-react";
 import { useTranslation } from "@/i18n";
-
 const norm = (s = "") =>
     String(s)
         .normalize("NFD")
@@ -73,7 +79,11 @@ const localizeContactError = (input, t) => {
             : null;
         const lower = rawMessage.toLowerCase();
 
-        if (lower.includes("required") || lower.includes("pflicht") || lower.includes("zorunlu")) {
+        if (
+            lower.includes("required") ||
+            lower.includes("pflicht") ||
+            lower.includes("zorunlu")
+        ) {
             return {
                 title: t("contact.errorTitle"),
                 message: fieldLabel
@@ -420,12 +430,16 @@ export default function ContactPage() {
                             role="alert"
                             aria-live="polite"
                         >
-                            <div className="ct-form-status__icon" aria-hidden="true">
+                            <div
+                                className="ct-form-status__icon"
+                                aria-hidden="true"
+                            >
                                 <AlertCircle size={18} />
                             </div>
                             <div className="ct-form-status__body">
                                 <strong className="ct-form-status__title">
-                                    {submitStatus.title || t("contact.errorTitle")}
+                                    {submitStatus.title ||
+                                        t("contact.errorTitle")}
                                 </strong>
                                 <p className="ct-form-status__text">
                                     {submitStatus.message}
@@ -547,7 +561,9 @@ export default function ContactPage() {
                                                 rows="6"
                                                 placeholder={
                                                     placeholderText ||
-                                                    t("contact.messagePlaceholder")
+                                                    t(
+                                                        "contact.messagePlaceholder",
+                                                    )
                                                 }
                                                 required={field.required}
                                             />
@@ -576,7 +592,9 @@ export default function ContactPage() {
                                                         : undefined
                                                 }
                                                 spellCheck={
-                                                    isEmailField ? false : undefined
+                                                    isEmailField
+                                                        ? false
+                                                        : undefined
                                                 }
                                                 placeholder={
                                                     placeholderText ||
@@ -589,7 +607,8 @@ export default function ContactPage() {
                                                     if (isPhoneField) {
                                                         event.currentTarget.value =
                                                             sanitizePhoneInput(
-                                                                event.currentTarget
+                                                                event
+                                                                    .currentTarget
                                                                     .value,
                                                             );
                                                     }
@@ -597,7 +616,8 @@ export default function ContactPage() {
                                                     if (isEmailField) {
                                                         event.currentTarget.value =
                                                             sanitizeEmailInput(
-                                                                event.currentTarget
+                                                                event
+                                                                    .currentTarget
                                                                     .value,
                                                             );
                                                     }

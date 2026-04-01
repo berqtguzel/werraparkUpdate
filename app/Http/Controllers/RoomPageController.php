@@ -130,17 +130,20 @@ class RoomPageController extends Controller
 
     private function fetchRoomPrices(int $roomId, string $locale): array
     {
-        $url = config('omr.base_url') . config('omr.endpoint') . 'room-prices/' . $roomId;
+        $url = config('omr.base_url') . config('omr.endpoint') . 'room-prices';
 
         foreach ($this->localeFallbackChain($locale) as $lang) {
-            $items = $this->fetchPaginatedItems($url, $this->langQuery($lang));
+            $items = $this->fetchPaginatedItems($url, array_merge(
+                $this->langQuery($lang),
+                ['room_id' => $roomId],
+            ));
             $mapped = $this->mapRoomPriceRows($items);
             if ($mapped !== []) {
                 return $mapped;
             }
         }
 
-        $items = $this->fetchPaginatedItems($url, []);
+        $items = $this->fetchPaginatedItems($url, ['room_id' => $roomId]);
         $mapped = $this->mapRoomPriceRows($items);
 
         return $mapped;
@@ -308,6 +311,10 @@ class RoomPageController extends Controller
                 if (isset($data[$key]) && is_array($data[$key]) && array_is_list($data[$key])) {
                     return array_values(array_filter($data[$key], 'is_array'));
                 }
+            }
+
+            if (!array_is_list($data) && count($data) > 0) {
+                return [$data];
             }
         }
 

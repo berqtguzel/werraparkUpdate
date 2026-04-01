@@ -14,7 +14,7 @@ use App\Services\StaffService;
 use App\Services\ReviewsService;
 use App\Services\ContactFormsService;
 use App\Services\SliderService;
-use App\Services\HotelService; // 1. Servisi buraya import ettik
+use App\Services\HotelService;
 use App\Services\HolidayThemeService;
 
 class HandleInertiaRequests extends Middleware
@@ -32,7 +32,7 @@ class HandleInertiaRequests extends Middleware
         private ReviewsService $reviewsService,
         private ContactFormsService $contactFormsService,
         private SliderService $sliderService,
-        private HotelService $hotelService, // 2. Constructor'a inject ettik
+        private HotelService $hotelService,
         private HolidayThemeService $holidayThemeService,
     ) {}
 
@@ -45,20 +45,30 @@ class HandleInertiaRequests extends Middleware
     {
         $locale = $request->route('locale') ?? 'de';
         $routeName = $request->route()?->getName() ?? '';
+
         $health = $this->apiHealthService->check();
         $apiUp = $health['success'] ?? false;
-        $isHomeRoute = in_array($routeName, self::HOME_ROUTES, true);
-        $needsHotels = $isHomeRoute || $routeName === 'hotels.show';
-        $needsThemes = $isHomeRoute || $routeName === 'offers.show';
-        $needsTravelThemes = $isHomeRoute;
-        $needsStaff = $isHomeRoute || $routeName === 'contact.index';
-        $needsReviews = $isHomeRoute;
-        $needsContactForms = $routeName === 'contact.index';
-        $needsSlider = $isHomeRoute;
 
+        // Route Kontrolleri
+        $isHomeRoute = in_array($routeName, self::HOME_ROUTES, true);
+
+        // Veri ihtiyaçlarını belirleyelim
+        $needsHotels       = $isHomeRoute || $routeName === 'hotels.show' || str_contains($routeName, 'hotel');
+        $needsThemes       = $isHomeRoute || $routeName === 'offers.show';
+        $needsTravelThemes = $isHomeRoute;
+        $needsStaff        = $isHomeRoute || $routeName === 'contact.index';
+
+        // 🔥 DÜZELTME: Yorumlar hem ana sayfada hem de iletişim/yorum sayfalarında yüklensin
+        $needsReviews      = $isHomeRoute || $routeName === 'contact.index' || str_contains($routeName, 'review');
+
+        $needsContactForms = $routeName === 'contact.index';
+        $needsSlider       = $isHomeRoute;
+
+        // Holiday Themes İşleme
         $holidayThemes = ($apiUp && ($needsThemes || $needsTravelThemes))
             ? $this->holidayThemeService->getThemes($locale)
             : [];
+
         $themeGroups = $holidayThemes !== []
             ? $this->holidayThemeService->splitThemesByFile($holidayThemes)
             : ['offers' => [], 'travelThemes' => []];
@@ -70,15 +80,18 @@ class HandleInertiaRequests extends Middleware
             ],
 
             'global' => [
-                'locale'    => $locale,
-                'menu'      => $apiUp ? $this->menuService->getMenu($locale) : [],
-                'hotels'    => ($apiUp && $needsHotels) ? $this->hotelService->getHotels() : [],
-                'offerThemes' => $themeGroups['offers'],
+                'locale'       => $locale,
+                'menu'         => $apiUp ? $this->menuService->getMenu($locale) : [],
+                'hotels'       => ($apiUp && $needsHotels) ? $this->hotelService->getHotels() : [],
+                'offerThemes'  => $themeGroups['offers'],
                 'travelThemes' => $themeGroups['travelThemes'],
-                'widgets'   => $apiUp ? $this->widgetService->getWidgets($locale) : $this->emptyWidgets(),
-                'settings'  => $apiUp ? $this->settingsService->getForFrontend($locale) : $this->emptySettings(),
+                'widgets'      => $apiUp ? $this->widgetService->getWidgets($locale) : $this->emptyWidgets(),
+                'settings'     => $apiUp ? $this->settingsService->getForFrontend($locale) : $this->emptySettings(),
                 'staff'        => ($apiUp && $needsStaff) ? $this->staffService->getStaff($locale) : [],
+
+                // Yorumlar burada yükleniyor
                 'reviews'      => ($apiUp && $needsReviews) ? $this->reviewsService->getReviews($locale) : [],
+
                 'contactForms' => ($apiUp && $needsContactForms) ? $this->contactFormsService->getContactForms($locale) : $this->emptyContactForms(),
                 'slider'       => ($apiUp && $needsSlider)
                     ? $this->sliderService->getSlider(config('omr.hero_slider_slug', 'hero'), $locale)
@@ -121,11 +134,11 @@ class HandleInertiaRequests extends Middleware
         return [
             'contactInfo' => [
                 'address' => '',
-                'phone' => '',
-                'email' => '',
+                'phone'   => '',
+                'email'   => '',
             ],
             'formFields' => [],
-            'forms' => [],
+            'forms'      => [],
         ];
     }
 }

@@ -359,7 +359,9 @@ function getFirstSelectableDay(months) {
     }
 
     for (const month of months) {
-        const match = month.days.find((cell) => cell.type === "price" && cell.item);
+        const match = month.days.find(
+            (cell) => cell.type === "price" && cell.item,
+        );
 
         if (match?.item?.date) {
             return match.item.date;
@@ -375,7 +377,11 @@ function getCheapestSelectableDay(months) {
     months.forEach((month) => {
         month.days.forEach((cell) => {
             if (cell.type !== "price" || !cell.item || cell.item.closed) return;
-            if (cell.item.price == null || Number.isNaN(Number(cell.item.price))) return;
+            if (
+                cell.item.price == null ||
+                Number.isNaN(Number(cell.item.price))
+            )
+                return;
 
             if (!cheapest || Number(cell.item.price) < Number(cheapest.price)) {
                 cheapest = cell.item;
@@ -483,6 +489,10 @@ function normalizeRoom(apiRoom, locale) {
 export default function RoomShow() {
     const { props } = usePage();
     const { t, locale } = useTranslation();
+
+    console.log("RoomPage props:", props);
+    console.log("Room prices from API:", props?.room?.room_prices);
+
     const data = React.useMemo(
         () => normalizeRoom(props?.room, locale),
         [props?.room, locale],
@@ -622,7 +632,8 @@ export default function RoomShow() {
 
     const currentCalendarMonth = calendarMonths[monthIndex] ?? null;
     const selectedItemIndex = React.useMemo(
-        () => allCalendarItems.findIndex((item) => item.date === selectedDateKey),
+        () =>
+            allCalendarItems.findIndex((item) => item.date === selectedDateKey),
         [allCalendarItems, selectedDateKey],
     );
     const selectedCalendarItem =
@@ -630,7 +641,8 @@ export default function RoomShow() {
     const prevCalendarItem =
         selectedItemIndex > 0 ? allCalendarItems[selectedItemIndex - 1] : null;
     const nextCalendarItem =
-        selectedItemIndex >= 0 && selectedItemIndex < allCalendarItems.length - 1
+        selectedItemIndex >= 0 &&
+        selectedItemIndex < allCalendarItems.length - 1
             ? allCalendarItems[selectedItemIndex + 1]
             : null;
     const cheapestDateKey = React.useMemo(
@@ -642,7 +654,9 @@ export default function RoomShow() {
         (date) => {
             if (!date) return;
 
-            const matchIndex = allCalendarItems.findIndex((item) => item.date === date);
+            const matchIndex = allCalendarItems.findIndex(
+                (item) => item.date === date,
+            );
             if (matchIndex < 0) return;
 
             setSelectedDateKey(date);
@@ -778,7 +792,9 @@ export default function RoomShow() {
                                 <header className="rux-calendar-panel__head">
                                     <div className="rux-calendar-panel__title">
                                         <CalendarDays size={16} />
-                                        <h2>{t("roomDetail.dailyPriceTitle")}</h2>
+                                        <h2>
+                                            {t("roomDetail.dailyPriceTitle")}
+                                        </h2>
                                     </div>
 
                                     {calendarMonths.length > 1 ? (
@@ -792,7 +808,9 @@ export default function RoomShow() {
                                                     )
                                                 }
                                                 disabled={monthIndex === 0}
-                                                aria-label={t("roomDetail.prevMonth")}
+                                                aria-label={t(
+                                                    "roomDetail.prevMonth",
+                                                )}
                                             >
                                                 <ChevronLeft size={16} />
                                             </button>
@@ -802,7 +820,8 @@ export default function RoomShow() {
                                                 onClick={() =>
                                                     setMonthIndex((prev) =>
                                                         Math.min(
-                                                            calendarMonths.length - 1,
+                                                            calendarMonths.length -
+                                                                1,
                                                             prev + 1,
                                                         ),
                                                     )
@@ -811,7 +830,9 @@ export default function RoomShow() {
                                                     monthIndex ===
                                                     calendarMonths.length - 1
                                                 }
-                                                aria-label={t("roomDetail.nextMonth")}
+                                                aria-label={t(
+                                                    "roomDetail.nextMonth",
+                                                )}
                                             >
                                                 <ChevronRight size={16} />
                                             </button>
@@ -826,9 +847,13 @@ export default function RoomShow() {
                                                 key={month.key}
                                                 type="button"
                                                 className={`rux-calendar-pill ${
-                                                    index === monthIndex ? "is-active" : ""
+                                                    index === monthIndex
+                                                        ? "is-active"
+                                                        : ""
                                                 }`}
-                                                onClick={() => setMonthIndex(index)}
+                                                onClick={() =>
+                                                    setMonthIndex(index)
+                                                }
                                             >
                                                 {month.label}
                                             </button>
@@ -841,7 +866,9 @@ export default function RoomShow() {
                                             className="rux-calendar-shortcut"
                                             onClick={() =>
                                                 selectCalendarDate(
-                                                    getFirstSelectableDay(calendarMonths),
+                                                    getFirstSelectableDay(
+                                                        calendarMonths,
+                                                    ),
                                                 )
                                             }
                                         >
@@ -852,7 +879,9 @@ export default function RoomShow() {
                                                 type="button"
                                                 className="rux-calendar-shortcut"
                                                 onClick={() =>
-                                                    selectCalendarDate(cheapestDateKey)
+                                                    selectCalendarDate(
+                                                        cheapestDateKey,
+                                                    )
                                                 }
                                             >
                                                 {t("roomDetail.bestPrice")}
@@ -866,9 +895,12 @@ export default function RoomShow() {
                                         <div>
                                             <div className="rux-calendar-month__title">
                                                 <CalendarDays size={16} />
-                                                <h4>{currentCalendarMonth.label}</h4>
+                                                <h4>
+                                                    {currentCalendarMonth.label}
+                                                </h4>
                                             </div>
-                                            {currentCalendarMonth.minPrice != null ? (
+                                            {currentCalendarMonth.minPrice !=
+                                            null ? (
                                                 <p className="rux-calendar-month__hint">
                                                     {t("roomDetail.fromLabel", {
                                                         value: formatMoney(
@@ -894,109 +926,161 @@ export default function RoomShow() {
                                             </div>
 
                                             <div className="rux-calendar-grid">
-                                        {currentCalendarMonth.days.map((cell) => {
-                                            if (cell.type === "empty") {
-                                                return (
-                                                    <div
-                                                        key={cell.key}
-                                                        className="rux-calendar-cell is-empty"
-                                                        aria-hidden="true"
-                                                    />
-                                                );
-                                            }
+                                                {currentCalendarMonth.days.map(
+                                                    (cell) => {
+                                                        if (
+                                                            cell.type ===
+                                                            "empty"
+                                                        ) {
+                                                            return (
+                                                                <div
+                                                                    key={
+                                                                        cell.key
+                                                                    }
+                                                                    className="rux-calendar-cell is-empty"
+                                                                    aria-hidden="true"
+                                                                />
+                                                            );
+                                                        }
 
-                                            if (cell.type === "plain") {
-                                                return (
-                                                    <div
-                                                        key={cell.key}
-                                                        className="rux-calendar-cell"
-                                                    >
-                                                        <span className="rux-calendar-day">
-                                                            {cell.day}
-                                                        </span>
-                                                    </div>
-                                                );
-                                            }
+                                                        if (
+                                                            cell.type ===
+                                                            "plain"
+                                                        ) {
+                                                            return (
+                                                                <div
+                                                                    key={
+                                                                        cell.key
+                                                                    }
+                                                                    className="rux-calendar-cell"
+                                                                >
+                                                                    <span className="rux-calendar-day">
+                                                                        {
+                                                                            cell.day
+                                                                        }
+                                                                    </span>
+                                                                </div>
+                                                            );
+                                                        }
 
-                                            const item = cell.item;
-                                            const tooltipLines = [
-                                                formatDateLabel(item?.date, locale),
-                                                item?.price != null
-                                                    ? formatMoney(item.price, locale)
-                                                    : t("roomDetail.priceOnRequest"),
-                                                item?.capacity
-                                                    ? t("roomDetail.capacityValue", {
-                                                          count: item.capacity,
-                                                      })
-                                                    : null,
-                                                item?.discountRate
-                                                    ? t("roomDetail.discountLabel", {
-                                                          value: item.discountRate,
-                                                      })
-                                                    : null,
-                                                item?.closed
-                                                    ? t("roomDetail.closedLabel")
-                                                    : null,
-                                                item?.notes
-                                                    ? `${t("roomDetail.notesLabel")}: ${item.notes}`
-                                                    : null,
-                                            ]
-                                                .filter(Boolean)
-                                                .join(" • ");
+                                                        const item = cell.item;
+                                                        const tooltipLines = [
+                                                            formatDateLabel(
+                                                                item?.date,
+                                                                locale,
+                                                            ),
+                                                            item?.price != null
+                                                                ? formatMoney(
+                                                                      item.price,
+                                                                      locale,
+                                                                  )
+                                                                : t(
+                                                                      "roomDetail.priceOnRequest",
+                                                                  ),
+                                                            item?.capacity
+                                                                ? t(
+                                                                      "roomDetail.capacityValue",
+                                                                      {
+                                                                          count: item.capacity,
+                                                                      },
+                                                                  )
+                                                                : null,
+                                                            item?.discountRate
+                                                                ? t(
+                                                                      "roomDetail.discountLabel",
+                                                                      {
+                                                                          value: item.discountRate,
+                                                                      },
+                                                                  )
+                                                                : null,
+                                                            item?.closed
+                                                                ? t(
+                                                                      "roomDetail.closedLabel",
+                                                                  )
+                                                                : null,
+                                                            item?.notes
+                                                                ? `${t("roomDetail.notesLabel")}: ${item.notes}`
+                                                                : null,
+                                                        ]
+                                                            .filter(Boolean)
+                                                            .join(" • ");
 
-                                            return (
-                                                <button
-                                                    key={cell.key}
-                                                    type="button"
-                                                    className={`rux-calendar-cell is-priced ${
-                                                        item?.closed ? "is-closed" : ""
-                                                    } ${
-                                                        selectedDateKey === item?.date
-                                                            ? "is-selected"
-                                                            : ""
-                                                    }`}
-                                                    title={tooltipLines}
-                                                    onClick={() =>
-                                                        selectCalendarDate(item?.date ?? null)
-                                                    }
-                                                >
-                                                    <div className="rux-calendar-cell__top">
-                                                        <span className="rux-calendar-day">
-                                                            {cell.day}
-                                                        </span>
-                                                        {item?.discountRate ? (
-                                                            <span className="rux-calendar-discount">
-                                                                -{item.discountRate}%
-                                                            </span>
-                                                        ) : null}
-                                                    </div>
+                                                        return (
+                                                            <button
+                                                                key={cell.key}
+                                                                type="button"
+                                                                className={`rux-calendar-cell is-priced ${
+                                                                    item?.closed
+                                                                        ? "is-closed"
+                                                                        : ""
+                                                                } ${
+                                                                    selectedDateKey ===
+                                                                    item?.date
+                                                                        ? "is-selected"
+                                                                        : ""
+                                                                }`}
+                                                                title={
+                                                                    tooltipLines
+                                                                }
+                                                                onClick={() =>
+                                                                    selectCalendarDate(
+                                                                        item?.date ??
+                                                                            null,
+                                                                    )
+                                                                }
+                                                            >
+                                                                <div className="rux-calendar-cell__top">
+                                                                    <span className="rux-calendar-day">
+                                                                        {
+                                                                            cell.day
+                                                                        }
+                                                                    </span>
+                                                                    {item?.discountRate ? (
+                                                                        <span className="rux-calendar-discount">
+                                                                            -
+                                                                            {
+                                                                                item.discountRate
+                                                                            }
+                                                                            %
+                                                                        </span>
+                                                                    ) : null}
+                                                                </div>
 
-                                                    <strong className="rux-calendar-price">
-                                                        {item?.price != null
-                                                            ? formatMoney(item.price, locale)
-                                                            : t("roomDetail.priceOnRequest")}
-                                                    </strong>
+                                                                <strong className="rux-calendar-price">
+                                                                    {item?.price !=
+                                                                    null
+                                                                        ? formatMoney(
+                                                                              item.price,
+                                                                              locale,
+                                                                          )
+                                                                        : t(
+                                                                              "roomDetail.priceOnRequest",
+                                                                          )}
+                                                                </strong>
 
-                                                    <div className="rux-calendar-meta">
-                                                        {item?.capacity ? (
-                                                            <span>
-                                                                {t(
-                                                                    "roomDetail.calendarGuestsShort",
-                                                                    {
-                                                                        count: item.capacity,
-                                                                    },
-                                                                )}
-                                                            </span>
-                                                        ) : null}
-                                                        {item?.closed ? (
-                                                            <span className="is-closed">
-                                                                {t("roomDetail.closedLabel")}
-                                                            </span>
-                                                        ) : null}
-                                                    </div>
-                                                </button>
-                                            );
-                                        })}
+                                                                <div className="rux-calendar-meta">
+                                                                    {item?.capacity ? (
+                                                                        <span>
+                                                                            {t(
+                                                                                "roomDetail.calendarGuestsShort",
+                                                                                {
+                                                                                    count: item.capacity,
+                                                                                },
+                                                                            )}
+                                                                        </span>
+                                                                    ) : null}
+                                                                    {item?.closed ? (
+                                                                        <span className="is-closed">
+                                                                            {t(
+                                                                                "roomDetail.closedLabel",
+                                                                            )}
+                                                                        </span>
+                                                                    ) : null}
+                                                                </div>
+                                                            </button>
+                                                        );
+                                                    },
+                                                )}
                                             </div>
                                         </div>
                                     </div>
@@ -1009,10 +1093,14 @@ export default function RoomShow() {
                                                 type="button"
                                                 className="rux-calendar-day-nav"
                                                 onClick={() =>
-                                                    selectCalendarDate(prevCalendarItem?.date)
+                                                    selectCalendarDate(
+                                                        prevCalendarItem?.date,
+                                                    )
                                                 }
                                                 disabled={!prevCalendarItem}
-                                                aria-label={t("roomDetail.prevDay")}
+                                                aria-label={t(
+                                                    "roomDetail.prevDay",
+                                                )}
                                             >
                                                 <ChevronLeft size={16} />
                                             </button>
@@ -1025,7 +1113,8 @@ export default function RoomShow() {
                                                     )}
                                                 </strong>
                                                 <span>
-                                                    {selectedCalendarItem.price != null
+                                                    {selectedCalendarItem.price !=
+                                                    null
                                                         ? formatMoney(
                                                               selectedCalendarItem.price,
                                                               locale,
@@ -1040,10 +1129,14 @@ export default function RoomShow() {
                                                 type="button"
                                                 className="rux-calendar-day-nav"
                                                 onClick={() =>
-                                                    selectCalendarDate(nextCalendarItem?.date)
+                                                    selectCalendarDate(
+                                                        nextCalendarItem?.date,
+                                                    )
                                                 }
                                                 disabled={!nextCalendarItem}
-                                                aria-label={t("roomDetail.nextDay")}
+                                                aria-label={t(
+                                                    "roomDetail.nextDay",
+                                                )}
                                             >
                                                 <ChevronRight size={16} />
                                             </button>
@@ -1051,21 +1144,29 @@ export default function RoomShow() {
                                         <div className="rux-calendar-detail__meta">
                                             {selectedCalendarItem.capacity ? (
                                                 <span>
-                                                    {t("roomDetail.capacityValue", {
-                                                        count: selectedCalendarItem.capacity,
-                                                    })}
+                                                    {t(
+                                                        "roomDetail.capacityValue",
+                                                        {
+                                                            count: selectedCalendarItem.capacity,
+                                                        },
+                                                    )}
                                                 </span>
                                             ) : null}
                                             {selectedCalendarItem.discountRate ? (
                                                 <span>
-                                                    {t("roomDetail.discountLabel", {
-                                                        value: selectedCalendarItem.discountRate,
-                                                    })}
+                                                    {t(
+                                                        "roomDetail.discountLabel",
+                                                        {
+                                                            value: selectedCalendarItem.discountRate,
+                                                        },
+                                                    )}
                                                 </span>
                                             ) : null}
                                             {selectedCalendarItem.closed ? (
                                                 <span className="is-closed">
-                                                    {t("roomDetail.closedLabel")}
+                                                    {t(
+                                                        "roomDetail.closedLabel",
+                                                    )}
                                                 </span>
                                             ) : null}
                                         </div>
@@ -1244,7 +1345,6 @@ export default function RoomShow() {
                                 </div>
                             </article>
                         )}
-
                 </div>
             </section>
         </AppLayout>

@@ -1,0 +1,1 @@
+{"success":false,"message":"Tenant not initialized. Please provide tenant identification via query parameter (?tenant=tenant_id) or header (X-Tenant-ID)"}

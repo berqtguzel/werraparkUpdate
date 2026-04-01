@@ -4,20 +4,19 @@ import { useTranslation } from "@/i18n";
 import "../../../css/hotel-reviews.css";
 
 function normalizeReview(r) {
-    let rating = Number(r.rating ?? r.stars ?? 5);
-    if (rating > 5) rating = Math.round(rating / 2);
-    rating = Math.max(1, Math.min(5, Math.round(rating)));
+    // PHP servisinden gelen rating zaten 1-5 arası,
+    // ama garantiye almak için kalsın
+    let rating = Number(r.rating ?? 5);
 
     return {
-        id: r.id ?? r.slug ?? String(Math.random()),
-        name: r.author_name ?? r.name ?? r.author ?? r.guest_name ?? "",
-        location: r.location ?? r.city ?? "",
+        id: r.id ?? String(Math.random()),
+        name: r.name ?? r.author_name ?? "Misafir",
+        location: r.location ?? "",
         rating,
-        text: r.content ?? r.text ?? r.review ?? "",
-        stay: r.stay ?? r.stay_date ?? r.period ?? r.hotel ?? "",
+        text: r.text ?? r.content ?? "", // PHP 'text' olarak gönderiyor
+        stay: r.stay ?? "",
     };
 }
-
 const stars = (count) => "★".repeat(Math.max(0, Math.min(5, count)));
 
 export default function HotelReviews() {
@@ -36,7 +35,7 @@ export default function HotelReviews() {
         return arr.map(normalizeReview);
     }, [apiReviews, widgetsRatings]);
     const track = [...reviews, ...reviews];
-
+    console.log("Inertia Props:", props.global);
     return (
         <section className="hr-wrap" aria-label={t("reviews.sectionAria")}>
             <div className="hr-head">
@@ -71,7 +70,8 @@ export default function HotelReviews() {
                                 <span>
                                     {[r.location, r.stay]
                                         .filter(Boolean)
-                                        .join(" · ") || t("reviews.metaFallback")}
+                                        .join(" · ") ||
+                                        t("reviews.metaFallback")}
                                 </span>
                             </div>
                         </article>

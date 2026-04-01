@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "@inertiajs/react";
 import { useTranslation } from "@/i18n";
-
+import { usePage } from "@inertiajs/react";
 function getNumberLocale(locale) {
     if (locale === "tr") return "tr-TR";
     if (locale === "en") return "en-GB";
@@ -20,6 +20,9 @@ export default function GiftVoucherForm({
     companies = [],
     defaultCompanyId = null,
 }) {
+    const { coupons } = usePage().props;
+
+    console.log(coupons);
     const { t } = useTranslation();
     const presetAmounts = [100, 200, 300, 400, 500];
     const [selectedAmount, setSelectedAmount] = React.useState(100);
@@ -410,7 +413,6 @@ export default function GiftVoucherForm({
                             <p>{submitError}</p>
                         </div>
                     ) : null}
-
                 </section>
             </div>
         </section>

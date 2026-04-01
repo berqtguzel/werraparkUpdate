@@ -13,7 +13,10 @@ import "../../../css/rooms-showcase.css";
 import { useTranslation } from "@/i18n";
 
 function stripHtml(value = "") {
-    return String(value).replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+    return String(value)
+        .replace(/<[^>]*>/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
 }
 
 function summarizeText(value = "", maxLength = 130) {
@@ -26,7 +29,9 @@ function summarizeText(value = "", maxLength = 130) {
 function normalizeList(items) {
     return (Array.isArray(items) ? items : [])
         .map((item) =>
-            typeof item === "string" ? item : item?.name ?? item?.label ?? null,
+            typeof item === "string"
+                ? item
+                : (item?.name ?? item?.label ?? null),
         )
         .filter(Boolean);
 }
@@ -86,16 +91,25 @@ function RoomCard({ hotel, locale, t }) {
                     <h3 id={`room-card-${hotel.id}`} className="rsm-title">
                         {hotel.name}
                     </h3>
-                    {cardSummary ? <p className="rsm-desc">{cardSummary}</p> : null}
+                    {cardSummary ? (
+                        <p className="rsm-desc">{cardSummary}</p>
+                    ) : null}
                 </div>
 
                 {factItems.length ? (
                     <div className="rsm-facts">
                         {factItems.map((fact) => (
-                            <div className="rsm-fact" key={`${fact.label}-${fact.value}`}>
-                                <span className="rsm-fact__icon">{fact.icon}</span>
+                            <div
+                                className="rsm-fact"
+                                key={`${fact.label}-${fact.value}`}
+                            >
+                                <span className="rsm-fact__icon">
+                                    {fact.icon}
+                                </span>
                                 <div className="rsm-fact__copy">
-                                    <span className="rsm-fact__label">{fact.label}</span>
+                                    <span className="rsm-fact__label">
+                                        {fact.label}
+                                    </span>
                                     <strong>{fact.value}</strong>
                                 </div>
                             </div>
@@ -143,9 +157,9 @@ export default function RoomsShowcase() {
             <div className="rsm-shell">
                 <header className="rsm-header">
                     <p className="rsm-eyebrow">{t("rooms.eyebrow")}</p>
-                    <h2 id="rooms-title" className="rsm-heading">
+                    <h1 id="rooms-title" className="rsm-heading">
                         {t("rooms.title")}
-                    </h2>
+                    </h1>
                     <p className="rsm-intro">{t("rooms.intro")}</p>
                 </header>
 
